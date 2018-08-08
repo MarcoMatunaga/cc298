@@ -7,9 +7,9 @@ real(8)						 :: T_total, p_total
 ! constantes do fluido
 real(8)						 :: gama, c_v
 ! constantes do escoamento 
-Real(8)						 :: theta 
+real(8)						 :: theta 
 ! constantes matematicas
-real(8)						 :: pi
+real(8)						 :: pi, dummy
 ! indices dos vetores --> geometria, malha
 real(8),dimension(:,:),allocatable               :: meshx, meshy
 integer(4)				         :: i,j,k
@@ -37,8 +37,9 @@ implicit none
 open(1,file='mesh') 
 read(1,*) imax,jmax,kmax
 !
+! add one more point on the index j due to the symmetry line
 !
-!
+jmax = jmax + 1
 allocate(meshx(imax,jmax), meshy(imax,jmax))
 allocate(p(imax,jmax), T(imax,jmax), rho(imax,jmax) )
 allocate(u(imax,jmax), v(imax,jmax))
@@ -92,7 +93,7 @@ end do
 !
 end subroutine initial_conditions
 !
-!
+! implementation of boundary conditions
 !
 subroutine boundary_conditions
 use vars
@@ -103,24 +104,22 @@ implicit none
 ! inlet boundary
 ! 
 theta = 0.0d0*(180.0d0/pi)
-do i = 1, 
-	do j = 1, 
-                u(i,j) = Q(i,j,2)/Q(i,j,1) 
-		v(i,j) = u(i,j)*tan(theta)		
-		a(i,j) = sqrt(2.0d0*gama*( (gama - 1.0d0)/(gama + 1.0d0) )*c_v*T_total)
-		T(i,j) = T_total*(1.0d0 - ( (gama-1.0d0)/(gama+1.0d0) )*(1.0d0+tan(theta)**2.0)*( u(i,j)/a(i,j) )**2.0d0) )
-		p(i,j) = p_total*(1.0d0 - ( (gama-1.0d0)/(gama+1.0d0) )*(1.0d0+tan(theta)**2.0)*( u(i,j)/a(i,j) )**2.0d0) )**(gama/(gama-1.0d0))
-		Q(i,j,4) = p(i,j)/(gama-1.0d0) + (rho/2.0d0)*(u(i,j)**2 + v(i,j)**2)
-	end do
+i = 1
+do j = 1, jmax - 1
+	u(i,j) = Q(i,j,2)/Q(i,j,1) 
+	v(i,j) = u(i,j)*tan(theta)		
+	a(i,j) = sqrt(2.0d0*gama*( (gama - 1.0d0)/(gama + 1.0d0) )*c_v*T_total)
+	T(i,j) = T_total*(1.0d0 - ( (gama-1.0d0)/(gama+1.0d0) )*(1.0d0+tan(theta)**2.0)*( u(i,j)/a(i,j) )**2.0d0) )
+	p(i,j) = p_total*(1.0d0 - ( (gama-1.0d0)/(gama+1.0d0) )*(1.0d0+tan(theta)**2.0)*( u(i,j)/a(i,j) )**2.0d0) )**(gama/(gama-1.0d0))
+	Q(i,j,4) = p(i,j)/(gama-1.0d0) + (rho/2.0d0)*(u(i,j)**2 + v(i,j)**2)
 end do
 !
 ! outlet boundary
 !
-do i = 1, 
-	do j = 1,  
+i = imax
+do j = 1, jmax - 1 
 		p(i,j) = p_total/3.0d0
                 Q(i,j,4) = p(i,j)/(gama-1.0d0) + (rho/2.0d0)*(u(i,j)**2 + v(i,j)**2)
-	end do
 end do
 !
 !
@@ -149,7 +148,7 @@ implicit none
 !
 do j = 1, jmax
 	do i = 1, imax
-		read(1,*) meshx(i,j),meshy(i,j)
+		read(1,*) meshx(i,j),meshy(i,j), dummy ! dummy para ler a coordenada z
 	end do
 end do
 close(1)
@@ -160,11 +159,9 @@ open(2,file='mesh.dat')
 write(2,*) 'TITLE = "Projeto1" '
 write(2,*) 'VARIABLES = "X" "Y" '
 WRITE(2,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
-do k = 1, kmax
-	do j = 1, jmax
-		do i = 1, imax
-			write(2,*) meshx(i,j), meshy(i,j)
-		end do
+do j = 1, jmax
+	do i = 1, imax
+		write(2,*) meshx(i,j), meshy(i,j)
 	end do
 end do
 close(2)
