@@ -12,14 +12,13 @@ do j = 1, jmax - 1
 		read(1,*) meshx(i,j),meshy(i,j), dummy ! dummy para ler a coordenada z
 	end do
 end do
-close(1)
-!
-! write the symmetry line
-!
+!**************************************************
+! write the symmetry line CREATE A FUNCTION FOR THIS SITUATION
+!**************************************************
 j = jmax
 do i = 1, imax
 	meshx(i,j) = meshx(i,jmax-1)
-	meshy(i,j) = 
+	meshy(i,j) = meshy(i,jmax-1) + (meshy(i,jmax-1) - meshy(i,jmax-2))
 end do
 !
 ! arquivo tecplot
@@ -33,7 +32,6 @@ do j = 1, jmax
 		write(2,*) meshx(i,j), meshy(i,j)
 	end do
 end do
-close(2)
 !
 !
 !

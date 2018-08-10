@@ -1,6 +1,6 @@
 NAME = projeto1
 
-F90FILES = vars.f90 artificial_dissipation.f90 boundary_cond.f90 implicit_beam_warming.f90 initial_cond.f90 mesh.f90 projeto1.f90
+F90FILES = vars.f90 artificial_dissipation.f90 boundary_cond.f90 implicit_beam_warming.f90 initial_cond.f90 mesh.f90 metric_terms.f90 projeto1.f90
 
 OFILES = $(F90FILES:.f90=.o)
 
