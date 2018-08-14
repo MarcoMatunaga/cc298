@@ -7,6 +7,7 @@ implicit none
 !
 !
 !
+theta = 0.0d0*(180.0d0/pi)
 gama = 1.4d0
 pi = 3.1415d0
 delta_eta = 1.0d0
@@ -14,8 +15,10 @@ delta_ksi = 1.0d0
 !
 ! here we consider the value of cv as (5/2)*R
 ! R is the universal perfect gas constant
+!
 R = 287.053d0
 c_v = 2.5d0*R
+a_cr = (2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total
 !
 !
 !
@@ -38,7 +41,7 @@ T_total = 294.8d0
 !p_total = 47.880258888889d0*2117.0d0
 p_total = 101360.0d0
 call mesh
-call metric_terms
+!call metric_terms
 call initial_conditions
 call boundary_conditions
 !
