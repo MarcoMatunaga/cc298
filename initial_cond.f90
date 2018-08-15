@@ -28,7 +28,6 @@ end do
 i = imax
 do j = 1, imax
 	p(i,j) = p_total/3.0d0
-	
 end do
 !
 !

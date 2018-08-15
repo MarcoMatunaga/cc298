@@ -19,6 +19,10 @@ delta_ksi = 1.0d0
 R = 287.053d0
 c_v = 2.5d0*R
 a_cr = (2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total
+!T_total = 0.555556d0*531.2d0
+T_total = 294.8d0
+!p_total = 47.880258888889d0*2117.0d0
+p_total = 101360.0d0
 !
 !
 !
@@ -28,29 +32,38 @@ read(1,*) imax,jmax,kmax
 ! add one more point on the index j due to the symmetry line
 !
 jmax = jmax + 1
-allocate(meshx(imax,jmax), meshy(imax,jmax), Q(imax,jmax,4))
-allocate(p(imax,jmax), T(imax,jmax), rho(imax,jmax) )
-allocate(u(imax,jmax), v(imax,jmax), a(imax,jmax))
+allocate(meshx(imax,jmax), meshy(imax,jmax))
+allocate(Q(imax,jmax,4))
+allocate(phi_jacobian(imax,jmax), theta_jacobian(imax,jmax))
+allocate(a1_jacobian(imax,jmax), metric_jacobian(imax,jmax))
+allocate(p(imax,jmax), T(imax,jmax), rho(imax,jmax))
+allocate(u(imax,jmax), v(imax,jmax), a(imax,jmax), q_vel(imax,jmax))
+allocate(a_cr(imax,jmax))
 allocate(y_ksi(imax,jmax), y_eta(imax,jmax))
 allocate(x_ksi(imax,jmax), x_eta(imax,jmax))
+allocate(ksi_x(imax,jmax), ksi_y(imax,jmax))
+allocate(eta_x(imax,jmax), eta_y(imax,jmax))
+allocate(A_barra(imax,jmax), B_barra(imax,jmax), M_barra(imax,jmax))
 !
 !
 !
-!T_total = 0.555556d0*531.2d0
-T_total = 294.8d0
-!p_total = 47.880258888889d0*2117.0d0
-p_total = 101360.0d0
 call mesh
-!call metric_terms
+call metric_terms
+call output
 call initial_conditions
 call boundary_conditions
 !
 !
 deallocate(meshx, meshy, Q)
 deallocate(p, T, rho)
-deallocate(u, v, a)
+deallocate(u, v, a, q_vel, a_cr)
 deallocate(y_ksi, y_eta)
 deallocate(x_ksi, x_eta)
+deallocate(ksi_x, ksi_y)
+deallocate(eta_x, eta_y)
+deallocate(phi_jacobian, theta_jacobian, a1_jacobian)
+deallocate(metric_jacobian)
+deallocate(A_barra, B_barra, M_barra)
 close(1)
 close(2)
 !
