@@ -9,7 +9,7 @@ implicit none
 !
 do j = 1, jmax - 1
     do i = 1, imax
-        read(1,*) meshx(i,j),meshy(i,j), dummy ! dummy para ler a coordenada z
+        read(1,*) meshx(i,j),meshy(i,j) 
     end do
 end do
 !**************************************************
@@ -17,7 +17,7 @@ end do
 !**************************************************
 j = jmax
 do i = 1, imax
-    meshx(i,j) = meshx(i,jmax-1)
+    meshx(i,j) = meshx(i,jmax-2)
     meshy(i,j) = meshy(i,jmax-1) + (meshy(i,jmax-1) - meshy(i,jmax-2))
 end do
 !
