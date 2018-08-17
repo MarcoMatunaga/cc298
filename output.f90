@@ -22,14 +22,14 @@ allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax) )
 ! end do
 ! close(3)
 !
-do j = 1, jmax
-    do i = 1, imax
-        p_out(i,j) = (gama - 1.0d0)*(Q(i,j,4)-0.50d0*( (Q(i,j,2)/Q(i,j,1))**2.0d0 + (Q(i,j,3)/Q(i,j,1))**2.0d0 ))
-        u_out(i,j) = Q(i,j,2)/Q(i,j,1)
-        v_out(i,j) = Q(i,j,3)/Q(i,j,1)
-        print *, i,j, p_out(i,j), u_out(i,j), v_out(i,j)
-    end do
-end do
+! do j = 1, jmax
+!     do i = 1, imax
+!         p_out(i,j) = (gama - 1.0d0)*(Q(i,j,4)-0.50d0*( (Q(i,j,2)/Q(i,j,1))**2.0d0 + (Q(i,j,3)/Q(i,j,1))**2.0d0 ))
+!         u_out(i,j) = Q(i,j,2)/Q(i,j,1)
+!         v_out(i,j) = Q(i,j,3)/Q(i,j,1)
+!         print *, i,j, p_out(i,j), u_out(i,j), v_out(i,j)
+!     end do
+! end do
 !
 ! condicoes de contorno e iniciais
 !
