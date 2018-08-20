@@ -31,13 +31,11 @@ read(1,*) imax,jmax
 jmax = jmax + 1
 call allocate_vars
 !
-!
-!
 call mesh
 call metric_terms
-call initial_conditions
+call initial_conditions_curv
 !call output
-call boundary_conditions
+call boundary_conditions_curv
 call output
 ! coordinate transformation
 !

@@ -2,7 +2,8 @@ module vars
 implicit none
 ! flow, equations, variables vectors/matrixes
 real(8),dimension(:,:),allocatable           :: T, p, u, v, q_vel, a
-real(8),dimension(:,:,:),allocatable         :: Q, E, F
+real(8),dimension(:,:),allocatable           :: v_tan, v_nor, U_contravariant, V_contravariant
+real(8),dimension(:,:,:),allocatable         :: Q
 real(8),dimension(:,:,:),allocatable         :: Q_barra, E_barra, F_barra 
 real(8)                                      :: T_total, p_total
 ! vector dimension 
@@ -36,9 +37,10 @@ contains
 !
 !
         allocate(meshx(imax,jmax), meshy(imax,jmax))
-        allocate(Q(imax,jmax,dim))
         allocate(phi_jacobian(imax,jmax), theta_jacobian(imax,jmax))
         allocate(a1_jacobian(imax,jmax), metric_jacobian(imax,jmax))
+        allocate( v_tan(imax,jmax), v_nor(imax,jmax))
+        allocate( U_contravariant(imax,jmax), V_contravariant(imax,jmax))
         allocate(p(imax,jmax), T(imax,jmax))
         allocate(u(imax,jmax), v(imax,jmax), a(imax,jmax), q_vel(imax,jmax))
         allocate(y_ksi(imax,jmax), y_eta(imax,jmax))
@@ -46,7 +48,7 @@ contains
         allocate(ksi_x(imax,jmax), ksi_y(imax,jmax))
         allocate(eta_x(imax,jmax), eta_y(imax,jmax))
         allocate(A_barra(imax,jmax), B_barra(imax,jmax), M_barra(imax,jmax))
-        allocate(E_barra(imax,jmax,dim), F_barra(imax,jmax,dim))
+        allocate(Q_barra(imax,jmax,dim), E_barra(imax,jmax,dim), F_barra(imax,jmax,dim))
 !
 !
 !
@@ -56,7 +58,9 @@ contains
 !
     subroutine deallocate_vars
         implicit none
-        deallocate(meshx, meshy, Q)
+        deallocate(meshx, meshy)
+        deallocate(v_tan, v_nor)
+        deallocate(U_contravariant, V_contravariant)
         deallocate(p, T)
         deallocate(u, v, a, q_vel)
         deallocate(y_ksi, y_eta)
@@ -66,9 +70,9 @@ contains
         deallocate(phi_jacobian, theta_jacobian, a1_jacobian)
         deallocate(metric_jacobian)
         deallocate(A_barra, B_barra, M_barra)
-        deallocate(E_barra, F_barra)
+        deallocate(Q_barra, E_barra, F_barra)
 !
 !
 !
-end subroutine deallocate_vars
+    end subroutine deallocate_vars
 end module vars
