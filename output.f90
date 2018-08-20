@@ -47,6 +47,19 @@ do j = 1, jmax
 end do
 close(3)
 !
+! testar os fluxos
+!
+open(4, file='teste_fluxes.dat')
+write(4,*) 'TITLE = "Projeto1" '
+write(4,*) 'VARIABLES = "E_1" "E_2" "E_3" "E_4" '
+write(4,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
+do j = 1, jmax
+    do i = 1, imax
+        write(4,'(4EN20.10)') E_barra(i,j,1), E_barra(i,j,2), E_barra(i,j,3), E_barra(i,j,4) 
+    end do
+end do
+close(4)
+!
 !
 !
 deallocate(u_out, v_out, p_out, rho)

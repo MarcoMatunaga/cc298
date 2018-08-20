@@ -3,6 +3,7 @@ implicit none
 ! flow, equations, variables vectors/matrixes
 real(8),dimension(:,:),allocatable           :: T, p, u, v, q_vel, a
 real(8),dimension(:,:),allocatable           :: v_tan, v_nor, U_contravariant, V_contravariant
+real(8),dimension(:,:),allocatable           :: residue1, residue2, residue3, residue4 
 real(8),dimension(:,:,:),allocatable         :: Q
 real(8),dimension(:,:,:),allocatable         :: Q_barra, E_barra, F_barra 
 real(8)                                      :: T_total, p_total
@@ -18,8 +19,9 @@ real(8)                                      :: pi, dummy
 integer(4)                                   :: i,j,k
 integer(4)                                   :: imax,jmax,kmax
 ! numerical variables, time marching
-real(8)                                      :: delta_t, delta_y, delta_x
-real(8)                                      :: residue1, residue2, residue3, residue4
+real(8),dimension(:,:),allocatable           :: delta_t
+real(8)                                      :: delta_y, delta_x
+real(8)                                      :: max_residue
 integer(4)                                   :: CFL
 ! mesh, metric terms, jacobians
 real(8),dimension(:,:),allocatable           :: meshx, meshy
@@ -37,6 +39,9 @@ contains
 !
 !
         allocate(meshx(imax,jmax), meshy(imax,jmax))
+        allocate(delta_t(imax,jmax))
+        allocate(residue1(imax,jmax), residue2(imax,jmax))
+        allocate(residue3(imax,jmax), residue4(imax,jmax))
         allocate(phi_jacobian(imax,jmax), theta_jacobian(imax,jmax))
         allocate(a1_jacobian(imax,jmax), metric_jacobian(imax,jmax))
         allocate( v_tan(imax,jmax), v_nor(imax,jmax))
@@ -59,6 +64,9 @@ contains
     subroutine deallocate_vars
         implicit none
         deallocate(meshx, meshy)
+        deallocate(delta_t)
+        deallocate(residue1, residue2)
+        deallocate(residue3, residue4)
         deallocate(v_tan, v_nor)
         deallocate(U_contravariant, V_contravariant)
         deallocate(p, T)

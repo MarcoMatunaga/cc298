@@ -2,8 +2,8 @@
 ! program project 1 cc298
 !
 program proj1
-use vars 
-implicit none
+        use vars 
+        implicit none
 !
 !
 !
@@ -15,6 +15,10 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
+    CFL = 0.001d0
+    !
+    ! inicializar com um deltat - duvida
+    !
     !
     ! here we consider the value of cv as (5/2)*R
     ! R is the universal perfect gas constant
@@ -36,7 +40,21 @@ call metric_terms
 call initial_conditions_curv
 !call output
 call boundary_conditions_curv
+!
+!
+call fluxes_curvilinear
 call output
+do j = 1, jmax
+        do i = 1, imax
+delta_t(i,j) = CFL/(max( abs(U_contravariant(i,j)) + a(i,j)*sqrt(ksi_x(i,j)**2.0d0 + ksi_y(i,j)**2.0d0 ), &
+                         abs(V_contravariant(i,j)) + a(i,j)*sqrt(eta_x(i,j)**2.0d0 + eta_y(i,j)**2.0d0 )))
+        print *, a(i,j), U_contravariant(i,j), V_contravariant(i,j), delta_t(i,j)
+        end do
+end do
+call euler_explicit
+call boundary_conditions_curv
+!
+!
 ! coordinate transformation
 !
 ! loop - update solution

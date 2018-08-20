@@ -28,6 +28,8 @@ do j = 2, jmax - 1
     Q_barra(i,j,2) = Q_barra(i,j,1)*u(i,j)/metric_jacobian(i,j)
     Q_barra(i,j,3) = Q_barra(i,j,1)*v(i,j)/metric_jacobian(i,j)    
     Q_barra(i,j,4) = p(i,j)/(gama-1.0d0) + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2 + v(i,j)**2)
+    U_contravariant(i,j) = u(i,j)*ksi_x(i,j) + v(i,j)*ksi_y(i,j)
+    V_contravariant(i,j) = u(i,j)*eta_x(i,j) + v(i,j)*eta_y(i,j)
 end do
 !
 ! outlet boundary
@@ -52,14 +54,20 @@ end do
 !
 ! lower boundary 
 !
-do j = 1, jmax
-    do i = 1, imax
-        u(i,j)     = Q_barra(i,j,2)/Q_barra(i,j,1)
-        v(i,j)     = Q_barra(i,j,3)/Q_barra(i,j,1)
-        V_tan(i,j) = (eta_y(i,j)*u(i,j) - eta_x(i,j)*v(i,j))/(sqrt(eta_x(i,j)**2.0d0+eta_y(i,j)**2.0d0))
-        V_nor(i,j) = (eta_y(i,j)*u(i,j) + eta_x(i,j)*v(i,j))/(sqrt(eta_x(i,j)**2.0d0+eta_y(i,j)**2.0d0))
-    end do
-end do 
+j = 1
+do i = 2, imax - 1
+        U_contravariant(i,j) = U_contravariant(i,j+1)
+        V_contravariant(i,j) = 0.0d0
+        !
+        ! extrapola os termos de metrica - duvida
+        ! tem uma raiz dos termos de metrica - duvida
+        ! 
+        ! u e v sao determinados pela matriz jacobiana de transformacao
+        ! so lebrar dos termos contrvariante das variaveis
+        !
+        u(i,j)               = x_ksi(i,j)*U_contravariant(i,j) 
+        v(i,j)               = y_ksi(i,j)*U_contravariant(i,j) 
+end do
 !
 !
 !
