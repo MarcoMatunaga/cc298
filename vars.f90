@@ -18,11 +18,12 @@ real(8)                                      :: pi, dummy
 ! indices dos vetores --> geometria, malha
 integer(4)                                   :: i,j,k
 integer(4)                                   :: imax,jmax,kmax
+integer(4)                                   :: iter, max_iter
 ! numerical variables, time marching
 real(8),dimension(:,:),allocatable           :: delta_t
 real(8)                                      :: delta_y, delta_x
 real(8)                                      :: max_residue
-integer(4)                                   :: CFL
+real(8)                                      :: CFL
 ! mesh, metric terms, jacobians
 real(8),dimension(:,:),allocatable           :: meshx, meshy
 real(8),dimension(:,:),allocatable           :: eta_x, eta_y, ksi_x, ksi_y

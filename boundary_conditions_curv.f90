@@ -3,8 +3,8 @@
 ! implementation of boundary conditions
 !
 subroutine boundary_conditions_curv
-use vars
-implicit none
+    use vars
+    implicit none
 !
 ! 1 lb/ft**2 = 47.880258888889
 ! 1 R = 0.555556K
@@ -25,8 +25,8 @@ do j = 2, jmax - 1
     a(i,j)   = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
     u(i,j)   = sqrt( (2.0d0/(gama - 1.0d0))*( (T_total/T(i,j)) - 1.0d0 )*a(i,j)**2.0d0 )
     v(i,j)   = u(i,j)*dtan(theta)   
-    Q_barra(i,j,2) = Q_barra(i,j,1)*u(i,j)/metric_jacobian(i,j)
-    Q_barra(i,j,3) = Q_barra(i,j,1)*v(i,j)/metric_jacobian(i,j)    
+    Q_barra(i,j,2) = Q_barra(i,j,1)*u(i,j)
+    Q_barra(i,j,3) = Q_barra(i,j,1)*v(i,j)    
     Q_barra(i,j,4) = p(i,j)/(gama-1.0d0) + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2 + v(i,j)**2)
     U_contravariant(i,j) = u(i,j)*ksi_x(i,j) + v(i,j)*ksi_y(i,j)
     V_contravariant(i,j) = u(i,j)*eta_x(i,j) + v(i,j)*eta_y(i,j)

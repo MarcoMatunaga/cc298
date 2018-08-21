@@ -29,6 +29,8 @@ read(1,*) imax,jmax
     T_total = 294.8d0
     !p_total = 47.880258888889d0*2117.0d0
     p_total = 101360.0d0
+    iter = 0
+    max_iter = 100000
 !
 ! add one more point on the index j due to the symmetry line
 !
@@ -40,19 +42,23 @@ call metric_terms
 call initial_conditions_curv
 !call output
 call boundary_conditions_curv
+max_residue = 1.0d0
 !
 !
-call fluxes_curvilinear
-call output
-do j = 1, jmax
-        do i = 1, imax
-delta_t(i,j) = CFL/(max( abs(U_contravariant(i,j)) + a(i,j)*sqrt(ksi_x(i,j)**2.0d0 + ksi_y(i,j)**2.0d0 ), &
-                         abs(V_contravariant(i,j)) + a(i,j)*sqrt(eta_x(i,j)**2.0d0 + eta_y(i,j)**2.0d0 )))
-        print *, a(i,j), U_contravariant(i,j), V_contravariant(i,j), delta_t(i,j)
-        end do
+do while ( max_residue > 10e-9 .and. iter < max_iter)
+    call fluxes_curvilinear
+    do j = 1, jmax
+            do i = 1, imax
+            a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
+            delta_t(i,j) = CFL/(max( abs(U_contravariant(i,j)) + a(i,j)*sqrt(ksi_x(i,j)**2.0d0 + ksi_y(i,j)**2.0d0 ), &
+                             abs(V_contravariant(i,j)) + a(i,j)*sqrt(eta_x(i,j)**2.0d0 + eta_y(i,j)**2.0d0 )))
+            end do
+    end do
+    call euler_explicit
+    call boundary_conditions_curv
+    iter = iter + 1
 end do
-call euler_explicit
-call boundary_conditions_curv
+call output
 !
 !
 ! coordinate transformation

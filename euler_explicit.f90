@@ -70,7 +70,7 @@ residue4(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,4) - E_barra(i-1,j,4)) + D4_ksi(
                 + 0.50d0*delta_eta*(F_barra(i,j+1,4) - F_barra(i,j-1,4)) + D4_eta(i,j,4)
         !
         !
-        max_residue = max(residue1(i,j), residue2(i,j), residue3(i,j), residue4(i,j) )
+        max_residue = max( abs(residue1(i,j)), abs(residue2(i,j)), abs(residue3(i,j)), abs(residue4(i,j)) )
         end do
 end do
 !
