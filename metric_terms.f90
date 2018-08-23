@@ -93,7 +93,13 @@ end do
 !
 do j = 1, jmax
     do i = 1, imax
-        metric_jacobian(i,j) = 1.0d0/(x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j))
+        !
+        ! be carefyl the fluxes vectors are multiplied by the
+        ! x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j) not by 
+        ! 1/x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j)
+        !
+        ! metric_jacobian(i,j) = 1.0d0/(x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j))
+        metric_jacobian(i,j) = x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j)
         eta_x(i,j) = -1.0d0*metric_jacobian(i,j)*y_ksi(i,j)
         eta_y(i,j) = metric_jacobian(i,j)*x_ksi(i,j)
         ksi_x(i,j) = metric_jacobian(i,j)*y_eta(i,j)

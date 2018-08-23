@@ -9,7 +9,7 @@ real(8),dimension(:,:,:), allocatable    :: Q_dis, D4_ksi, D4_eta
 !
 !
 !
-eps_e = 0.03d0
+eps_e = 1.00d0
 allocate(Q_dis(imax,jmax,dim), D4_ksi(imax,jmax,dim), D4_eta(imax,jmax,dim) )
 !
 ! vector q_dis apenas para facilitar o calculo da dissipacao artificial
@@ -23,29 +23,47 @@ do j = 1, jmax
         end do
 end do
 !
+! calculate in everybody - it is a poka-yoke
+!
+do j = 2, jmax - 1
+    do i = 2, imax - 1
+            D4_ksi(i,j,1) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,1) - 2.0d0*Q_dis(i,j,1) + Q_dis(i-1,j,1) )
+            D4_ksi(i,j,2) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,2) - 2.0d0*Q_dis(i,j,2) + Q_dis(i-1,j,2) )
+            D4_ksi(i,j,3) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,3) - 2.0d0*Q_dis(i,j,3) + Q_dis(i-1,j,3) )
+            D4_ksi(i,j,4) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,4) - 2.0d0*Q_dis(i,j,4) + Q_dis(i-1,j,4) )
+            !
+            !
+            !         
+            D4_eta(i,j,1) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,1) - 2.0d0*Q_dis(i,j,1) + Q_dis(i,j-1,1) )
+            D4_eta(i,j,2) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,2) - 2.0d0*Q_dis(i,j,2) + Q_dis(i,j-1,2) )
+            D4_eta(i,j,3) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,3) - 2.0d0*Q_dis(i,j,3) + Q_dis(i,j-1,3) )
+            D4_eta(i,j,4) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,4) - 2.0d0*Q_dis(i,j,4) + Q_dis(i,j-1,4) )
+    end do
+end do
+!
 !
 !
 do j = 3, jmax - 2
         do i = 3, imax - 2
-            D4_ksi(i,j,1) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i+2,j,1) &
-                            - 4.0d0*Q_dis(i+1,j,1) - 4.0d0*Q_dis(i-1,j,1) + Q_dis(i-2,j,1) )
-            D4_ksi(i,j,2) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i+2,j,2) &
-                            - 4.0d0*Q_dis(i+1,j,2) - 4.0d0*Q_dis(i-1,j,2) + Q_dis(i-2,j,2) )
-            D4_ksi(i,j,3) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i+2,j,3) &
-                            - 4.0d0*Q_dis(i+1,j,3) - 4.0d0*Q_dis(i-1,j,3) + Q_dis(i-2,j,3) )
-            D4_ksi(i,j,4) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i+2,j,4) &
-                            - 4.0d0*Q_dis(i+1,j,4) - 4.0d0*Q_dis(i-1,j,4) + Q_dis(i-2,j,4) )
+            D4_ksi(i,j,1) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+2,j,1) &
+                            - 4.0d0*Q_dis(i+1,j,1) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i-1,j,1) + Q_dis(i-2,j,1) )
+            D4_ksi(i,j,2) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+2,j,2) &
+                            - 4.0d0*Q_dis(i+1,j,2) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i-1,j,2) + Q_dis(i-2,j,2) )
+            D4_ksi(i,j,3) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+2,j,3) &
+                            - 4.0d0*Q_dis(i+1,j,3) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i-1,j,3) + Q_dis(i-2,j,3) )
+            D4_ksi(i,j,4) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+2,j,4) &
+                            - 4.0d0*Q_dis(i+1,j,4) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i-1,j,4) + Q_dis(i-2,j,4) )
             !
             !
             !         
-            D4_eta(i,j,1) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i,j+2,1) &
-                            - 4.0d0*Q_dis(i,j+1,1) - 4.0d0*Q_dis(i,j-1,1) + Q_dis(i,j-2,1) )
-            D4_eta(i,j,2) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i,j+2,2) &
-                            - 4.0d0*Q_dis(i,j+1,2) - 4.0d0*Q_dis(i,j-1,2) + Q_dis(i,j-2,2) )
-            D4_eta(i,j,3) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i,j+2,3) &
-                            - 4.0d0*Q_dis(i,j+1,3) - 4.0d0*Q_dis(i,j-1,3) + Q_dis(i,j-2,3) )
-            D4_eta(i,j,4) = -eps_e*delta_t(i,j)*(1.0d0/metric_jacobian(i,j))*( Q_dis(i,j+2,4) & 
-                            - 4.0d0*Q_dis(i,j+1,4) - 4.0d0*Q_dis(i,j-1,4) + Q_dis(i,j-2,4) )
+            D4_eta(i,j,1) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+2,1) &
+                            - 4.0d0*Q_dis(i,j+1,1) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i,j-1,1) + Q_dis(i,j-2,1) )
+            D4_eta(i,j,2) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+2,2) &
+                            - 4.0d0*Q_dis(i,j+1,2) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i,j-1,2) + Q_dis(i,j-2,2) )
+            D4_eta(i,j,3) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+2,3) &
+                            - 4.0d0*Q_dis(i,j+1,3) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i,j-1,3) + Q_dis(i,j-2,3) )
+            D4_eta(i,j,4) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+2,4) & 
+                            - 4.0d0*Q_dis(i,j+1,4) + 6.0d0*Q_dis(i,j,2) - 4.0d0*Q_dis(i,j-1,4) + Q_dis(i,j-2,4) )
         end do
 end do
 !
@@ -54,23 +72,27 @@ end do
 !
 do j = 2, jmax - 1
         do i = 2, imax - 1
-residue1(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,1) - E_barra(i-1,j,1)) + D4_ksi(i,j,1) & 
-                + 0.50d0*delta_eta*(F_barra(i,j+1,1) - F_barra(i,j-1,1)) + D4_eta(i,j,1)
+residue1(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,1) - E_barra(i-1,j,1))  & 
+              + 0.50d0*delta_eta*(F_barra(i,j+1,1) - F_barra(i,j-1,1)) 
         !
         !
-residue2(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,2) - E_barra(i-1,j,2)) + D4_ksi(i,j,2) &
-                + 0.50d0*delta_eta*(F_barra(i,j+1,2) - F_barra(i,j-1,2)) + D4_eta(i,j,2)
+residue2(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,2) - E_barra(i-1,j,2))  &
+              + 0.50d0*delta_eta*(F_barra(i,j+1,2) - F_barra(i,j-1,2)) 
         !
         !
-residue3(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,3) - E_barra(i-1,j,3)) + D4_ksi(i,j,3) & 
-                + 0.50d0*delta_eta*(F_barra(i,j+1,3) - F_barra(i,j-1,3)) + D4_eta(i,j,3)
+residue3(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,3) - E_barra(i-1,j,3)) & 
+              + 0.50d0*delta_eta*(F_barra(i,j+1,3) - F_barra(i,j-1,3)) 
         !
         !
-residue4(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,4) - E_barra(i-1,j,4)) + D4_ksi(i,j,4) &
-                + 0.50d0*delta_eta*(F_barra(i,j+1,4) - F_barra(i,j-1,4)) + D4_eta(i,j,4)
+residue4(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,4) - E_barra(i-1,j,4)) &
+              + 0.50d0*delta_eta*(F_barra(i,j+1,4) - F_barra(i,j-1,4)) 
         !
         !
-        max_residue = max( abs(residue1(i,j)), abs(residue2(i,j)), abs(residue3(i,j)), abs(residue4(i,j)) )
+        residue1(i,j) = residue1(i,j) + D4_ksi(i,j,1) + D4_eta(i,j,1)
+        residue2(i,j) = residue2(i,j) + D4_ksi(i,j,2) + D4_eta(i,j,2)
+        residue3(i,j) = residue3(i,j) + D4_ksi(i,j,3) + D4_eta(i,j,3)
+        residue4(i,j) = residue4(i,j) + D4_ksi(i,j,4) + D4_eta(i,j,4)
+        max_residue = log10(max( abs(residue1(i,j)), abs(residue2(i,j)), abs(residue3(i,j)), abs(residue4(i,j))))
         end do
 end do
 !

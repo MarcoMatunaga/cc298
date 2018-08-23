@@ -32,8 +32,13 @@ real(8),dimension(:,:),allocatable           :: metric_jacobian
 real(8),dimension(:,:),allocatable           :: phi_jacobian, theta_jacobian, a1_jacobian
 real(8),dimension(:,:),allocatable           :: A_barra, B_barra, M_barra
 real(8)                                      :: delta_eta, delta_ksi
+!
+integer(4)                                   :: nsave
 
 contains
+!
+!
+!
     subroutine allocate_vars
         implicit none
 !
