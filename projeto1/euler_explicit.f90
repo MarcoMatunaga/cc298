@@ -92,7 +92,7 @@ residue4(i,j) = 0.50d0*delta_ksi*(E_barra(i+1,j,4) - E_barra(i-1,j,4)) &
         residue2(i,j) = residue2(i,j) + D4_ksi(i,j,2) + D4_eta(i,j,2)
         residue3(i,j) = residue3(i,j) + D4_ksi(i,j,3) + D4_eta(i,j,3)
         residue4(i,j) = residue4(i,j) + D4_ksi(i,j,4) + D4_eta(i,j,4)
-        max_residue = log10(max( abs(residue1(i,j)), abs(residue2(i,j)), abs(residue3(i,j)), abs(residue4(i,j))))
+        max_residue = log10(max( (residue1(i,j)), (residue2(i,j)), (residue3(i,j)), (residue4(i,j))))
         end do
 end do
 !
