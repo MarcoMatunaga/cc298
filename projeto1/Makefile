@@ -1,6 +1,6 @@
 NAME = bocal
 
-F90FILES = vars.f90 output_routines.f90 artificial_dissipation.f90 fluxes_curvilinear.f90 boundary_conditions_curv.f90 implicit_beam_warming.f90 initial_cond_curv.f90 mesh.f90 metric_terms.f90 jacobian.f90 euler_explicit.f90 projeto1.f90
+F90FILES = vars.f90 output_routines.f90 mesh.f90 jacobian.f90 metric_terms.f90 euler_explicit.f90 initial_cond_curv.f90 fluxes_curvilinear.f90 vector_curvilinear.f90 boundary_conditions_curv.f90 projeto1.f90
 
 OFILES = $(F90FILES:.f90=.o)
 
