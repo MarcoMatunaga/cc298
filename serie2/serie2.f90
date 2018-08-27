@@ -1,15 +1,15 @@
 program serie2
-    ! pontos da malha - usar no maximo 50 pontos
+    ! pontos da malha - usar no maximo 100 pontos
     integer(4)             :: j, jmiddle, jmax
     integer(4)             :: i
-    real(8),dimension(50)  :: u, f, u_init
+    real(8),dimension(300)  :: u, f, u_init
 !
 ! declare the values
 !
 u = 0.0d0
-jmax = 10
+f = 0.0d0
+jmax = 150
 jmiddle = jmax/2
-print *, jmiddle
 !
 !
 !
@@ -27,21 +27,21 @@ do i = jmiddle + 1, jmax
     u(i) = u_init(i)
 end do
 !
-! artificial dissipation - second differences
+! artificial dissipation - fourth differences
 !
-do i = 1, jmax
-f(i) = - 0.25d0*( u(i+2) - 4.0d0*u(i+1) + 6.0d0*u(i) - 4.0d0*u(i-1) + u(j-2) )
+do i = 3, jmax - 2
+f(i) = -0.25d0*( u(i+2) - 4.0d0*u(i+1) + 6.0d0*u(i) - 4.0d0*u(i-1) + u(i-2) )
 end do
 !
 ! time marching
 !
-do i = 2, jmax - 1
+do i = 3, jmax - 2
 u(i) = u(i) - 0.50d0*(u(i+1) - u(i-1)) + f(i)
 end do
 !
 !
 !
-open(1,file="diferenças_segundas")
+open(1,file="diferenças_quartas")
 do i = 1, jmax
 write(1,*) i, u_init(i), u(i)
 end do
@@ -64,21 +64,21 @@ do i = jmiddle + 1, jmax
     u(i) = u_init(i)
 end do
 !
-! artificial dissipation - fourth differences
+! artificial dissipation - second differences
 !
-do i = 1, jmax
+do i = 3, jmax - 2
     f(i) = 0.50d0*( u(i+1) - 2.0d0*u(i) + u(i-1) )
 end do
 !
 ! time marching
 !
-do i = 2, jmax - 1
+do i = 3, jmax - 2
 u(i) = u(i) - 0.50d0*(u(i+1) - u(i-1)) + f(i)
 end do
 !
 ! output
 !
-open(2,file="diferenças_quartas")
+open(2,file="diferenças_segundas")
 do i = 1, jmax
 write(2,*) i, u_init(i),u(i)
 end do

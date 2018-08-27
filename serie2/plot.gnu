@@ -8,8 +8,10 @@ set output "output.png"
 set xtics font "Times-Roman, 10"
 set ytics font "Times-Roman, 10"
 
-set xlabel "x position"
-set ylabel "properties"
+set yrange [-1.2:1.2]
+
+set xlabel "mesh points"
+set ylabel "u"
 set title "Série2"
 
 set style line 1 lt rgb "black" 
