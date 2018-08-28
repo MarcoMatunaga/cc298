@@ -50,8 +50,8 @@ call output_metric_terms
 !
 !
 call initial_conditions_curv
-call output_inicial
 call boundary_conditions_curv
+call output_inicial
 max_residue = 1.0d0
 !
 !

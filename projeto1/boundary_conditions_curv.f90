@@ -71,7 +71,10 @@ do i = 1, imax
     Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i,j+1,3)/metric_jacobian(i,j+1))
     p(i,j)         = (gama - 1.0d0)*(Q_barra(i,j+1,4)/metric_jacobian(i,j+1) &
                      - (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2.0d0 + v(i,j)**2.0d0))
-        print *, "oi4", u(i,j)
+    open(10,file="erro")
+    if (p(i,j) < 0.0003d0) then
+        write(10,*) (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2.0d0 + v(i,j)**2.0d0)
+    end if
     Q_barra(i,j,4) = p(i,j)/(gama-1.0d0) + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2.0d0 + v(i,j)**2.0d0) 
 end do
 !
