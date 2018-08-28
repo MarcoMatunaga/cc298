@@ -16,7 +16,7 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 0.5d0
+    CFL = 0.1d0
     !
     ! inicializar com um deltat - duvida
     !
@@ -50,16 +50,14 @@ call output_metric_terms
 !
 !
 call initial_conditions_curv
-
-!call output
+call output_inicial
 call boundary_conditions_curv
 max_residue = 1.0d0
 !
 !
 do while ( max_residue > -9.0d0 .and. iter < max_iter)
-    call fluxes_curvilinear
+    call fluxes_curvilinear 
     call output_fluxes
-    !print*, U_contravariant(i,j), E_barra(3,3,1)
     do j = 1, jmax
             do i = 1, imax
             a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
@@ -69,7 +67,7 @@ do while ( max_residue > -9.0d0 .and. iter < max_iter)
     end do
     !
     !
-    if ( mod(iter,50) == 0 ) then
+    if ( mod(iter,5) == 0 ) then
         call output_tecplot
         nsave = nsave + 1
     end if
