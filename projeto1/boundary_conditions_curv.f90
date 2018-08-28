@@ -15,7 +15,7 @@ subroutine boundary_conditions_curv
 !
 i = 1
 do j = 2, jmax - 1
-    u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
+    u(i,j)   = Q_barra(i+1,j,2)/Q_barra(i+1,j,1)
     v(i,j)   = u(i,j)*dtan(theta)   
     T(i,j)   = T_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*(1.0d0+dtan(theta)**2)*((u(i,j)/a_cr)**2.0d0))
     p(i,j)   = p_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*(1.0d0+dtan(theta)**2)*((u(i,j)/a_cr)**2.0d0))**(gama/(gama-1.0d0))
@@ -62,8 +62,8 @@ do i = 2, imax - 1
         ! u e v sao determinados pela matriz jacobiana de transformacao
         ! so lebrar dos termos contrvariante das variaveis
         !
-    u(i,j+1)         = x_ksi(i,j+1)*U_contravariant(i,j) 
-    v(i,j+1)         = y_ksi(i,j+1)*U_contravariant(i,j) 
+    u(i,j)         = x_ksi(i,j+1)*U_contravariant(i,j) 
+    v(i,j)         = y_ksi(i,j+1)*U_contravariant(i,j) 
     Q_barra(i,j,1) = Q_barra(i,j+1,1)
     Q_barra(i,j,2) = Q_barra(i,j+1,2)
     Q_barra(i,j,3) = Q_barra(i,j+1,3)

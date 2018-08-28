@@ -27,17 +27,17 @@ end do
 !
 do j = 2, jmax - 1
     do i = 2, imax - 1
-            D4_ksi(i,j,1) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,1) - 2.0d0*Q_dis(i,j,1) + Q_dis(i-1,j,1) )
-            D4_ksi(i,j,2) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,2) - 2.0d0*Q_dis(i,j,2) + Q_dis(i-1,j,2) )
-            D4_ksi(i,j,3) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,3) - 2.0d0*Q_dis(i,j,3) + Q_dis(i-1,j,3) )
-            D4_ksi(i,j,4) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,4) - 2.0d0*Q_dis(i,j,4) + Q_dis(i-1,j,4) )
+            D4_ksi(i,j,1) = eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,1) - 2.0d0*Q_dis(i,j,1) + Q_dis(i-1,j,1) )
+            D4_ksi(i,j,2) = eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,2) - 2.0d0*Q_dis(i,j,2) + Q_dis(i-1,j,2) )
+            D4_ksi(i,j,3) = eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,3) - 2.0d0*Q_dis(i,j,3) + Q_dis(i-1,j,3) )
+            D4_ksi(i,j,4) = eps_e*(metric_jacobian(i,j))*( Q_dis(i+1,j,4) - 2.0d0*Q_dis(i,j,4) + Q_dis(i-1,j,4) )
             !
             !
             !         
-            D4_eta(i,j,1) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,1) - 2.0d0*Q_dis(i,j,1) + Q_dis(i,j-1,1) )
-            D4_eta(i,j,2) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,2) - 2.0d0*Q_dis(i,j,2) + Q_dis(i,j-1,2) )
-            D4_eta(i,j,3) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,3) - 2.0d0*Q_dis(i,j,3) + Q_dis(i,j-1,3) )
-            D4_eta(i,j,4) = -eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,4) - 2.0d0*Q_dis(i,j,4) + Q_dis(i,j-1,4) )
+            D4_eta(i,j,1) = eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,1) - 2.0d0*Q_dis(i,j,1) + Q_dis(i,j-1,1) )
+            D4_eta(i,j,2) = eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,2) - 2.0d0*Q_dis(i,j,2) + Q_dis(i,j-1,2) )
+            D4_eta(i,j,3) = eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,3) - 2.0d0*Q_dis(i,j,3) + Q_dis(i,j-1,3) )
+            D4_eta(i,j,4) = eps_e*(metric_jacobian(i,j))*( Q_dis(i,j+1,4) - 2.0d0*Q_dis(i,j,4) + Q_dis(i,j-1,4) )
     end do
 end do
 !
