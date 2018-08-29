@@ -21,8 +21,6 @@ do i = 1, imax
     meshy(i,j) = meshy(i,jmax-1) + (meshy(i,jmax-1) - meshy(i,jmax-2))
 end do
 !
-!
-!
 ! arquivo tecplot
 !
 open(2,file='mesh.dat')

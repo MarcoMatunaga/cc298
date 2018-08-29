@@ -67,11 +67,12 @@ contains
     !
     open(6, file="metric_terms.dat")
     write(6,*) 'TITLE = "Projeto1" '
-    write(6,*) 'VARIABLES = "i" "j" "ksi_x" "ksi_y" "eta_x" "eta_y" "metric_jacobian" ' 
+    write(6,*) 'VARIABLES = "x" "y" "i" "j" "x_ksi" "y_ksi" "x_eta" "y_eta" "metric_jacobian" ' 
     write(6,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT'
     do j = 1, jmax
         do i = 1, imax
-            write(6,*) i,j, ksi_x(i,j), ksi_y(i,j), eta_x(i,j), eta_y(i,j), metric_jacobian(i,j)
+            write(6,*) meshx(i,j), meshy(i,j), i,j, x_ksi(i,j), y_ksi(i,j), &
+                                   x_eta(i,j), y_eta(i,j), metric_jacobian(i,j)
         end do 
     end do
     !
@@ -111,10 +112,10 @@ contains
     subroutine output_inicial
         use vars 
         implicit none
-        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho
+        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach
     !
     !
-    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax) )
+    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
     !
      do j = 1, jmax
          do i = 1, imax
@@ -123,6 +124,7 @@ contains
              v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
              p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
                           - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
+             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
          end do
      end do
     !
@@ -130,20 +132,20 @@ contains
     !
     open(3,file='teste_init.dat')
     write(3,*) 'TITLE = "Projeto1" '
-    write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv "p" '
+    write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv" "p" "mach" '
     write(3,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
     do j = 1, jmax
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), p(i,j)
+            write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), p(i,j), mach(i,j)
         end do
     end do
     close(3)
     !
     !
     !
-    deallocate(u_out, v_out, p_out, rho)
+    deallocate(u_out, v_out, p_out, rho, mach)
     !
     !
     !
@@ -154,10 +156,10 @@ contains
     subroutine output_final
         use vars 
         implicit none
-        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho
+        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach
     !
     !
-    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax) )
+    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
     !
      do j = 1, jmax
          do i = 1, imax
@@ -166,6 +168,7 @@ contains
              v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
              p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
                           - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
+             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
          end do
      end do
     !
@@ -173,21 +176,21 @@ contains
     !
     open(3,file='teste_boundary.dat')
     write(3,*) 'TITLE = "Projeto1" '
-    write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "i" "j" "e" '
+    write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "e" "mach" '
     write(3,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
     do j = 1, jmax
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), rho(i,j), p_out(i,j), DBLE(i), DBLE(j), & 
-            Q_barra(i,j,4)
+            write(3,'(10ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), rho(i,j), p_out(i,j), & 
+            Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
         end do
     end do
     close(3)
     !
     !
     !
-    deallocate(u_out, v_out, p_out, rho)
+    deallocate(u_out, v_out, p_out, rho, mach)
     !
     !
     !
@@ -208,21 +211,24 @@ contains
     subroutine output_tecplot
         use vars 
         implicit none
-        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho
+        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach, q_vel_out
         character (len=100) :: fname = '.dat'
         character (len=100) :: FileTag    
     !
     !
     FileTag = convert(nsave)
-    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax) )
+    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
+    allocate(q_vel_out(imax,jmax))
     !
      do j = 1, jmax
          do i = 1, imax
              rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
              v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
-             p_out(i,j) = (gama - 1.0d0)*((Q_barra(i,j,4)/metric_jacobian(i,j)) &
-                          - 0.50d0*rho(i,j)*( (u_out(i,j)**2.0d0 + (v_out(i,j)**2.0d0 ))))
+             p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
+                          - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
+             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
+             q_vel_out(i,j) = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 )
          end do
      end do
     !
@@ -230,21 +236,22 @@ contains
     !
     open(7,file=trim(FileTag)//trim(fname))
     write(7,*) 'TITLE = "Projeto1" '
-    write(7,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "i" "j" "e" '
+    write(7,*) 'VARIABLES = "X" "Y" "u" "v" "q_vel_out" "rho" "p" "e" "mach" '
     write(7,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
     do j = 1, jmax
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(7,'(9ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), rho(i,j), p_out(i,j), DBLE(i), DBLE(j), & 
-            Q_barra(i,j,4)
+            write(7,'(9ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), q_vel_out(i,j), rho(i,j), p_out(i,j), & 
+            Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
         end do
     end do
     close(7)
     !
     !
     !
-    deallocate(u_out, v_out, p_out, rho)
+    deallocate(u_out, v_out, p_out, rho, mach)
+    deallocate(q_vel_out)
     !
     !
     end subroutine

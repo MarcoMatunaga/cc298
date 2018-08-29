@@ -16,7 +16,7 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 0.1d0
+    CFL = 0.01d0
     !
     ! inicializar com um deltat - duvida
     !
@@ -32,8 +32,8 @@ read(1,*) imax,jmax
     p_total = 101360.0d0
     nsave = 0
     iter = 0
-    max_iter = 1000
-    a_cr = (2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total
+    max_iter = 100000
+    a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
 !
 ! add one more point on the index j due to the symmetry line
 !
@@ -67,16 +67,16 @@ do while ( max_residue > -9.0d0 .and. iter < max_iter)
     end do
     !
     !
-    if ( mod(iter,10) == 0 ) then
+    if ( mod(iter,(max_iter/10)) == 0 ) then
         call output_tecplot
         nsave = nsave + 1
     end if
     !
     !
     call euler_explicit
+    iter = iter + 1
     call output_residue
     call boundary_conditions_curv
-    iter = iter + 1
 end do
 !
 ! close the archive used to write the residue
