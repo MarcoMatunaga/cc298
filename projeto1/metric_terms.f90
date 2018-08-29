@@ -100,10 +100,10 @@ do j = 1, jmax
         !
         ! metric_jacobian(i,j) = 1.0d0/(x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j))
         metric_jacobian(i,j) = x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j)
-        eta_x(i,j) = -1.0d0*metric_jacobian(i,j)*y_ksi(i,j)
-        eta_y(i,j) = metric_jacobian(i,j)*x_ksi(i,j)
-        ksi_x(i,j) = metric_jacobian(i,j)*y_eta(i,j)
-        ksi_y(i,j) = -1.0d0*metric_jacobian(i,j)*x_eta(i,j)
+        eta_x(i,j) = -1.0d0*(1.0d0/metric_jacobian(i,j))*y_ksi(i,j)
+        eta_y(i,j) = (1.0d0/metric_jacobian(i,j))*x_ksi(i,j)
+        ksi_x(i,j) = (1.0d0/metric_jacobian(i,j))*y_eta(i,j)
+        ksi_y(i,j) = -1.0d0*(1.0d0/metric_jacobian(i,j))*x_eta(i,j)
     end do
 end do
 !

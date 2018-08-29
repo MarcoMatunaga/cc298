@@ -53,6 +53,15 @@ do j = 1, jmax
 end do
 !
 !
+!
+do j = 1, jmax
+    do i = 1, imax
+        U_contravariant(i,j) = u(i,j)*ksi_x(i,j) + v(i,j)*ksi_y(i,j)
+        V_contravariant(i,j) = u(i,j)*eta_x(i,j) + v(i,j)*eta_y(i,j)
+    end do 
+end do
+!
+!
 ! 
 deallocate(Q)
 !

@@ -67,7 +67,7 @@ do while ( max_residue > -9.0d0 .and. iter < max_iter)
     end do
     !
     !
-    if ( mod(iter,5) == 0 ) then
+    if ( mod(iter,10) == 0 ) then
         call output_tecplot
         nsave = nsave + 1
     end if

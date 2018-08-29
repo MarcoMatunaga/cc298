@@ -121,8 +121,8 @@ contains
              rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
              v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
-             p_out(i,j) = (gama - 1.0d0)*((Q_barra(i,j,4)/metric_jacobian(i,j)) &
-                          - 0.50d0*rho(i,j)*( (u_out(i,j)**2.0d0 + (v_out(i,j)**2.0d0 ))))
+             p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
+                          - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
          end do
      end do
     !
@@ -130,14 +130,13 @@ contains
     !
     open(3,file='teste_init.dat')
     write(3,*) 'TITLE = "Projeto1" '
-    write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "i" "j" "e" '
+    write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv "p" '
     write(3,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
     do j = 1, jmax
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), rho(i,j), p_out(i,j), DBLE(i), DBLE(j), & 
-            Q_barra(i,j,4)
+            write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), p(i,j)
         end do
     end do
     close(3)
@@ -165,8 +164,8 @@ contains
              rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
              v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
-             p_out(i,j) = (gama - 1.0d0)*((Q_barra(i,j,4)/metric_jacobian(i,j)) &
-                          - 0.50d0*rho(i,j)*( (u_out(i,j)**2.0d0 + (v_out(i,j)**2.0d0 ))))
+             p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
+                          - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
          end do
      end do
     !
