@@ -72,8 +72,13 @@ do while ( max_residue > -9.0d0 .and. iter < max_iter)
         nsave = nsave + 1
     end if
     !
+    ! time marching
     !
     call euler_explicit
+    call implicit_beam_warming
+    !
+    !
+    !
     iter = iter + 1
     call output_residue
     call boundary_conditions_curv
