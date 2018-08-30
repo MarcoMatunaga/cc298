@@ -2,10 +2,11 @@
 ! compute the jacobians
 !
 subroutine jacobian(u_jac,v_jac,e_jac,rho_jac,ksi_x_jac,ksi_y_jac,eta_x_jac,eta_y_jac,size,A_jac,B_jac)
+    use vars
     implicit none
-    real(8), intent(in)    :: u_jac,v_jac,e_jac,rho_jac,ksi_x_jac,ksi_y_jac,eta_x_jac,eta_y_jac,size
-    real(8), intent(out)   :: A_jac, B_jac
-    real(8)                :: phi_jacobian, theta_jacobian_ksi, theta_jacobian_eta, a1_jacobian
+    real(8), intent(in)                              :: u_jac,v_jac,e_jac,rho_jac,ksi_x_jac,ksi_y_jac,eta_x_jac,eta_y_jac,size
+    real(8),dimension(:,:),allocatable,intent(out)   :: A_jac, B_jac
+    real(8)                                          :: phi_jacobian, theta_jacobian_ksi, theta_jacobian_eta, a1_jacobian
 !
 ! calculate some terms present in the Euler Jacobians
 !
