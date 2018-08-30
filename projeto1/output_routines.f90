@@ -242,7 +242,7 @@ contains
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(7,'(9ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), q_vel_out(i,j), rho(i,j), p_out(i,j), & 
+            write(7,'(15ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), q_vel_out(i,j), rho(i,j), p_out(i,j), & 
             Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
         end do
     end do
