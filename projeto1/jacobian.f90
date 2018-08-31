@@ -4,8 +4,9 @@
 subroutine jacobian(u_jac,v_jac,e_jac,rho_jac,ksi_x_jac,ksi_y_jac,eta_x_jac,eta_y_jac,size,A_jac,B_jac)
     use vars
     implicit none
-    real(8), intent(in)                              :: u_jac,v_jac,e_jac,rho_jac,ksi_x_jac,ksi_y_jac,eta_x_jac,eta_y_jac,size
-    real(8),dimension(:,:),allocatable,intent(out)   :: A_jac, B_jac
+    real(8), intent(in)                              :: u_jac,v_jac,e_jac,rho_jac,ksi_x_jac,ksi_y_jac,eta_x_jac,eta_y_jac
+    integer(4), intent(in)                           :: size
+    real(8),dimension(size,size),intent(out)         :: A_jac, B_jac
     real(8)                                          :: phi_jacobian, theta_jacobian_ksi, theta_jacobian_eta, a1_jacobian
 !
 ! calculate some terms present in the Euler Jacobians
@@ -58,7 +59,6 @@ B_jac(4,1) = theta_jacobian_eta*(phi_jacobian**2.0d0 - a1_jacobian)
 B_jac(4,2) = eta_x_jac*a1_jacobian - (gama - 1.0d0)*u_jac*theta_jacobian_eta
 B_jac(4,3) = eta_y_jac*a1_jacobian - (gama - 1.0d0)*v_jac*theta_jacobian_eta
 B_jac(4,4) = gama*theta_jacobian_eta
-!
 !
 !
 end subroutine jacobian

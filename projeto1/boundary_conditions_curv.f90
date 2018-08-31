@@ -28,7 +28,7 @@ end do
 ! lower boundary (wall boundary)
 !
 j = 1
-do i = 2, imax - 1 
+do i = 2, imax
     U_contravariant(i,j) = U_contravariant(i,j+1)
     V_contravariant(i,j) = 0.0d0
         !
@@ -46,10 +46,20 @@ do i = 2, imax - 1
     Q_barra(i,j,4) = metric_jacobian(i,j)*(Q_barra(i,j+1,4)/metric_jacobian(i,j+1))
 end do
 !
+! symmetry boundary
+!
+j = jmax
+do i = 1, imax
+    Q_barra(i,j,1) =  metric_jacobian(i,j)*(Q_barra(i,j-2,1)/metric_jacobian(i,j-2))
+    Q_barra(i,j,2) =  metric_jacobian(i,j)*(Q_barra(i,j-2,2)/metric_jacobian(i,j-2))
+    Q_barra(i,j,3) = -metric_jacobian(i,j)*(Q_barra(i,j-2,3)/metric_jacobian(i,j-2))
+    Q_barra(i,j,4) =  metric_jacobian(i,j)*(Q_barra(i,j-2,4)/metric_jacobian(i,j-2))
+end do
+!
 ! outlet boundary
 !
 i = imax
-do j = 1, jmax - 1
+do j = 2, jmax
     u(i,j)     = Q_barra(i,j,2)/Q_barra(i,j,1)
     v(i,j)     = Q_barra(i,j,3)/Q_barra(i,j,1)
     a(i,j)     = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
@@ -68,16 +78,6 @@ do j = 1, jmax - 1
         Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i-1,j,3)/metric_jacobian(i-1,j))
         Q_barra(i,j,4) = metric_jacobian(i,j)*(Q_barra(i-1,j,4)/metric_jacobian(i-1,j))
     end if
-end do
-!
-! symmetry boundary
-!
-j = jmax
-do i = 1, imax
-    Q_barra(i,j,1) =  metric_jacobian(i,j)*(Q_barra(i,j-2,1)/metric_jacobian(i,j-2))
-    Q_barra(i,j,2) =  metric_jacobian(i,j)*(Q_barra(i,j-2,2)/metric_jacobian(i,j-2))
-    Q_barra(i,j,3) = -metric_jacobian(i,j)*(Q_barra(i,j-2,3)/metric_jacobian(i,j-2))
-    Q_barra(i,j,4) =  metric_jacobian(i,j)*(Q_barra(i,j-2,4)/metric_jacobian(i,j-2))
 end do
 !
 !

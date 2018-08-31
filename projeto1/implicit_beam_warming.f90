@@ -5,8 +5,8 @@ subroutine implicit_beam_warming
     use vars
     implicit none
 
-real(8)                                  :: eps_e
-real(8),dimension(:,:,:), allocatable    :: Q_dis, D4_ksi, D4_eta
+real(8)                                      :: eps_e
+real(8),dimension(:,:,:), allocatable        :: Q_dis, D4_ksi, D4_eta
 real(8),dimension(:,:),allocatable           :: A_barra, B_barra, M_barra
 !
 !

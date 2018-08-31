@@ -30,7 +30,7 @@ read(1,*) imax,jmax
     T_total = 294.8d0
     !p_total = 47.880258888889d0*2117.0d0
     p_total = 101360.0d0
-    nsave = 1
+    nsave = 0
     iter = 0
     max_iter = 80000
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
@@ -66,20 +66,20 @@ do while ( max_residue > -9.0d0 .and. iter < max_iter)
             end do
     end do
     !
-    !
-    if ( mod(iter,(max_iter/10)) == 0 ) then
-        call output_tecplot
-        nsave = nsave + 1
-    end if
-    !
     ! time marching
     !
     call euler_explicit
-    call implicit_beam_warming
+    !call implicit_beam_warming
     !
     !
     !
     iter = iter + 1
+    !
+    !
+    if ( mod(iter,(max_iter/10)) == 0 ) then
+        nsave = nsave + 1
+        call output_tecplot
+    end if
     call output_residue
     call boundary_conditions_curv
 end do

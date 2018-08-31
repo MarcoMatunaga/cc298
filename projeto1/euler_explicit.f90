@@ -9,7 +9,7 @@ real(8),dimension(:,:,:), allocatable    :: Q_dis, D4_ksi, D4_eta
 !
 !
 !
-eps_e = 4.00d0
+eps_e = 10.00d0
 allocate(Q_dis(imax,jmax,dim), D4_ksi(imax,jmax,dim), D4_eta(imax,jmax,dim) )
 !
 ! vector q_dis apenas para facilitar o calculo da dissipacao artificial
