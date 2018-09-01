@@ -55,7 +55,7 @@ call output_inicial
 max_residue = 1.0d0
 !
 !
-do while ( max_residue > -9.0d0 .and. iter < max_iter)
+do while ( max_residue > -15.0d0 .and. iter < max_iter)
     call fluxes_curvilinear 
     call output_fluxes
     do j = 1, jmax

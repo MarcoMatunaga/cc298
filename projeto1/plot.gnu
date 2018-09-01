@@ -18,4 +18,4 @@ set style line 1 \
     linetype 1 linewidth 2 \
     pointtype 7 pointsize 1.5
 
-plot 'residue.dat' with linespoints linestyle 1
+plot 'residue.dat' with lines linestyle 1
