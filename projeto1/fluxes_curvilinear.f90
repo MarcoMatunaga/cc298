@@ -17,6 +17,7 @@ do j = 1, jmax
                  - 0.50d0*( (Q_barra(i,j,1)/metric_jacobian(i,j))*(u(i,j)**2.0d0+v(i,j)**2.0d0) ) )
         U_contravariant(i,j) = u(i,j)*ksi_x(i,j) + v(i,j)*ksi_y(i,j)
         V_contravariant(i,j) = u(i,j)*eta_x(i,j) + v(i,j)*eta_y(i,j)
+    if (j == 1) V_contravariant(i,j) = 0.0d0
     end do
 end do
 !

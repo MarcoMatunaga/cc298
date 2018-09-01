@@ -72,7 +72,6 @@ do j = 2, jmax
         Q_barra(i,j,4) = metric_jacobian(i,j)*(p(i,j)/(gama-1.0d0) &
                         + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2.0d0 + v(i,j)**2.0d0))
     else
-        write(*,*) "super", iter,i,j,q_vel(i,j)/a(i,j)
         Q_barra(i,j,1) = metric_jacobian(i,j)*(Q_barra(i-1,j,1)/metric_jacobian(i-1,j))
         Q_barra(i,j,2) = metric_jacobian(i,j)*(Q_barra(i-1,j,2)/metric_jacobian(i-1,j))
         Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i-1,j,3)/metric_jacobian(i-1,j))

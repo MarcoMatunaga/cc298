@@ -16,7 +16,7 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 0.01d0
+    CFL = 0.1d0
     !
     ! inicializar com um deltat - duvida
     !
