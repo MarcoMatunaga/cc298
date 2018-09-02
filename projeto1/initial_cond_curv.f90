@@ -2,6 +2,9 @@ subroutine initial_conditions_curv
     use vars
     implicit none
 !
+!
+real(8), dimension(:,:,:), allocatable  :: Q
+!
 ! inlet boundary
 ! 
 ! 1 lb/ft**2 = 47.880258888889

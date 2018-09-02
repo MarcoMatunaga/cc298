@@ -2,9 +2,8 @@ module vars
 implicit none
 ! flow, equations, variables vectors/matrixes
 real(8),dimension(:,:),allocatable           :: T, p, u, v, q_vel, a
-real(8),dimension(:,:),allocatable           :: v_tan, v_nor, U_contravariant, V_contravariant
+real(8),dimension(:,:),allocatable           :: U_contravariant, V_contravariant
 real(8),dimension(:,:),allocatable           :: residue1, residue2, residue3, residue4 
-real(8),dimension(:,:,:),allocatable         :: Q
 real(8),dimension(:,:,:),allocatable         :: Q_barra, E_barra, F_barra 
 real(8)                                      :: T_total, p_total
 ! vector dimension 
@@ -32,6 +31,10 @@ real(8),dimension(:,:),allocatable           :: metric_jacobian
 real(8)                                      :: delta_eta, delta_ksi
 !
 integer(4)                                   :: nsave
+! artificial parameters
+integer(4)                                   :: which_diss
+real(8)                                      :: eps_e
+real(8),dimension(:,:,:), allocatable        :: Q_dis, D4_ksi, D4_eta
 
 contains
 !
@@ -47,7 +50,6 @@ contains
         allocate(residue1(imax,jmax), residue2(imax,jmax))
         allocate(residue3(imax,jmax), residue4(imax,jmax))
         allocate(metric_jacobian(imax,jmax))
-        allocate( v_tan(imax,jmax), v_nor(imax,jmax))
         allocate( U_contravariant(imax,jmax), V_contravariant(imax,jmax))
         allocate(p(imax,jmax), T(imax,jmax))
         allocate(u(imax,jmax), v(imax,jmax), a(imax,jmax), q_vel(imax,jmax))
@@ -56,6 +58,7 @@ contains
         allocate(ksi_x(imax,jmax), ksi_y(imax,jmax))
         allocate(eta_x(imax,jmax), eta_y(imax,jmax))
         allocate(Q_barra(imax,jmax,dim), E_barra(imax,jmax,dim), F_barra(imax,jmax,dim))
+        allocate(Q_dis(imax,jmax,dim), D4_ksi(imax,jmax,dim), D4_eta(imax,jmax,dim) )
 !
 !
 !
@@ -69,7 +72,6 @@ contains
         deallocate(delta_t)
         deallocate(residue1, residue2)
         deallocate(residue3, residue4)
-        deallocate(v_tan, v_nor)
         deallocate(U_contravariant, V_contravariant)
         deallocate(p, T)
         deallocate(u, v, a, q_vel)
@@ -79,6 +81,7 @@ contains
         deallocate(eta_x, eta_y)
         deallocate(metric_jacobian)
         deallocate(Q_barra, E_barra, F_barra)
+        deallocate(Q_dis, D4_ksi, D4_eta)
 !
 !
 !

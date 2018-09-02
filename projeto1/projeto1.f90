@@ -18,8 +18,12 @@ read(1,*) imax,jmax
     delta_ksi = 1.0d0
     CFL = 0.1d0
     !
-    ! inicializar com um deltat - duvida
+    ! choose disspation
+    ! which_diss = 1 D4
+    ! which_diss = 2 D2
+    ! which_diss = 3 nonlinear
     !
+    which_diss = 1
     !
     ! here we consider the value of cv as (5/2)*R
     ! R is the universal perfect gas constant
