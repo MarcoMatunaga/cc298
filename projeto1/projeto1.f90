@@ -72,8 +72,8 @@ do while ( max_residue > -15.0d0 .and. iter < max_iter)
     !
     ! time marching
     !
-    call euler_explicit
-    !call implicit_beam_warming
+    !call euler_explicit
+    call implicit_beam_warming
     !
     !
     !

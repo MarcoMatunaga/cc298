@@ -22,18 +22,16 @@ allocate(B_sys(dim),Ax_sys(imax*dim,imax*dim),Ay_sys(jmax*dim,jmax*dim))
 !
 ! create an identy matrix
 !
-do j = 1, dim
     do i = 1, dim
-        if(i == j) Id(i,j) = 1.0d0 
+        Id(i,i) = 1.0d0 
     end do
-end do
 !
 ! initialize the variables for the linear system
 !
 deltaQ_til  = 0.0d0
 deltaQ      = 0.0d0
-Ax_sys       = 0.0d0
-Ay_sys       = 0.0d0
+Ax_sys      = 0.0d0
+Ay_sys      = 0.0d0
 B_sys       = 0.0d0
 !
 ! residue - pick the maximum residue of them 
@@ -69,11 +67,17 @@ do j = 2, jmax - 1
         B_sys(4) = -delta_t(i,j)*0.5d0*( E_Barra(i+1,j,4) - E_Barra(i-1,j,4) + F_barra(i,j+1,4) - F_barra(i,j-1,4) )
     end do
 end do
+
+do j = 1, jmax
         call jacobian_ksi(u(i+1,j),v(i+1,j),Q_barra(i+1,j,4),Q_barra(i+1,j,1),ksi_x(i+1,j),ksi_y(i+1,j),dim,A_barra)
         A_plus  = A_barra
         call jacobian_ksi(u(i-1,j),v(i-1,j),Q_barra(i-1,j,4),Q_barra(i-1,j,1),ksi_x(i-1,j),ksi_y(i-1,j),dim,A_barra)
         A_minus = A_barra
-        call create_block_tridiagonal(A_plus)
+        !
+        ! see the subroutine create_block_tridiagonal for information about the parameters
+        !
+end do
+        call create_block_tridiagonal(A_minus,Id,A_plus,dim,jmax)
 !
 !
 !
