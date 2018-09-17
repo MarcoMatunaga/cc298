@@ -9,7 +9,7 @@ real(8),dimension(:,:),allocatable             :: A_barra, B_barra, M_barra
 real(8),dimension(:,:,:),allocatable           :: A_plus, A_minus
 real(8),dimension(:,:,:),allocatable           :: B_plus, B_minus
 real(8),dimension(:,:,:),allocatable           :: Id_x, Id_y
-real(8),dimension(:,:),allocatable             :: deltaQ, deltaQ_til
+real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 ! linear system variables
 real(8),dimension(:,:),allocatable             :: Ax_sys, Ay_sys
 real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
@@ -21,7 +21,7 @@ integer index_i, index_j
 allocate(A_barra(dim,dim), B_barra(dim,dim), M_barra(dim,dim))
 allocate(A_minus(imax-1,dim,dim), A_plus(imax-1,dim,dim))
 allocate(B_minus(jmax,dim,dim), B_plus(jmax,dim,dim))
-allocate(deltaQ_til(imax,dim), deltaQ(jmax,dim))
+allocate(deltaQ_til(imax,jmax,dim), deltaQ(imax,jmax,dim))
 allocate(Id_x(imax,dim,dim),Id_y(imax,dim,dim))
 allocate(Bx_sys(imax,dim),Ax_sys(imax*dim,imax*dim),By_sys(jmax,dim),Ay_sys(jmax*dim,jmax*dim))
 !
@@ -64,11 +64,12 @@ max_residue = -1.0d0
 !     
 ! ii) Solve eq 4.120 for deltaQ barra 
 !
+! let is start the implicit beam warming
+!
 ! step i) a) I need: A, deltaQ_til, E_Barra, F_barra
 !
-!
 j = 1
-do while ( j == 1 )
+do while ( j <= jmax )
     !
     i = 1
     !
@@ -113,23 +114,23 @@ do while ( j == 1 )
     ! see the subroutine create_block_tridiagonal for information about the parameters
     !
     call create_block_tridiagonal(A_minus,Id_x,A_plus,dim,imax,Ax_sys)
-    !
+!
 ! use for test or debug 
 !
-     write (*,200)
-     open(98,file='./debug/Ax_sys')
-     do i = 1,dim*imax,dim
-        write (98,209)  Ax_sys(i:i+dim-1,i:i+dim-1)
-     end do
-  200 format (' Matrix A - block tridiagonal')
-
-     open(99,file='./debug/inverse')
-     do i = 1,dim
-        write (99,209)  (Id_x(1,i,j),j=1,dim)
-     end do
-     close(99)
-     write (*,201)
-  201 format (' Matrix I - block tridiagonal')
+  !    write (*,200)
+  !    open(98,file='./debug/Ax_sys')
+  !    do i = 1,dim*imax,dim
+  !       write (98,209)  Ax_sys(i:i+dim-1,i:i+dim-1)
+  !    end do
+  ! 200 format (' Matrix A - block tridiagonal')
+  !
+  !    open(99,file='./debug/inverse')
+  !    do i = 1,dim
+  !       write (99,209)  (Id_x(1,i,j),j=1,dim)
+  !    end do
+  !    close(99)
+  !    write (*,201)
+  ! 201 format (' Matrix I - block tridiagonal')
     !
     ! now create the vector B_sys, i.e., vector b of the system
     !
@@ -140,19 +141,88 @@ do while ( j == 1 )
             Bx_sys(i,4) = -delta_t(i,j)*0.5d0*( E_Barra(i+1,j,4) - E_Barra(i-1,j,4) + F_barra(i,j+1,4) - F_barra(i,j-1,4) )
         end do
     !
+    ! we need to solve the block tridiagonal system j times
+    !
+    call thomas_block_tridiagonal 
+    !
     ! add one to the index loop
     !
     j = j + 1
 end do
 !
-call thomas_block_tridiagonal 
 !
-! step ii) a) mount the left matrix of the linear system
+deallocate(Ax_sys,Bx_sys)
 !
-! call jacobian_eta(u(i,j+1),v(i,j+1),Q_barra(i,j+1,4),Q_barra(i,j+1,1),eta_x(i,j+1),eta_y(i,j+1),dim,B_barra)
-! B_plus  = B_barra
-! call jacobian_eta(u(i,j-1),v(i,j-1),Q_barra(i,j-1,4),Q_barra(i,j-1,1),eta_x(i,j-1),eta_y(i,j-1),dim,B_barra)
-! B_minus = B_barra
+! step ii)
+!
+i = 1
+do while ( i <= imax)
+    !
+    j = 1
+    !
+    call jacobian_eta(u(i,j),v(i,j),Q_barra(i,j,4),Q_barra(i,j,1),eta_x(i,j),eta_y(i,j),dim,B_barra)
+    !
+    !
+    do index_i = 1, dim
+        do index_j = 1, dim
+            B_plus(j,index_i,index_j) = 0.5d0*delta_t(i,j)
+        end do
+    end do
+    !
+    !
+    do j = 2, jmax - 1
+        !
+        !
+        call jacobian_eta(u(i,j),v(i,j),Q_barra(i,j,4),Q_barra(i,j,1),eta_x(i,j),eta_y(i,j),dim,B_barra)
+        !
+        !
+        do index_i = 1, dim
+            do index_j = 1, dim
+                B_plus(j,index_i,index_j) = 0.5d0*delta_t(i,j)
+            end do
+        end do
+        !
+        !
+        call jacobian_eta(u(i,j),v(i,j),Q_barra(i,j,4),Q_barra(i,j,1),eta_x(i,j),eta_y(i,j),dim,B_barra)
+        !
+        !
+        do index_i = 1, dim
+            do index_j = 1, dim
+                B_minus(j,index_i,index_j) = -0.5d0*delta_t(i,j)
+            end do
+        end do
+        !
+        !
+    end do
+    !
+    !
+    j = jmax
+    !
+    !
+    call jacobian_eta(u(i,j),v(i,j),Q_barra(i,j,4),Q_barra(i,j,1),eta_x(i,j),eta_y(i,j),dim,B_barra)
+    !
+    !
+    do index_i = 1, dim
+        do index_j = 1, dim
+            B_minus(j,index_i,index_j) = -0.5d0*delta_t(i,j)
+        end do
+    end do
+    !
+    ! now create By_sys
+    !
+
+    !
+    ! solve the block tridiagonal
+    !
+    call thomas_block_tridiagonal
+    !
+    ! add one to the index loop
+    !
+i = i + 1
+end do
+!
+!
+deallocate(Ay_sys,By_sys)
 !
 !
 !
@@ -161,7 +231,6 @@ deallocate(A_minus, A_plus)
 deallocate(B_minus, B_plus)
 deallocate(deltaQ_til, deltaQ)
 deallocate(Id_x,Id_y)
-deallocate(Bx_sys,By_sys,Ax_sys,Ay_sys)
 !
 !
 !
