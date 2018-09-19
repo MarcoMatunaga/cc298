@@ -1,3 +1,23 @@
+program test_inverse
+double precision matrix(4,4), inv(4,4)
+integer i,j
+
+martix = 0.0d0
+do i =1,4
+	matrix(i,i) = 1.0d0
+end do
+!
+!
+!
+call inverse(matrix,inv,4)
+!
+!
+!
+print*, inv
+end program 
+!
+!
+!
 subroutine inverse(a,c,n)
 !============================================================
 ! Inverse matrix
@@ -56,15 +76,15 @@ end do
 204 format (/, ' Upper Matrix')
 205 format (6f12.6)
 ! print the lower matrix L
-  ! write(*,203) 
-  ! do i=1,n
-  !   write(*,205) (L(i,j),j=1,n)
-  ! enddo
+  write(*,203) 
+  do i=1,n
+    write(*,205) (L(i,j),j=1,n)
+  enddo
 ! print the upper matrix U
-  ! write(*,204)
-  ! do i=1,n
-  !   write(*,205) (U(i,j),j=1,n)
-  ! enddo
+  write(*,204)
+  do i=1,n
+    write(*,205) (U(i,j),j=1,n)
+  enddo
 ! end of MarcoMatunaga writing
 ! Step 3: compute columns of the inverse matrix C
 do k=1,n
