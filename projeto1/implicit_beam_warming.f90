@@ -116,7 +116,7 @@ do while ( j <= jmax - 1 )
     !
     ! call create_block_tridiagonal(A_minus,Id_x,A_plus,dim,imax,Ax_sys)
 !
-! use for test or debug 
+! use for test or debug
 !
   !    write (*,200)
   !    open(98,file='./debug/Ax_sys')
@@ -139,17 +139,17 @@ do while ( j <= jmax - 1 )
     ! i really can dropp the j index because the subroutine call 
     ! is made for each value of the index j
     ! *********
+    call residue
         do i = 2, imax - 1
-            Bx_sys(i,j,1) = -delta_t(i,j)*0.5d0*( E_Barra(i+1,j,1) - E_Barra(i-1,j,1) + F_barra(i,j+1,1) - F_barra(i,j-1,1) )
-            Bx_sys(i,j,2) = -delta_t(i,j)*0.5d0*( E_Barra(i+1,j,2) - E_Barra(i-1,j,2) + F_barra(i,j+1,2) - F_barra(i,j-1,2) )
-            Bx_sys(i,j,3) = -delta_t(i,j)*0.5d0*( E_Barra(i+1,j,3) - E_Barra(i-1,j,3) + F_barra(i,j+1,3) - F_barra(i,j-1,3) )
-            Bx_sys(i,j,4) = -delta_t(i,j)*0.5d0*( E_Barra(i+1,j,4) - E_Barra(i-1,j,4) + F_barra(i,j+1,4) - F_barra(i,j-1,4) )
+            Bx_sys(i,j,1) = -residue1(i,j)
+            Bx_sys(i,j,2) = -residue2(i,j)
+            Bx_sys(i,j,3) = -residue3(i,j)
+            Bx_sys(i,j,4) = -residue4(i,j)
         end do
     !
     ! we need to solve the block tridiagonal system j times
     !
-    call thomas_block_tridiagonal(1,j,imax,A_minus,Id_x,A_plus,deltaQ_til,Bx_sys) 
-    write(*,*) deltaQ_til
+    call thomas_block_tridiagonal(1,j,imax,A_minus,Id_x,A_plus,Bx_sys,deltaQ_til) 
     !
     ! add one to the index loop
     !
@@ -227,11 +227,22 @@ do while ( i <= imax - 1 )
     !
     ! solve the block tridiagonal i times
     !
-    call thomas_block_tridiagonal(i,1,jmax,B_minus,Id_y,B_plus,deltaQ,By_sys)
+    call thomas_block_tridiagonal(i,1,jmax,B_minus,Id_y,B_plus,By_sys,deltaQ)
     !
     ! add one to the index loop
     !
 i = i + 1
+end do
+!
+! update Q_barra
+!
+do j = 1, jmax
+    do i = 1, imax
+        Q_barra(i,j,1) = deltaQ(i,j,1) + Q_barra(i,j,1)         
+        Q_barra(i,j,2) = deltaQ(i,j,2) + Q_barra(i,j,2)
+        Q_barra(i,j,3) = deltaQ(i,j,3) + Q_barra(i,j,3)
+        Q_barra(i,j,4) = deltaQ(i,j,4) + Q_barra(i,j,4)        
+    end do    
 end do
 !
 !

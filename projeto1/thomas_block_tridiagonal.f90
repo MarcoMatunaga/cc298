@@ -1,4 +1,4 @@
-subroutine thomas_block_tridiagonal(x_dir,y_dir,size,lower,main,upper,sol,res)
+subroutine thomas_block_tridiagonal(x_dir,y_dir,size,lower,main,upper,res,sol)
     use vars
     implicit none
 !
@@ -78,16 +78,16 @@ do diag = 2, size - 1
     !
     do j_sub = 1, dim
         do i_sub = 1, dim
-            aux1(i_sub,j_sub) = lower(diag,i_sub,j_sub)
+            a_matrix(i_sub,j_sub) = lower(diag,i_sub,j_sub)
             aux2(i_sub,j_sub) = gama_matrix(diag-1,i_sub,j_sub)
         end do 
     end do
     !
     !
-    aux3 = matmul(aux1,aux2)
+    aux3 = matmul(a_matrix,aux2)
     !
     !
-    aux1 = 0.0d0
+    a_matrix = 0.0d0
     !
     !
     do j_sub = 1, dim
@@ -141,7 +141,7 @@ call inverse(b_matrix,inv_matrix,dim)
 !**************************************
 ! too many ifs one by subroutine call
 !**************************************
-if (x_dir == 1) then
+if (size == jmax) then
     do i_sub = 1, dim 
         d_aux(i_sub) = res(diag,y_dir,i_sub) 
     end do
@@ -169,14 +169,14 @@ do diag = 2, size
     do j_sub = 1, dim
         do i_sub = 1, dim
             b_matrix(i_sub,j_sub) = main(diag,i_sub,j_sub) 
-            aux(i_sub,j_sub) = lower(diag,i_sub,j_sub)
+            a_matrix(i_sub,j_sub) = lower(diag,i_sub,j_sub)
             aux1(i_sub,j_sub) = gama_matrix(diag-1,i_sub,j_sub)
         end do
     end do
     !
     !
-    aux2 = matmul(aux,aux1)
-    aux = 0.0d0
+    aux2 = matmul(a_matrix,aux1)
+    a_matrix = 0.0d0
     aux1 = 0.0d0
     !
     !
@@ -193,7 +193,7 @@ do diag = 2, size
     aux2 = 0.0d0
     !
     !
-    if ( x_dir == 1 ) then
+    if ( size == jmax ) then
         do i_sub = 1, dim
             d_aux(i_sub) = res(diag,y_dir,i_sub)
         end do
@@ -245,7 +245,7 @@ do i_sub = 1, dim
 end do
 !
 !
-do diag = size - 1, 1
+do diag = size - 1, 1,-1
     !
     !
     do i_sub = 1, dim
@@ -281,7 +281,7 @@ end do
 ! i_sub and j_sub change their usual value only here
 ! because we gonna update the value of the solution matrix
 !
-if ( x_dir == 1 ) then 
+if ( size == jmax ) then 
     !
     !
     do i_sub = 1, imax
