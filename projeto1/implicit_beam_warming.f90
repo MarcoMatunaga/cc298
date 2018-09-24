@@ -154,6 +154,9 @@ do while ( j <= jmax - 1 )
     ! add one to the index loop
     !
     j = j + 1
+    !
+    ! *******************
+    !
 end do
 !
 !
@@ -246,7 +249,7 @@ do j = 1, jmax
 end do
 !
 !
-! deallocate(Ay_sys)
+!deallocate(Ay_sys)
 deallocate(By_sys)
 !
 !

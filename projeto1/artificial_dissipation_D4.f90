@@ -1,7 +1,7 @@
 !
 ! artificial dissipation
 !
-subroutine artificial_dissipation_D4
+subroutine routine_artificial_dissipation_D4
     use vars
     implicit none
 !
@@ -87,4 +87,4 @@ end do
 !
 ! 
 !
-end subroutine artificial_dissipation_D4
+end subroutine routine_artificial_dissipation_D4

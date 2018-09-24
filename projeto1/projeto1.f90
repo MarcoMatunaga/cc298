@@ -24,6 +24,8 @@ read(1,*) imax,jmax
     ! which_diss = 3 nonlinear
     !
     which_diss = 1
+    eps_e = 5.00d0 ! good value for the artificial dissipation of fourth differences
+    !eps_e = ! good value for the artificial dissipation of fourth differences
     !
     ! here we consider the value of cv as (5/2)*R
     ! R is the universal perfect gas constant
@@ -36,7 +38,7 @@ read(1,*) imax,jmax
     p_total = 101360.0d0
     nsave = 0
     iter = 0
-    max_iter = 100000
+    max_iter = 100
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
 !
 ! add one more point on the index j due to the symmetry line
@@ -64,26 +66,27 @@ do while ( max_residue > -15.0d0 .and. iter < max_iter)
     call output_fluxes
     do j = 1, jmax
             do i = 1, imax
-            a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
-            delta_t(i,j) = CFL/(max( abs(U_contravariant(i,j)) + a(i,j)*sqrt(ksi_x(i,j)**2.0d0 + ksi_y(i,j)**2.0d0 ), &
-                             abs(V_contravariant(i,j)) + a(i,j)*sqrt(eta_x(i,j)**2.0d0 + eta_y(i,j)**2.0d0 )))
+               a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
+               delta_t(i,j) = CFL/(max( abs(U_contravariant(i,j)) + a(i,j)*sqrt(ksi_x(i,j)**2.0d0 + ksi_y(i,j)**2.0d0 ), &
+                              abs(V_contravariant(i,j)) + a(i,j)*sqrt(eta_x(i,j)**2.0d0 + eta_y(i,j)**2.0d0 )))
             end do
     end do
     !
     ! time marching
     !
-    !call euler_explicit
-    call implicit_beam_warming
-    !
+    call euler_explicit
+    !call implicit_beam_warming
     !
     !
     iter = iter + 1
     !
     !
-     if ( mod(iter,(max_iter/10)) == 0 ) then
+    if ( mod(iter,(max_iter/10)) == 0 ) then
          nsave = nsave + 1
          call output_tecplot
-     end if
+    end if
+    !
+    !
     call output_residue
     call boundary_conditions_curv
 end do

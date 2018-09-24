@@ -1,4 +1,4 @@
-subroutine artificial_dissipation_D2
+subroutine routine_artificial_dissipation_D2
     use vars
     implicit none
 !
@@ -50,4 +50,4 @@ end do
 !
 !
 !
-end subroutine artificial_dissipation_D2
+end subroutine routine_artificial_dissipation_D2
