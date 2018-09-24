@@ -10,8 +10,8 @@ real(8),dimension(:,:,:),allocatable           :: A_plus, A_minus
 real(8),dimension(:,:,:),allocatable           :: B_plus, B_minus
 real(8),dimension(:,:,:),allocatable           :: Id_x, Id_y
 real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
-! linear system variables
-! real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
+!linear system variables
+!real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
 real(8),dimension(:,:,:),allocatable           :: Bx_sys, By_sys
 !
 integer index_i, index_j
@@ -24,7 +24,7 @@ allocate(B_minus(jmax,dim,dim), B_plus(jmax,dim,dim))
 allocate(deltaQ_til(imax,jmax,dim), deltaQ(imax,jmax,dim))
 allocate(Id_x(imax,dim,dim),Id_y(jmax,dim,dim))
 allocate(Bx_sys(imax,jmax,dim),By_sys(imax,jmax,dim))
-! allocate(Ax_sys(imax*dim,imax*dim),Ay_sys(jmax*dim,jmax*dim))
+!allocate(Ax_sys(imax*dim,imax*dim),Ay_sys(jmax*dim,jmax*dim))
 !
 ! create the two identies matrix
 !
@@ -37,8 +37,8 @@ end do
 !
 deltaQ_til  = 0.0d0
 deltaQ      = 0.0d0
-! Ax_sys      = 0.0d0
-! Ay_sys      = 0.0d0
+!Ax_sys      = 0.0d0
+!Ay_sys      = 0.0d0
 Bx_sys      = 0.0d0
 By_sys      = 0.0d0
 !
@@ -69,8 +69,8 @@ max_residue = -1.0d0
 !
 ! step i) a) I need: A, deltaQ_til, E_Barra, F_barra
 !
-j = 2
-do while ( j <= jmax - 1 )
+j = 1
+do while ( j <= jmax )
     !
     i = 1
     !
@@ -139,8 +139,9 @@ do while ( j <= jmax - 1 )
     ! i really can dropp the j index because the subroutine call 
     ! is made for each value of the index j
     ! *********
-    call residue
-        do i = 2, imax - 1
+    !
+        do i = 1, imax
+            call residue(i,j)
             Bx_sys(i,j,1) = -residue1(i,j)
             Bx_sys(i,j,2) = -residue2(i,j)
             Bx_sys(i,j,3) = -residue3(i,j)
@@ -166,8 +167,8 @@ deallocate(Bx_sys)
 !
 ! step ii)
 !
-i = 2
-do while ( i <= imax - 1 )
+i = 1
+do while ( i <= imax )
     !
     j = 1
     !
@@ -176,7 +177,7 @@ do while ( i <= imax - 1 )
     !
     do index_i = 1, dim
         do index_j = 1, dim
-            B_plus(j,index_i,index_j) = 0.5d0*delta_t(i,j)
+            B_plus(j,index_i,index_j) = 0.5d0*delta_t(i,j)*B_barra(index_i,index_j)
         end do
     end do
     !
@@ -189,7 +190,7 @@ do while ( i <= imax - 1 )
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_plus(j,index_i,index_j) = 0.5d0*delta_t(i,j)
+                B_plus(j,index_i,index_j) = 0.5d0*delta_t(i,j)*B_barra(index_i,index_j)
             end do
         end do
         !
@@ -199,7 +200,7 @@ do while ( i <= imax - 1 )
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_minus(j,index_i,index_j) = -0.5d0*delta_t(i,j)
+                B_minus(j,index_i,index_j) = -0.5d0*delta_t(i,j)*B_barra(index_i,index_j)
             end do
         end do
         !
@@ -215,7 +216,7 @@ do while ( i <= imax - 1 )
     !
     do index_i = 1, dim
         do index_j = 1, dim
-            B_minus(j,index_i,index_j) = -0.5d0*delta_t(i,j)
+            B_minus(j,index_i,index_j) = -0.5d0*delta_t(i,j)*B_barra(index_i,index_j)
         end do
     end do
     !
@@ -239,8 +240,8 @@ end do
 !
 ! update Q_barra
 !
-do j = 1, jmax
-    do i = 1, imax
+do j = 2, jmax - 1
+    do i = 2, imax - 1
         Q_barra(i,j,1) = deltaQ(i,j,1) + Q_barra(i,j,1)         
         Q_barra(i,j,2) = deltaQ(i,j,2) + Q_barra(i,j,2)
         Q_barra(i,j,3) = deltaQ(i,j,3) + Q_barra(i,j,3)

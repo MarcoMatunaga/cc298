@@ -6,8 +6,8 @@ F90FILES = vars.f90 output_routines.f90 functions.f90 mesh.f90 jacobian_eta.f90 
 #OFILES = $(MODFILES:modules/*.f90=.o) $(F90FILES:.f90=.o)
 OFILES = $(F90FILES:.f90=.o)
 
-#FC = ifort
-FC = gfortran
+FC = ifort
+#FC = gfortran
 #FLAGS = -O3 -fopenmp
 #FLAGS = -O0  -g -traceback -check all -check bounds -check uninit -ftrapuv -debug all -gen-interfaces -warn interfaces -I/usr/include
 #FLAGS = -O0 -g -fpe:0 -traceback -check all -check bounds -check uninit -ftrapuv -debug all -I/usr/include

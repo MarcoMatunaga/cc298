@@ -20,17 +20,13 @@ do j = 1, jmax
 end do
 !
 !
-!
-do j = 1, jmax
-    do i = 1, imax
-        call residue(i,j)
-    end do
-end do
+max_residue = -100.0d0
 !
 ! explicit time marching 
 !
 do j = 2, jmax - 1
         do i = 2, imax - 1
+            call residue(i,j)
             Q_barra(i,j,1) = Q_barra(i,j,1) - residue1(i,j)
             Q_barra(i,j,2) = Q_barra(i,j,2) - residue2(i,j)
             Q_barra(i,j,3) = Q_barra(i,j,3) - residue3(i,j) 
