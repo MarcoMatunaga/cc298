@@ -3,10 +3,14 @@ double precision matrix(4,4), inv(4,4)
 integer i,j
 
 martix = 0.0d0
-do i =1,4
-	matrix(i,i) = 1.0d0
-end do
+! do i =1,4
+!    matrix(i,i) = 1.0d0
+! end do
 !
+matrix(1,1) = 0.0d0
+matrix(1,2) = 1.50d0
+matrix(2,1) = 1.50d0
+matrix(3,1) = 1.0d0
 !
 !
 call inverse(matrix,inv,4)
@@ -14,7 +18,7 @@ call inverse(matrix,inv,4)
 !
 !
 print*, inv
-end program 
+end program test_inverse
 !
 !
 !
