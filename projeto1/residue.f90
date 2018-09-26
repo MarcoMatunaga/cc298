@@ -9,6 +9,8 @@ integer r_i, r_j
 ! residue - pick the maximum residue of them 
 ! which means the norma_infinity
 !
+max_residue = -100.0d0
+!
 if (which_diss == 1) then 
     !
     !
@@ -39,47 +41,6 @@ else if (which_diss == 2) then
     D4_eta(r_i,r_j,4) = dis_eta2(r_i,r_j,4)
     !
     !
-end if
-!
-!
-if (r_i == 1 .or. r_j == 1) then 
-                    !
-                    !
-residue1(r_i,r_j) = 0.50d0*( E_barra(r_i+1,r_j,1) - E_barra(r_i,r_j,1) ) &
-                    + 0.50d0*( F_barra(r_i,r_j+1,1) - F_barra(r_i,r_j,1) )
-                    !
-                    !
-residue2(r_i,r_j) = 0.50d0*( E_barra(r_i+1,r_j,2) - E_barra(r_i,r_j,2) ) &
-                    + 0.50d0*( F_barra(r_i,r_j+1,2) - F_barra(r_i,r_j,2) )
-                    !
-                    !
-residue3(r_i,r_j) = 0.50d0*( E_barra(r_i+1,r_j,3) - E_barra(r_i,r_j,3) ) &
-                    + 0.50d0*( F_barra(r_i,r_j+1,3) - F_barra(r_i,r_j,3) )
-                    !
-                    !
-residue4(r_i,r_j) = 0.50d0*( E_barra(r_i+1,r_j,4) - E_barra(r_i,r_j,4) ) &
-                    + 0.50d0*( F_barra(r_i,r_j+1,4) - F_barra(r_i,r_j,4) )
-                    !
-                    !
-else if (r_j == jmax .or. r_i == imax) then 
-                    !
-                    !
-residue1(r_i,r_j) = 0.50d0*( E_barra(r_i,r_j,1) - E_barra(r_i-1,r_j,1) ) &
-                    + 0.50d0*( F_barra(r_i,r_j,1) - F_barra(r_i,r_j-1,1) )
-                    !
-                    !
-residue2(r_i,r_j) = 0.50d0*( E_barra(r_i,r_j,2) - E_barra(r_i-1,r_j,2) ) &
-                    + 0.50d0*( F_barra(r_i,r_j,2) - F_barra(r_i,r_j-1,2) )
-                    !
-                    !
-residue3(r_i,r_j) = 0.50d0*( E_barra(r_i,r_j,3) - E_barra(r_i-1,r_j,3) ) &
-                    + 0.50d0*( F_barra(r_i,r_j,3) - F_barra(r_i,r_j-1,3) )
-                    !
-                    !
-residue4(r_i,r_j) = 0.50d0*( E_barra(r_i,r_j,4) - E_barra(r_i-1,r_j,4) ) &
-                    + 0.50d0*( F_barra(r_i,r_j,4) - F_barra(r_i,r_j-1,4) )
-                    !
-                    !   
 end if
 !
 !

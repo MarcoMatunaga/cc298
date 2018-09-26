@@ -14,7 +14,7 @@ real(8),dimension(:,:),allocatable             :: deltaQ_til_i, deltaQ_til_j
 real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 !linear system variables
 !real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
-real(8),dimension(:,:),allocatable           :: Bx_sys, By_sys
+real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
 !
 integer index_i, index_j, i_sol, j_sol
 !
@@ -46,6 +46,16 @@ deltaQ      = 0.0d0
 Bx_sys      = 0.0d0
 By_sys      = 0.0d0
 !
+!
+do j = 1, jmax
+        do i = 1, imax
+            Q_dis(i,j,1) = Q_barra(i,j,1)/metric_jacobian(i,j)
+            Q_dis(i,j,2) = Q_barra(i,j,2)/metric_jacobian(i,j)
+            Q_dis(i,j,3) = Q_barra(i,j,3)/metric_jacobian(i,j)
+            Q_dis(i,j,4) = Q_barra(i,j,4)/metric_jacobian(i,j)
+        end do
+end do
+!
 ! remember that the Q_barra is multiplied by metric_jacobian
 ! when i call the jacobian i divide energy by rho which 
 ! cancels the metric_jacobian
@@ -68,9 +78,9 @@ By_sys      = 0.0d0
 !
 ! step i) a) I need: A, deltaQ_til, E_Barra, F_barra
 !
-i_sol = 1
-j_sol = 1
-looping_j_sol: do while ( j_sol <= jmax )
+i_sol = 2
+j_sol = 2
+looping_j_sol: do while ( j_sol <= jmax - 1  )
     !
     i = 1
     !
@@ -78,7 +88,7 @@ looping_j_sol: do while ( j_sol <= jmax )
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i+1,j_sol)*A_barra(index_i,index_j)
                 end do
             end do
     !
@@ -88,7 +98,7 @@ looping_j_sol: do while ( j_sol <= jmax )
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i+1,j_sol)*A_barra(index_i,index_j)
                 end do
             end do
             !
@@ -96,7 +106,7 @@ looping_j_sol: do while ( j_sol <= jmax )
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i-1,j_sol)*A_barra(index_i,index_j)
                 end do
             end do
             !
@@ -108,7 +118,7 @@ looping_j_sol: do while ( j_sol <= jmax )
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i-1,j_sol)*A_barra(index_i,index_j)
                 end do
             end do
     !
@@ -136,7 +146,7 @@ looping_j_sol: do while ( j_sol <= jmax )
     ! is made for each value of the index j
     ! *********
     !
-        do i = 1, imax
+        do i = 2, imax - 1
             call residue(i,j_sol)
             Bx_sys(1,i) = -residue1(i,j_sol)
             Bx_sys(2,i) = -residue2(i,j_sol)
@@ -150,7 +160,7 @@ looping_j_sol: do while ( j_sol <= jmax )
     !
     ! update j_sol
     !
-    do i = 1, imax
+    do i = 2, imax - 1
         deltaQ_til(1,i,j_sol) = deltaQ_til_i(1,i)
         deltaQ_til(2,i,j_sol) = deltaQ_til_i(2,i)
         deltaQ_til(3,i,j_sol) = deltaQ_til_i(3,i)
@@ -170,7 +180,7 @@ end do looping_j_sol
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j)
+                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j+1)*B_barra(index_i,index_j)
             end do
         end do
         !
@@ -183,7 +193,7 @@ end do looping_j_sol
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j)
+                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j+1)*B_barra(index_i,index_j)
                 end do
             end do
             !
@@ -193,7 +203,7 @@ end do looping_j_sol
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j)
+                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j-1)*B_barra(index_i,index_j)
                 end do
             end do
             !
@@ -209,13 +219,13 @@ end do looping_j_sol
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j)
+                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j-1)*B_barra(index_i,index_j)
             end do
         end do
         !
         ! now create By_sys
         !
-        do j = 1, jmax
+        do j = 2, jmax - 1
             By_sys(1,j) = deltaQ_til(1,i_sol,j)
             By_sys(2,j) = deltaQ_til(2,i_sol,j)
             By_sys(3,j) = deltaQ_til(3,i_sol,j)
@@ -228,7 +238,7 @@ end do looping_j_sol
         !
         ! add one to the index loop
         !
-        do j = 1, jmax
+        do j = 2, jmax - 1
             deltaQ(i_sol,j,1) = deltaQ_til_j(1,j)        
             deltaQ(i_sol,j,2) = deltaQ_til_j(2,j)
             deltaQ(i_sol,j,3) = deltaQ_til_j(3,j)
@@ -237,7 +247,7 @@ end do looping_j_sol
         !
         ! update Q_barra
         !
-        do j = 1, jmax
+        do j = 2, jmax - 1
             Q_barra(i_sol,j,1) = deltaQ(i_sol,j,1) + Q_barra(i_sol,j,1)         
             Q_barra(i_sol,j,2) = deltaQ(i_sol,j,2) + Q_barra(i_sol,j,2)
             Q_barra(i_sol,j,3) = deltaQ(i_sol,j,3) + Q_barra(i_sol,j,3)

@@ -19,9 +19,6 @@ do j = 1, jmax
         end do
 end do
 !
-!
-max_residue = -100.0d0
-!
 ! explicit time marching 
 !
 do j = 2, jmax - 1
