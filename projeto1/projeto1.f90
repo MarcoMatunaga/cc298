@@ -16,7 +16,7 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 0.1d0
+    CFL = 1.0d0
     !
     ! choose dissipation
     ! which_diss = 1 D4
@@ -26,7 +26,6 @@ read(1,*) imax,jmax
     which_diss = 1
     !eps_e = 10.00d0 ! good value for the artificial dissipation of second differences
     !eps_e = 5.0d0  ! good value for the artificial dissipation of fourth differences
-    eps_e = 5.0d0
     !
     ! here we consider the value of cv as (5/2)*R
     ! R is the universal perfect gas constant
@@ -39,7 +38,7 @@ read(1,*) imax,jmax
     p_total = 101360.0d0
     nsave = 0
     iter = 0
-    max_iter = 500
+    max_iter = 20000
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
 !
 ! add one more point on the index j due to the symmetry line
@@ -60,7 +59,7 @@ call output_inicial
 max_residue = 1.0d0
 !
 !
-do while ( max_residue > -15.0d0 .and. iter < max_iter)
+do while ( max_residue > -15.0d0 .and. iter < max_iter )
     call fluxes_curvilinear 
     call output_fluxes
     do j = 1, jmax

@@ -15,6 +15,7 @@ real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 !linear system variables
 !real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
 real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
+real(8)                                        :: dissipation
 !
 integer index_i, index_j, i_sol, j_sol
 !
@@ -45,6 +46,11 @@ deltaQ      = 0.0d0
 !Ay_sys      = 0.0d0
 Bx_sys      = 0.0d0
 By_sys      = 0.0d0
+!
+! set dissipation parameters
+!
+eps_dis_e = 5.0d0
+eps_dis_i = 2.0d0*eps_dis_e
 !
 !
 do j = 1, jmax
@@ -88,7 +94,7 @@ looping_j_sol: do while ( j_sol <= jmax - 1  )
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i+1,j_sol)*A_barra(index_i,index_j)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i+1,j_sol)*A_barra(index_i,index_j) 
                 end do
             end do
     !
@@ -156,6 +162,7 @@ looping_j_sol: do while ( j_sol <= jmax - 1  )
     !
     ! we need to solve the block tridiagonal system j times
     ! blktriad(maind,lower,upper,id,md,xb,x)
+    ! put artificial dissipation
     call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til_i) 
     !
     ! update j_sol

@@ -31,9 +31,9 @@ real(8),dimension(:,:),allocatable           :: metric_jacobian
 real(8)                                      :: delta_eta, delta_ksi
 !
 integer(4)                                   :: nsave, total_sol
-! artificial parameters
+! artificial dissipation parameters
 integer(4)                                   :: which_diss
-real(8)                                      :: eps_e
+real(8)                                      :: eps_dis_e, eps_dis_i
 real(8),dimension(:,:,:), allocatable        :: Q_dis, D4_ksi, D4_eta
 
 contains
