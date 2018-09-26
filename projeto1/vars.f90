@@ -30,7 +30,7 @@ real(8),dimension(:,:),allocatable           :: x_eta, y_eta, x_ksi, y_ksi
 real(8),dimension(:,:),allocatable           :: metric_jacobian
 real(8)                                      :: delta_eta, delta_ksi
 !
-integer(4)                                   :: nsave
+integer(4)                                   :: nsave, total_sol
 ! artificial parameters
 integer(4)                                   :: which_diss
 real(8)                                      :: eps_e

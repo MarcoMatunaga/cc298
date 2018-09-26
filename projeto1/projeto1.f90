@@ -39,7 +39,7 @@ read(1,*) imax,jmax
     p_total = 101360.0d0
     nsave = 0
     iter = 0
-    max_iter = 50000
+    max_iter = 100
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
 !
 ! add one more point on the index j due to the symmetry line

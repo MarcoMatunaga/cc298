@@ -174,7 +174,7 @@ contains
     !
     ! condicoes de contorno e iniciais
     !
-    open(3,file='teste_boundary.dat')
+    open(3,file='final.dat')
     write(3,*) 'TITLE = "Projeto1" '
     write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "e" "mach" '
     write(3,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 

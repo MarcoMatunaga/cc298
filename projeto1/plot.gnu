@@ -12,7 +12,6 @@ set xlabel "iterations"
 set ylabel "residue"
 set title "Projeto1"
 
-
 set style line 1 \
     linecolor rgb '#0060ad' \
     linetype 1 linewidth 2 \
