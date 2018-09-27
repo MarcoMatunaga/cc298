@@ -68,8 +68,8 @@ contains
     open(6, file="metric_terms.dat")
     write(6,*) 'TITLE = "Projeto1" '
     write(6,*) 'VARIABLES = "x" "y" "i" "j" "x_ksi" "y_ksi" "x_eta" "y_eta" "metric_jacobian" ' 
-    write(6,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT'
-    do j = 1, jmax
+    write(6,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT'
+    do j = 1, jmax - 1
         do i = 1, imax
             write(6,*) meshx(i,j), meshy(i,j), i,j, x_ksi(i,j), y_ksi(i,j), &
                                    x_eta(i,j), y_eta(i,j), metric_jacobian(i,j)
@@ -94,8 +94,8 @@ contains
     open(4, file='teste_fluxes.dat')
     write(4,*) 'TITLE = "Projeto1" '
     write(4,*) 'VARIABLES = "E_1" "E_2" "E_3" "E_4" '
-    write(4,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
-    do j = 1, jmax
+    write(4,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
+    do j = 1, jmax - 1
         do i = 1, imax
             write(4,'(4EN20.10)') E_barra(i,j,1), E_barra(i,j,2), E_barra(i,j,3), E_barra(i,j,4) 
         end do
@@ -117,7 +117,7 @@ contains
     !
     allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
     !
-     do j = 1, jmax
+     do j = 1, jmax - 1
          do i = 1, imax
              rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
@@ -133,8 +133,8 @@ contains
     open(3,file='teste_init.dat')
     write(3,*) 'TITLE = "Projeto1" '
     write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv" "p" "mach" '
-    write(3,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
-    do j = 1, jmax
+    write(3,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
+    do j = 1, jmax - 1
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
@@ -161,7 +161,7 @@ contains
     !
     allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
     !
-     do j = 1, jmax
+     do j = 1, jmax - 1
          do i = 1, imax
              rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
@@ -177,8 +177,8 @@ contains
     open(3,file='final.dat')
     write(3,*) 'TITLE = "Projeto1" '
     write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "e" "mach" '
-    write(3,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
-    do j = 1, jmax
+    write(3,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
+    do j = 1, jmax - 1
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
@@ -220,7 +220,7 @@ contains
     allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
     allocate(q_vel_out(imax,jmax))
     !
-     do j = 1, jmax
+     do j = 1, jmax - 1
          do i = 1, imax
              rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
@@ -237,8 +237,8 @@ contains
     open(7,file=trim(FileTag)//trim(fname))
     write(7,*) 'TITLE = "Projeto1" '
     write(7,*) 'VARIABLES = "X" "Y" "u" "v" "q_vel_out" "rho" "p" "e" "mach" '
-    write(7,*) 'ZONE I = ', imax, ' J =', jmax, ' DATAPACKING = POINT' 
-    do j = 1, jmax
+    write(7,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
+    do j = 1, jmax - 1
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)

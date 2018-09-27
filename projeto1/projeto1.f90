@@ -7,7 +7,6 @@ program proj1
         implicit none
 !
 !
-!
 open(1,file='mesh') 
 read(1,*) imax,jmax
     dim = 4
@@ -16,7 +15,13 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 1.0d0
+    CFL = 0.90d0
+    !
+    ! choose the time marching method method
+    ! time_method = 1 euler explicit 
+    ! time_method = 2 euler implicit (beam warming)
+    !
+    time_method = 2
     !
     ! choose dissipation
     ! which_diss = 1 D4
@@ -26,6 +31,11 @@ read(1,*) imax,jmax
     which_diss = 1
     !eps_e = 10.00d0 ! good value for the artificial dissipation of second differences
     !eps_e = 5.0d0  ! good value for the artificial dissipation of fourth differences
+    !
+    ! set dissipation parameters
+    !
+    eps_dis_e = 5.0d0
+    eps_dis_i = 2.5d0*eps_dis_e
     !
     ! here we consider the value of cv as (5/2)*R
     ! R is the universal perfect gas constant
@@ -38,7 +48,7 @@ read(1,*) imax,jmax
     p_total = 101360.0d0
     nsave = 0
     iter = 0
-    max_iter = 20000
+    max_iter = 5000
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
 !
 ! add one more point on the index j due to the symmetry line
@@ -72,8 +82,8 @@ do while ( max_residue > -15.0d0 .and. iter < max_iter )
     !
     ! time marching
     !
-    !call euler_explicit
-    call implicit_beam_warming
+    if (time_method == 1) call euler_explicit
+    if (time_method == 2) call implicit_beam_warming
     !
     !
     if ( mod(iter,(max_iter/10)) == 0 ) then

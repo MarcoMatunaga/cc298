@@ -1,4 +1,5 @@
 *.o
 fort.6
 *.dat
-.png
+*.png
+*.mod

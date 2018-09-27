@@ -31,6 +31,8 @@ real(8),dimension(:,:),allocatable           :: metric_jacobian
 real(8)                                      :: delta_eta, delta_ksi
 !
 integer(4)                                   :: nsave, total_sol
+! time marching method
+integer(4)                                   :: time_method
 ! artificial dissipation parameters
 integer(4)                                   :: which_diss
 real(8)                                      :: eps_dis_e, eps_dis_i

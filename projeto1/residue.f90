@@ -14,31 +14,31 @@ max_residue = -100.0d0
 if (which_diss == 1) then 
     !
     !
-    D4_ksi(r_i,r_j,1) = dis_ksi4(r_i,r_j,1)
-    D4_ksi(r_i,r_j,2) = dis_ksi4(r_i,r_j,2)
-    D4_ksi(r_i,r_j,3) = dis_ksi4(r_i,r_j,3)
-    D4_ksi(r_i,r_j,4) = dis_ksi4(r_i,r_j,4)
+    D4_ksi(r_i,r_j,1) = dis_ksi4(r_i,r_j,1,eps_dis_e)
+    D4_ksi(r_i,r_j,2) = dis_ksi4(r_i,r_j,2,eps_dis_e)
+    D4_ksi(r_i,r_j,3) = dis_ksi4(r_i,r_j,3,eps_dis_e)
+    D4_ksi(r_i,r_j,4) = dis_ksi4(r_i,r_j,4,eps_dis_e)
     !
     !
-    D4_eta(r_i,r_j,1) = dis_eta4(r_i,r_j,1)
-    D4_eta(r_i,r_j,2) = dis_eta4(r_i,r_j,2)
-    D4_eta(r_i,r_j,3) = dis_eta4(r_i,r_j,3)
-    D4_eta(r_i,r_j,4) = dis_eta4(r_i,r_j,4)
+    D4_eta(r_i,r_j,1) = dis_eta4(r_i,r_j,1,eps_dis_e)
+    D4_eta(r_i,r_j,2) = dis_eta4(r_i,r_j,2,eps_dis_e)
+    D4_eta(r_i,r_j,3) = dis_eta4(r_i,r_j,3,eps_dis_e)
+    D4_eta(r_i,r_j,4) = dis_eta4(r_i,r_j,4,eps_dis_e)
     !
     !
 else if (which_diss == 2) then 
     !
     !
-    D4_ksi(r_i,r_j,1) = dis_ksi2(r_i,r_j,1)
-    D4_ksi(r_i,r_j,2) = dis_ksi2(r_i,r_j,2)
-    D4_ksi(r_i,r_j,3) = dis_ksi2(r_i,r_j,3)
-    D4_ksi(r_i,r_j,4) = dis_ksi2(r_i,r_j,4)
+    D4_ksi(r_i,r_j,1) = dis_ksi2(r_i,r_j,1,eps_dis_e)
+    D4_ksi(r_i,r_j,2) = dis_ksi2(r_i,r_j,2,eps_dis_e)
+    D4_ksi(r_i,r_j,3) = dis_ksi2(r_i,r_j,3,eps_dis_e)
+    D4_ksi(r_i,r_j,4) = dis_ksi2(r_i,r_j,4,eps_dis_e)
     !
     !
-    D4_eta(r_i,r_j,1) = dis_eta2(r_i,r_j,1)
-    D4_eta(r_i,r_j,2) = dis_eta2(r_i,r_j,2)
-    D4_eta(r_i,r_j,3) = dis_eta2(r_i,r_j,3)
-    D4_eta(r_i,r_j,4) = dis_eta2(r_i,r_j,4)
+    D4_eta(r_i,r_j,1) = dis_eta2(r_i,r_j,1,eps_dis_e)
+    D4_eta(r_i,r_j,2) = dis_eta2(r_i,r_j,2,eps_dis_e)
+    D4_eta(r_i,r_j,3) = dis_eta2(r_i,r_j,3,eps_dis_e)
+    D4_eta(r_i,r_j,4) = dis_eta2(r_i,r_j,4,eps_dis_e)
     !
     !
 end if

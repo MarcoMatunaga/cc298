@@ -99,6 +99,8 @@ do j = 1, jmax
         ! 1/x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j)
         !
         ! metric_jacobian(i,j) = 1.0d0/(x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j))
+        ! metric_jacobian is equivalent to the J^-1 used by professor azevedo
+        !
         metric_jacobian(i,j) = x_ksi(i,j)*y_eta(i,j) - x_eta(i,j)*y_ksi(i,j)
         eta_x(i,j) = -1.0d0*(1.0d0/metric_jacobian(i,j))*y_ksi(i,j)
         eta_y(i,j) = (1.0d0/metric_jacobian(i,j))*x_ksi(i,j)

@@ -1,13 +1,13 @@
 module functions
     use vars
     implicit none
-
+    !
         contains
-
-    real function dis_ksi4(art_i,art_j,pos,eps) 
+    !
+    real(8) function dis_ksi4(art_i,art_j,pos,eps) 
         implicit none
-        integer, intent(in) :: art_i, art_j, pos
-        real, intent(in) :: eps
+        integer(4), intent(in) :: art_i, art_j, pos
+        real(8),    intent(in) :: eps
         !
         if (art_i == 2 .or. art_i == imax - 1 .or. art_j == 2 .or. art_j == jmax - 1) then
         !
@@ -26,10 +26,10 @@ module functions
     !
     !
     !
-    real function dis_eta4(art_i,art_j,pos,eps) 
+    real(8) function dis_eta4(art_i,art_j,pos,eps) 
         implicit none
-        integer, intent(in) :: art_i, art_j, pos
-        real, intent(in) :: eps
+        integer(4), intent(in) :: art_i, art_j, pos
+        real(8),    intent(in) :: eps
         !
         if (art_i == 2 .or. art_i == imax - 1 .or. art_j == 2 .or. art_j == jmax - 1) then
         !
@@ -48,10 +48,10 @@ module functions
     !
     !
     !
-    real function dis_eta2(art_i,art_j,pos,eps) 
+    real(8) function dis_eta2(art_i,art_j,pos,eps) 
         implicit none
-        integer, intent(in) :: art_i, art_j, pos
-        real, intent(in) :: eps
+        integer(4), intent(in) :: art_i, art_j, pos
+        real(8),    intent(in) :: eps
         !
         !
                     dis_eta2 = -eps*( Q_dis(art_i,art_j+1,pos) - 2.0d0*Q_dis(art_i,art_j,pos) &
@@ -62,10 +62,10 @@ module functions
     !
     !
     !
-    real function dis_ksi2(art_i,art_j,pos,eps) 
+    real(8) function dis_ksi2(art_i,art_j,pos,eps) 
         implicit none
-        integer, intent(in) :: art_i, art_j, pos
-        real, intent(in) :: eps
+        integer(4), intent(in) :: art_i, art_j, pos
+        real(8),    intent(in) :: eps
         !
         !
                     dis_ksi2 = -eps*( Q_dis(art_i+1,art_j,pos) - 2.0d0*Q_dis(art_i,art_j,pos) &
@@ -76,4 +76,26 @@ module functions
     !
     !
     !
+    ! real(8) function dis_imp_ksi(art_i,art_j,pos,eps)
+    !     implicit none
+    !     integer(4), intent(in) :: art_i, art_j, pos
+    !     real(8),    intent(in) :: eps
+    !     !
+    !     !
+    !                 dis_imp_ksi = -eps*delta(art_i,art_j)*metric_jacobian(art_i,art_j)*()
+    !     !
+    !     !
+    ! end function dis_imp_ksi
+    ! !
+    ! !
+    ! real(8) function dis_imp_eta(art_i,art_j,pos,eps)
+    !     implicit none
+    !     integer(4), intent(in) :: art_i, art_j, pos
+    !     real(8),    intent(in) :: eps
+    !     !
+    !     !
+    !                 dis_imp_eta = -eps*delta(art_i,art_j)*metric_jacobian(art_i,art_j)*()
+    !     !
+    !     !
+    ! end function dis_imp_ksi
 end module functions

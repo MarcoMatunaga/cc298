@@ -10,12 +10,15 @@ real(8),dimension(:,:),allocatable             :: A_barra, B_barra, M_barra
 real(8),dimension(:,:,:),allocatable           :: A_plus, A_minus
 real(8),dimension(:,:,:),allocatable           :: B_plus, B_minus
 real(8),dimension(:,:,:),allocatable           :: Id_x, Id_y
+real(8),dimension(:,:,:),allocatable           :: main_x, main_y
 real(8),dimension(:,:),allocatable             :: deltaQ_til_i, deltaQ_til_j
 real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 !linear system variables
 !real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
 real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
-real(8)                                        :: dissipation
+real(8),dimension(:,:),allocatable             :: identy
+real(8)                                        :: coeff_cte
+double precision dissipation(dim)
 !
 integer index_i, index_j, i_sol, j_sol
 !
@@ -27,14 +30,19 @@ allocate(B_minus(dim,dim,jmax), B_plus(dim,dim,jmax))
 allocate(deltaQ_til_i(dim,imax), deltaQ_til_j(dim,jmax))
 allocate(deltaQ_til(dim,imax,jmax), deltaQ(imax,jmax,dim))
 allocate(Id_x(dim,dim,imax),Id_y(dim,dim,jmax))
+allocate(main_x(dim,dim,imax),main_y(dim,dim,jmax))
 allocate(Bx_sys(dim,imax),By_sys(dim,jmax))
-!allocate(Ax_sys(imax*dim,imax*dim),Ay_sys(jmax*dim,jmax*dim))
+allocate(identy(dim,dim))
 !
 ! create the two identies matrix
 !
+Id_x = 0.0d0
+Id_y = 0.0d0
+identy = 0.0d0
 do i = 1, dim
      Id_x(i,i,1:imax) = 1.0d0 
      Id_y(i,i,1:jmax) = 1.0d0 
+     identy(i,i) = 1.0d0
 end do
 !
 ! initialize the variables for the linear system
@@ -42,15 +50,12 @@ end do
 deltaQ_til_i  = 0.0d0
 deltaQ_til_j  = 0.0d0
 deltaQ      = 0.0d0
+main_x = 0.0d0
+main_y = 0.0d0
 !Ax_sys      = 0.0d0
 !Ay_sys      = 0.0d0
 Bx_sys      = 0.0d0
 By_sys      = 0.0d0
-!
-! set dissipation parameters
-!
-eps_dis_e = 5.0d0
-eps_dis_i = 2.0d0*eps_dis_e
 !
 !
 do j = 1, jmax
@@ -66,13 +71,12 @@ end do
 ! when i call the jacobian i divide energy by rho which 
 ! cancels the metric_jacobian
 !
-!***********************************************************
-! melhor ter feito uma funcao para as jacobians
-!***********************************************************
-!
+! ***********************************************************
+!   melhor ter feito uma funcao para as jacobians
+! ***********************************************************
 !
 ! refs pulliam Arc2d and Pulliam fundamental algorithms of
-! coputational fluid dynamics
+! computational fluid dynamics
 !
 ! the algorithm consists of two steps 
 ! in each step you solve a linear system like A X = B
@@ -86,45 +90,65 @@ end do
 !
 i_sol = 2
 j_sol = 2
-looping_j_sol: do while ( j_sol <= jmax - 1  )
+looping_j_sol: do while ( j_sol <= jmax - 1 )
     !
     i = 1
     !
             call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             !
+            do index_i = 1, dim 
+                    coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
+                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i+1,j_sol)) 
+            end do
+            !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i+1,j_sol)*A_barra(index_i,index_j) 
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + matmul(identy,dissipation)
                 end do
             end do
     !
     do i = 2, imax - 1
             !
+            do index_i = 1, dim 
+                    coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
+                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i+1,j_sol)) 
+            end do
+            !
             call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i+1,j_sol)*A_barra(index_i,index_j)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + matmul(identy,dissipation)
                 end do
             end do
+            !
+            do index_i = 1, dim 
+                    coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
+                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i-1,j_sol)) 
+            end do 
             !
             call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i-1,j_sol)*A_barra(index_i,index_j)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + matmul(identy,dissipation)
                 end do
             end do
             !
     end do
     !
     i = imax
-    !
+    !       
+            do index_i = 1, dim 
+                    coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
+                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i-1+1,j_sol)) 
+            end do 
+            !
             call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i-1,j_sol)*A_barra(index_i,index_j)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + matmul(identy,dissipation)
                 end do
             end do
     !
@@ -163,7 +187,14 @@ looping_j_sol: do while ( j_sol <= jmax - 1  )
     ! we need to solve the block tridiagonal system j times
     ! blktriad(maind,lower,upper,id,md,xb,x)
     ! put artificial dissipation
-    call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til_i) 
+    do i = 1, imax
+        do index_i = 1, dim 
+            do index_j = 1, dim
+                main_x(index_i,index_j,i) = Id_x(index_i,index_j,i)
+            end do 
+        end do 
+    end do
+    call blktriad(main_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til_i) 
     !
     ! update j_sol
     !
@@ -187,7 +218,8 @@ end do looping_j_sol
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j+1)*B_barra(index_i,index_j)
+                coeff_cte = -eps_dis_i*delta_t(i,j)*metric_jacobian(i,j)
+                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) 
             end do
         end do
         !
@@ -200,7 +232,8 @@ end do looping_j_sol
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j+1)*B_barra(index_i,index_j)
+                    coeff_cte = -eps_dis_i*delta_t(i,j)*metric_jacobian(i,j)
+                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) 
                 end do
             end do
             !
@@ -210,7 +243,8 @@ end do looping_j_sol
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j-1)*B_barra(index_i,index_j)
+                    coeff_cte = -eps_dis_i*delta_t(i,j)*metric_jacobian(i,j)
+                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) 
                 end do
             end do
             !
@@ -226,7 +260,8 @@ end do looping_j_sol
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j-1)*B_barra(index_i,index_j)
+                coeff_cte = -eps_dis_i*delta_t(i,j)*metric_jacobian(i,j)
+                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) 
             end do
         end do
         !
@@ -241,7 +276,14 @@ end do looping_j_sol
         !
         ! solve the block tridiagonal i times
         ! call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til) 
-        call blktriad(Id_y,B_minus,B_plus,dim,jmax,By_sys,deltaQ_til_j)
+        do j = 1, jmax
+            do index_i = 1, dim 
+                do index_j = 1, dim
+                    main_y(index_i,index_j,j) = Id_y(index_i,index_j,j) 
+                end do 
+            end do 
+        end do
+        call blktriad(main_y,B_minus,B_plus,dim,jmax,By_sys,deltaQ_til_j)
         !
         ! add one to the index loop
         !
@@ -264,11 +306,10 @@ end do looping_j_sol
     end do 
 !
 !
-!deallocate(Ay_sys)
-!deallocate(Ax_sys)
 deallocate(Id_x)
 deallocate(Bx_sys)
 deallocate(By_sys)
+deallocate(identy)
 !
 !
 !
@@ -278,6 +319,7 @@ deallocate(B_minus, B_plus)
 deallocate(deltaQ_til)
 deallocate(deltaQ_til_i,deltaQ_til_j, deltaQ)
 deallocate(Id_y)
+deallocate(main_x,main_y)
 !
 !
 !
