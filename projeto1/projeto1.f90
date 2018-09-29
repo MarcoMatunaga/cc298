@@ -15,13 +15,13 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 0.90d0
+    CFL = 0.10d0
     !
     ! choose the time marching method method
     ! time_method = 1 euler explicit 
     ! time_method = 2 euler implicit (beam warming)
     !
-    time_method = 2
+    time_method = 2 
     !
     ! choose dissipation
     ! which_diss = 1 D4
