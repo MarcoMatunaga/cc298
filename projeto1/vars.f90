@@ -21,7 +21,7 @@ integer(4)                                   :: iter, max_iter
 ! numerical variables, time marching
 real(8),dimension(:,:),allocatable           :: delta_t
 real(8)                                      :: delta_y, delta_x
-real(8)                                      :: max_residue
+real(8)                                      :: max_residue, res_conv
 real(8)                                      :: CFL
 ! mesh, metric terms, jacobians
 real(8),dimension(:,:),allocatable           :: meshx, meshy
@@ -35,7 +35,7 @@ integer(4)                                   :: nsave, total_sol
 integer(4)                                   :: time_method
 ! artificial dissipation parameters
 integer(4)                                   :: which_diss
-real(8)                                      :: eps_dis_e, eps_dis_i
+real(8)                                      :: eps_dis_e, eps_dis_i, dis_factor
 real(8),dimension(:,:,:), allocatable        :: Q_dis, D4_ksi, D4_eta
 
 contains

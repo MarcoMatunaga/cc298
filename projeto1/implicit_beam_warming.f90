@@ -46,8 +46,6 @@ do i = 1, dim
      Identy(i,i) = 1.0d0 
 end do
 !
-write(*,*) Identy(1,1),Identy(2,2),Identy(3,3),Identy(4,4)
-write(*,*) Identy(1,2),Identy(2,2),Identy(3,2),Identy(4,2)
 ! initialize the variables for the linear system
 !
 deltaQ_til_i  = 0.0d0
