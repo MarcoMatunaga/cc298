@@ -1,0 +1,68 @@
+# set terminal pngcairo  background "#ffffff" enhanced fontscale 1.0 size 640, 480  dashlength 2
+# set output 'lines_arrows.4.png'
+set bar 1.000000 front
+set style circle radius graph 0.02, first 0.00000, 0.00000 
+set style ellipse size graph 0.05, 0.03, first 0.00000 angle 0 units xy
+set label 1 "arrowstyle 1:" at -520.000, -100.000, 0.00000 right norotate back nopoint
+set label 2 "arrowstyle 2:" at -520.000, -110.000, 0.00000 right norotate back nopoint
+set label 3 "arrowstyle 3:" at -520.000, -120.000, 0.00000 right norotate back nopoint
+set label 4 "arrowstyle 4:" at -520.000, -130.000, 0.00000 right norotate back nopoint
+set label 5 "arrowstyle 5:" at -520.000, -140.000, 0.00000 right norotate back nopoint
+set label 6 "arrowstyle 6:" at -520.000, -150.000, 0.00000 right norotate back nopoint
+set label 7 "arrowstyle 7:" at -520.000, -160.000, 0.00000 right norotate back nopoint
+set label 8 "arrowstyle 8:" at -520.000, -170.000, 0.00000 right norotate back nopoint
+set arrow 1 from -500.000, -100.000, 0.00000 to 500.000, -100.000, 0.00000 head back filled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 size screen  0.025,30.000,45.000
+set arrow 2 from -500.000, -110.000, 0.00000 to 500.000, -110.000, 0.00000 head back nofilled linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,90.000
+set arrow 3 from -500.000, -120.000, 0.00000 to 500.000, -120.000, 0.00000 head back filled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,45.000
+set arrow 4 from -500.000, -130.000, 0.00000 to 500.000, -130.000, 0.00000 head back filled linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,90.000
+set arrow 5 from -500.000, -140.000, 0.00000 to 500.000, -140.000, 0.00000 heads back filled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,135.000
+set arrow 6 from -500.000, -150.000, 0.00000 to 500.000, -150.000, 0.00000 head back empty linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,135.000
+set arrow 7 from -500.000, -160.000, 0.00000 to 500.000, -160.000, 0.00000 nohead back nofilled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1
+set arrow 8 from -500.000, -170.000, 0.00000 to 500.000, -170.000, 0.00000 heads back nofilled linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.008,90.000,90.000
+set style line 1  linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 pointtype 7 pointsize 0.500 pointinterval 0
+set style line 2  linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 pointtype 7 pointsize 0.500 pointinterval 0
+set style arrow 1 head back filled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 size screen  0.025,30.000,45.000
+set style arrow 2 head back nofilled linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,90.000
+set style arrow 3 head back filled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,45.000
+set style arrow 4 head back filled linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,90.000
+set style arrow 5 heads back filled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,135.000
+set style arrow 6 head back empty linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.030,15.000,135.000
+set style arrow 7 nohead back nofilled linecolor rgb "dark-violet"  linewidth 2.000 dashtype 1
+set style arrow 8 heads back nofilled linecolor rgb "skyblue"  linewidth 2.000 dashtype 1 size screen  0.008,90.000,90.000
+set style textbox transparent margins  1.0,  1.0 border
+unset logscale
+set xtics border in scale 0,0 mirror norotate  autojustify
+set ytics border in scale 0,0 mirror norotate  autojustify
+set ztics border in scale 0,0 nomirror norotate  autojustify
+set cbtics border in scale 0,0 mirror norotate  autojustify
+set rtics axis in scale 0,0 nomirror norotate  autojustify
+set paxis 1 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 1 tics  rangelimit autofreq 
+set paxis 2 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 2 tics  rangelimit autofreq 
+set paxis 3 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 3 tics  rangelimit autofreq 
+set paxis 4 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 4 tics  rangelimit autofreq 
+set paxis 5 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 5 tics  rangelimit autofreq 
+set paxis 6 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 6 tics  rangelimit autofreq 
+set paxis 7 tics border in scale 0,0 nomirror norotate  autojustify
+set paxis 7 tics  rangelimit autofreq 
+set title "Top: plot with vectors arrowstyle 1, Bottom: explicit arrows" 
+set xrange [ -1000.00 : 1000.00 ] noreverse nowriteback
+set yrange [ -178.000 : 86.0000 ] noreverse nowriteback
+set paxis 1 range [ * : * ] noreverse nowriteback
+set paxis 2 range [ * : * ] noreverse nowriteback
+set paxis 3 range [ * : * ] noreverse nowriteback
+set paxis 4 range [ * : * ] noreverse nowriteback
+set paxis 5 range [ * : * ] noreverse nowriteback
+set paxis 6 range [ * : * ] noreverse nowriteback
+set paxis 7 range [ * : * ] noreverse nowriteback
+set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front  noinvert bdefault
+i = 9
+myencoding = "utf8"
+x = 3.3
+## Last datafile plotted: "arrowstyle.dat"
+plot 'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 3

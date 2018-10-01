@@ -4,6 +4,7 @@
 subroutine implicit_beam_warming
     use vars
     use output_routines
+    use functions
     implicit none
 !
 real(8),dimension(:,:),allocatable             :: A_barra, B_barra, M_barra
@@ -16,8 +17,9 @@ real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 !linear system variables
 !real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
 real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
+real(8),dimension(:,:),allocatable             :: Identy
+real(8),dimension(:),allocatable               :: L_ksi, L_eta
 real(8)                                        :: coeff_cte
-double precision dissipation(dim)
 !
 integer index_i, index_j, i_sol, j_sol
 !
@@ -31,6 +33,8 @@ allocate(deltaQ_til(dim,imax,jmax), deltaQ(imax,jmax,dim))
 allocate(Id_x(dim,dim,imax),Id_y(dim,dim,jmax))
 allocate(main_x(dim,dim,imax),main_y(dim,dim,jmax))
 allocate(Bx_sys(dim,imax),By_sys(dim,jmax))
+allocate(Identy(dim,dim))
+allocate(L_ksi(dim),L_eta(dim))
 !
 ! create the two identies matrix
 !
@@ -38,12 +42,14 @@ Id_x = 0.0d0
 Id_y = 0.0d0
 do i = 1, dim
      Id_x(i,i,1:imax) = 1.0d0 
-     Id_y(i,i,1:jmax) = 1.0d0 
+     Id_y(i,i,1:jmax) = 1.0d0
+     Identy(i,i) = 1.0d0 
 end do
 !
+write(*,*) Identy(1,1),Identy(2,2),Identy(3,3),Identy(4,4)
+write(*,*) Identy(1,2),Identy(2,2),Identy(3,2),Identy(4,2)
 ! initialize the variables for the linear system
 !
-dissipation = 0.0d0
 deltaQ_til_i  = 0.0d0
 deltaQ_til_j  = 0.0d0
 deltaQ      = 0.0d0
@@ -93,43 +99,33 @@ looping_j_sol: do while ( j_sol <= jmax - 1 )
     !
 call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             !
-            coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
-            do index_i = 1, dim 
-                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i+1,j_sol)) 
-            end do
-            !write(*,*) j_sol, dissipation(1), dissipation(2), dissipation(3), dissipation(4)
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + dissipation(index_i)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(3)*Identy(index_i,index_j)
                 end do
-            end do
+            end do 
     !
     do i = 2, imax - 1
             !
-            coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
-            do index_i = 1, dim 
-                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i+1,j_sol)) 
-            end do
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
+            
             !
 call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + dissipation(index_i)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(3)*Identy(index_i,index_j)
                 end do
             end do
             !
-            !coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
-            do index_i = 1, dim 
-                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i-1,j_sol)) 
-            end do 
             !
 call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + dissipation(index_i)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(1)*Identy(index_i,index_j)
                 end do
             end do
             !
@@ -137,35 +133,16 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
     !
     i = imax
     !       
-            coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
-            do index_i = 1, dim 
-                    dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i-1,j_sol)) 
-            end do 
+            !
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
             !
 call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + dissipation(index_i)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(1)*Identy(index_i,index_j)
                 end do
             end do
-    !
-    ! use for test or debug
-    !
-    !    write (*,200)
-    !    open(98,file='./debug/Ax_sys')
-    !    do i = 1,dim*imax,dim
-    !       write (98,209)  Ax_sys(i:i+dim-1,i:i+dim-1)
-    !    end do
-    ! 200 format (' Matrix A - block tridiagonal')
-    !
-    !    open(99,file='./debug/inverse')
-    !    do i = 1,dim
-    !       write (99,209)  (Id_x(1,i,j_sol),j=1,dim)
-    !    end do
-    !    close(99)
-    !    write (*,201)
-    ! 201 format (' Matrix I - block tridiagonal')
     !
     ! now create the vector B_sys, i.e., vector b of the system
     !
@@ -185,17 +162,12 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
     ! we need to solve the block tridiagonal system j times
     ! blktriad(maind,lower,upper,id,md,xb,x)
     ! put artificial dissipation
-    do i = 2, imax - 1
-            coeff_cte = -eps_dis_i*delta_t(i,j_sol)*metric_jacobian(i,j_sol)
-        do index_i = 1, dim 
-            dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i,j_sol)) 
-        end do
-    end do
     !
-    do i = 2, imax - 1
+    do i = 1, imax
+        L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
         do index_i = 1, dim 
             do index_j = 1, dim
-                main_x(index_i,index_j,i) = Id_x(index_i,index_j,i) - 2.0d0*dissipation(index_i)
+                main_x(index_i,index_j,i) = Id_x(index_i,index_j,i) + L_ksi(2)*Identy(index_i,index_j)
             end do 
         end do 
     end do
@@ -220,46 +192,35 @@ end do looping_j_sol
         !
 call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
         !
-        !
-            coeff_cte = -eps_dis_i*delta_t(i_sol,j)*metric_jacobian(i_sol,j)
-            do index_i = 1, dim 
-                dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i_sol,j+1))
-            end do 
+        L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + dissipation(index_i)
+                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(3)*Identy(index_i,index_j)
             end do
         end do
         !
         !
         do j = 2, jmax - 1
             !
+            L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
             !
-            coeff_cte = -eps_dis_i*delta_t(i_sol,j)*metric_jacobian(i_sol,j)
-            do index_i = 1, dim 
-                dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i_sol,j+1))
-            end do 
 call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
             !
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                        B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + dissipation(index_i)
+                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(3)*Identy(index_i,index_j)
                 end do
             end do
             !
             !
-            coeff_cte = -eps_dis_i*delta_t(i_sol,j)*metric_jacobian(i_sol,j)
-            do index_i = 1, dim 
-                dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i_sol,j-1))
-            end do 
 call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
             !
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                        B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + dissipation(index_i)
+                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(1)*Identy(index_i,index_j)
                 end do
             end do
             !
@@ -269,17 +230,14 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         !
         j = jmax
         !
-        !
-            coeff_cte = -eps_dis_i*delta_t(i_sol,j)*metric_jacobian(i_sol,j)
-            do index_i = 1, dim 
-                dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i_sol,j-1))
-            end do 
+        ! 
 call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
         !
+        L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + dissipation(index_i)
+                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(1)*Identy(index_i,index_j)
             end do
         end do
         !
@@ -294,14 +252,11 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         !
         ! solve the block tridiagonal i times
         ! call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til) 
-            coeff_cte = -eps_dis_i*delta_t(i_sol,j)*metric_jacobian(i_sol,j)
-            do index_i = 1, dim 
-                dissipation(index_i) = coeff_cte*(1.0d0/metric_jacobian(i_sol,j))
-            end do 
-        do j = 2, jmax - 1
+        do j = 1, jmax 
+            L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
             do index_i = 1, dim 
                 do index_j = 1, dim
-                    main_y(index_i,index_j,j) = Id_y(index_i,index_j,j) - 2.0d0*dissipation(index_i)
+                    main_y(index_i,index_j,j) = Id_y(index_i,index_j,j) + L_eta(2)*Identy(index_i,index_j)
                 end do 
             end do 
         end do
@@ -341,6 +296,8 @@ deallocate(deltaQ_til)
 deallocate(deltaQ_til_i,deltaQ_til_j, deltaQ)
 deallocate(Id_y)
 deallocate(main_x,main_y)
+deallocate(Identy)
+deallocate(L_ksi,L_eta)
 !
 !
 !

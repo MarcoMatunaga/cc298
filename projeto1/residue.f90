@@ -58,8 +58,9 @@ residue3(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,3) - E_barra(r_i-1,r_j,3)) &
         !
 residue4(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,4) - E_barra(r_i-1,r_j,4)) &
                     + 0.50d0*(F_barra(r_i,r_j+1,4) - F_barra(r_i,r_j-1,4)) 
-        !
-        !
+        ! ***********************************
+        ! posso juntar os dois blocos seguintes
+        ! ***********************************
         residue1(r_i,r_j) = residue1(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,1) + D4_eta(r_i,r_j,1))
         residue2(r_i,r_j) = residue2(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,2) + D4_eta(r_i,r_j,2))
         residue3(r_i,r_j) = residue3(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,3) + D4_eta(r_i,r_j,3))

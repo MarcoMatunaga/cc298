@@ -1,0 +1,38 @@
+# set terminal pngcairo  background "#ffffff" enhanced fontscale 1.0 size 640, 480  dashlength 2
+# set output 'lines_arrows.2.png'
+set bar 1.000000 front
+set style circle radius graph 0.02, first 0.00000, 0.00000 
+set style ellipse size graph 0.05, 0.03, first 0.00000 angle 0 units xy
+set style line 1  linecolor rgb "red"  linewidth 3.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 2  linecolor rgb "orange"  linewidth 2.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 3  linecolor rgb "yellow"  linewidth 3.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 4  linecolor rgb "green"  linewidth 2.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style textbox transparent margins  1.0,  1.0 border
+unset logscale
+set offsets 0.05, 0.05, 0, 0
+set style function linespoints
+unset xtics
+unset ytics
+unset paxis 1 tics
+unset paxis 2 tics
+unset paxis 3 tics
+unset paxis 4 tics
+unset paxis 5 tics
+unset paxis 6 tics
+unset paxis 7 tics
+set title "The pointinterval property is another way to create interrupted lines" 
+set xlabel "This technique works best for equally spaced data points" 
+set xrange [ -0.500000 : 3.30000 ] noreverse nowriteback
+set yrange [ -1.00000 : 1.40000 ] noreverse nowriteback
+set paxis 1 range [ * : * ] noreverse nowriteback
+set paxis 2 range [ * : * ] noreverse nowriteback
+set paxis 3 range [ * : * ] noreverse nowriteback
+set paxis 4 range [ * : * ] noreverse nowriteback
+set paxis 5 range [ * : * ] noreverse nowriteback
+set paxis 6 range [ * : * ] noreverse nowriteback
+set paxis 7 range [ * : * ] noreverse nowriteback
+set bmargin  6
+set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front  noinvert bdefault
+unset colorbox
+i = 9
+plot cos(x)     lt -1 pi -4 pt 6 title 'pi -4',        cos(x-.8)  lt -1 pi -3 pt 7 ps 0.2 title 'pi -3 pt 7 ps 0.2',       cos(x-.2)  lt -1 pi -6 pt 7 title 'pi -6',     cos(x-.4)  lt -1 pi -3 pt 4 title 'pi -3',     cos(x-.6)  lt -1 pi -5 pt 5 title 'pi -5',      cos(x-1.)  with line lt -1 notitle,       cos(x+.2)  with line lt -1 lw 2 title 'lw 2'

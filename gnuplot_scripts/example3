@@ -1,0 +1,42 @@
+# set terminal pngcairo  background "#ffffff" enhanced fontscale 1.0 size 640, 480  dashlength 2
+# set output 'lines_arrows.3.png'
+set bar 1.000000 front
+set style circle radius graph 0.02, first 0.00000, 0.00000 
+set style ellipse size graph 0.05, 0.03, first 0.00000 angle 0 units xy
+set style line 1  linecolor rgb "red"  linewidth 3.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 2  linecolor rgb "orange"  linewidth 2.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 3  linecolor rgb "yellow"  linewidth 3.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 4  linecolor rgb "green"  linewidth 2.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style textbox transparent margins  1.0,  1.0 border
+unset logscale
+set offsets 0.05, 0.05, 0, 0
+set pointintervalbox 1.5
+set style data linespoints
+set style function linespoints
+unset xtics
+unset ytics
+unset paxis 1 tics
+unset paxis 2 tics
+unset paxis 3 tics
+unset paxis 4 tics
+unset paxis 5 tics
+unset paxis 6 tics
+unset paxis 7 tics
+set title "The pointinterval property also works with character point symbols" 
+set xrange [ -0.500000 : 3.30000 ] noreverse nowriteback
+set yrange [ -1.00000 : 1.40000 ] noreverse nowriteback
+set paxis 1 range [ * : * ] noreverse nowriteback
+set paxis 2 range [ * : * ] noreverse nowriteback
+set paxis 3 range [ * : * ] noreverse nowriteback
+set paxis 4 range [ * : * ] noreverse nowriteback
+set paxis 5 range [ * : * ] noreverse nowriteback
+set paxis 6 range [ * : * ] noreverse nowriteback
+set paxis 7 range [ * : * ] noreverse nowriteback
+set bmargin  6
+set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front  noinvert bdefault
+unset colorbox
+i = 9
+myencoding = "utf8"
+x = 3.3
+## Last datafile plotted: "+"
+plot '+' using 1:(cos(x-1.))  with line lt -1 lw 1 title 'lw 1',       '+' using 1:(cos(x))     lt -1 pi -4 pt "C" title 'pi -4',        '+' using 1:(cos(x-.8))  lt -1 pi -3 pt "D" title 'pi -3 pt "D"',       '+' using 1:(cos(x-.2))  lt -1 pi -6 pt "âœ " tc rgb "blue" title 'pi -6 tc rgb "blue"',     '+' using 1:(cos(x-.4))  lt -1 pi -3 pt "âœ²" title 'pi -3',     '+' using 1:(cos(x-.6))  lt -1 pi -5 pt "â˜º" title 'pi -5',      '+' using 1:(cos(x+.2))  with line lt -1 lw 2 title 'lw 2'

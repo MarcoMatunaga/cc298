@@ -1,0 +1,43 @@
+# set terminal pngcairo  background "#ffffff" enhanced fontscale 1.0 size 640, 480  dashlength 2
+# set output 'lines_arrows.1.png'
+set bar 1.000000 front
+set style circle radius graph 0.02, first 0.00000, 0.00000 
+set style ellipse size graph 0.05, 0.03, first 0.00000 angle 0 units xy
+set label 1 "set style line 1 lt 2 lc rgb \"red\" lw 3" at -0.400000, -0.250000, 0.00000 left norotate back textcolor rgb "red"  nopoint
+set label 2 "set style line 2 lt 2 lc rgb \"orange\" lw 2" at -0.400000, -0.350000, 0.00000 left norotate back textcolor rgb "orange"  nopoint
+set label 3 "set style line 3 lt 2 lc rgb \"yellow\" lw 3" at -0.400000, -0.450000, 0.00000 left norotate back textcolor rgb "yellow"  nopoint
+set label 4 "set style line 4 lt 2 lc rgb \"green\" lw 2" at -0.400000, -0.550000, 0.00000 left norotate back textcolor rgb "green"  nopoint
+set label 5 "plot ... lt 1 lc 3 " at -0.400000, -0.650000, 0.00000 left norotate back textcolor rgb "#56b4e9"  nopoint
+set label 6 "plot ... lt 3 lc 3 " at -0.400000, -0.750000, 0.00000 left norotate back textcolor rgb "#56b4e9"  nopoint
+set label 7 "plot ... lt 5 lc 3 " at -0.400000, -0.850000, 0.00000 left norotate back textcolor rgb "#56b4e9"  nopoint
+set style line 1  linecolor rgb "red"  linewidth 3.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 2  linecolor rgb "orange"  linewidth 2.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 3  linecolor rgb "yellow"  linewidth 3.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style line 4  linecolor rgb "green"  linewidth 2.000 dashtype 2 pointtype 2 pointsize default pointinterval 0
+set style textbox transparent margins  1.0,  1.0 border
+unset logscale
+unset xtics
+unset ytics
+unset paxis 1 tics
+unset paxis 2 tics
+unset paxis 3 tics
+unset paxis 4 tics
+unset paxis 5 tics
+unset paxis 6 tics
+unset paxis 7 tics
+set title "Independent colors and dot/dash styles" 
+set xlabel "You will only see dashed lines if your current terminal setting permits it" 
+set xrange [ -0.500000 : 3.50000 ] noreverse nowriteback
+set yrange [ -1.00000 : 1.40000 ] noreverse nowriteback
+set paxis 1 range [ * : * ] noreverse nowriteback
+set paxis 2 range [ * : * ] noreverse nowriteback
+set paxis 3 range [ * : * ] noreverse nowriteback
+set paxis 4 range [ * : * ] noreverse nowriteback
+set paxis 5 range [ * : * ] noreverse nowriteback
+set paxis 6 range [ * : * ] noreverse nowriteback
+set paxis 7 range [ * : * ] noreverse nowriteback
+set bmargin  7
+set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front  noinvert bdefault
+unset colorbox
+i = 6
+plot cos(x)     ls 1 title 'ls 1',        cos(x-.2)  ls 2 title 'ls 2',     cos(x-.4)  ls 3 title 'ls 3',     cos(x-.6)  ls 4 title 'ls 4',      cos(x-.8)  lt 1 lc 3 title 'lt 1 lc 3',       cos(x-1.)  lt 3 lc 3 title 'lt 3 lc 3',       cos(x-1.2) lt 5 lc 3 title 'lt 5 lc 3'

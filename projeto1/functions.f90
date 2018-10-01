@@ -76,26 +76,32 @@ module functions
     !
     !
     !
-    ! real(8) function dis_imp_ksi(art_i,art_j,pos,eps)
-    !     implicit none
-    !     integer(4), intent(in) :: art_i, art_j, pos
-    !     real(8),    intent(in) :: eps
-    !     !
-    !     !
-    !                 dis_imp_ksi = -eps*delta(art_i,art_j)*metric_jacobian(art_i,art_j)*()
-    !     !
-    !     !
-    ! end function dis_imp_ksi
-    ! !
-    ! !
-    ! real(8) function dis_imp_eta(art_i,art_j,pos,eps)
-    !     implicit none
-    !     integer(4), intent(in) :: art_i, art_j, pos
-    !     real(8),    intent(in) :: eps
-    !     !
-    !     !
-    !                 dis_imp_eta = -eps*delta(art_i,art_j)*metric_jacobian(art_i,art_j)*()
-    !     !
-    !     !
-    ! end function dis_imp_ksi
+    function dis_imp_ksi(art_i,art_j,eps)
+        implicit none
+        integer(4), intent(in) :: art_i, art_j
+        real(8),    intent(in) :: eps
+        double precision dis_imp_ksi(3)        
+        !
+        !
+                    dis_imp_ksi(1) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i-1,art_j))
+                    dis_imp_ksi(2) = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(2.0d0/metric_jacobian(art_i,art_j))
+                    dis_imp_ksi(3) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i+1,art_j))                    
+        !
+        !
+    end function dis_imp_ksi
+    !
+    !
+    function dis_imp_eta(art_i,art_j,eps)
+        implicit none
+        integer(4), intent(in) :: art_i, art_j
+        real(8),    intent(in) :: eps
+        double precision dis_imp_eta(3)        
+        !
+        !
+                    dis_imp_eta(1) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i,art_j-1))
+                    dis_imp_eta(2) = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(2.0d0/metric_jacobian(art_i,art_j))
+                    dis_imp_eta(3) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i,art_j+1)) 
+        !
+        !
+    end function dis_imp_eta
 end module functions

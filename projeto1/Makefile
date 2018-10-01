@@ -12,7 +12,10 @@ FC = gfortran
 #FLAGS = -O0  -g -traceback -check all -check bounds -check uninit -ftrapuv -debug all -gen-interfaces -warn interfaces -I/usr/include
 #FLAGS = -O0 -g -fpe:0 -traceback -check all -check bounds -check uninit -ftrapuv -debug all -I/usr/include
 #FLAGS = -O0 -g -mkl
-FLAGS = -g  
+# gfortran fin bad operations (be careful!!) and NaN
+#FLAGS = -g -fbacktrace -ffpe-trap=zero,overflow,underflow
+#
+FLAGS = -g 
 # linkagem de bibliotecas ldd(comando linux para listar as bibliotecas)
 LIBS = -lblas -llapack
 #LIBS = -lnetcdf -lnetcdff -L/home/schiavo/libs/lib -I/home/schiavo/libs/include -lcgns 

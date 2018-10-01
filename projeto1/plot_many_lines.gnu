@@ -1,6 +1,8 @@
 #!/usr/bin/gnuplot
 
 # Script gnuplot to iteratively plot residuals of bru3d.
+# example also retired from the site below
+# http://gnuplot.sourceforge.net/demo_5.0/lines_arrows.html
 
 set term png
 set output "residue.png"
@@ -16,24 +18,6 @@ set title "Projeto1"
     linecolor rgb '#0060ad' \
     linetype 1 linewidth 2 \
     pointtype 7 pointsize 1.5
-
-plot 'residue.dat' with lines linestyle 1
-
-#
-# Combine dot/dash, linecolor, and arrowstyle demos into a single file.
-# Demonstrate explicit choice of both dot/dash pattern (linetype) 
-# and color (linecolor).
-#
-set termoption dash
-
-set xrange [-0.5:3.5]
-set yrange [-1:1.4]
-set bmargin 7
-unset ytics
-unset xtics
-#
-set title "Independent colors and dot/dash styles"
-unset colorbox
 #
 # reset linetypes to base dash patterns
 #

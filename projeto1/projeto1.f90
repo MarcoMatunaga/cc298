@@ -15,15 +15,15 @@ read(1,*) imax,jmax
     gama = 1.4d0
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
-    CFL = 0.10d0
+    CFL = 0.20d0
     !
     ! choose the time marching method method
     ! time_method = 1 euler explicit 
     ! time_method = 2 euler implicit (beam warming)
     !
-    time_method = 2 
+    time_method = 1
     !
-    ! choose dissipation
+    ! choose dissipation (explicit)
     ! which_diss = 1 D4
     ! which_diss = 2 D2
     ! which_diss = 3 nonlinear
@@ -34,8 +34,8 @@ read(1,*) imax,jmax
     !
     ! set dissipation parameters
     !
-    eps_dis_e = 5.0d0
-    eps_dis_i = 2.5d0*eps_dis_e
+    eps_dis_e = 10.0d0
+    eps_dis_i = 4.0d0*eps_dis_e
     !
     ! here we consider the value of cv as (5/2)*R
     ! R is the universal perfect gas constant
@@ -48,7 +48,7 @@ read(1,*) imax,jmax
     p_total = 101360.0d0
     nsave = 0
     iter = 0
-    max_iter = 5000
+    max_iter = 25000
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
 !
 ! add one more point on the index j due to the symmetry line
