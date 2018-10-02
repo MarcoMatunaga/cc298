@@ -73,10 +73,12 @@ residue4(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,4) - E_barra(r_i-1,r_j,4)) &
         residue4(r_i,r_j) = delta_t(r_i,r_j)*residue4(r_i,r_j)
         !
         !
-        if ( log10(abs(residue1(r_i,r_j))) > max_residue ) max_residue = log10(abs(residue1(r_i,r_j)))
-        if ( log10(abs(residue2(r_i,r_j))) > max_residue ) max_residue = log10(abs(residue2(r_i,r_j)))
-        if ( log10(abs(residue3(r_i,r_j))) > max_residue ) max_residue = log10(abs(residue3(r_i,r_j)))
-        if ( log10(abs(residue4(r_i,r_j))) > max_residue ) max_residue = log10(abs(residue4(r_i,r_j)))
+        if ( (abs(residue1(r_i,r_j))) > max_residue ) max_residue = (abs(residue1(r_i,r_j)))
+        if ( (abs(residue2(r_i,r_j))) > max_residue ) max_residue = (abs(residue2(r_i,r_j)))
+        if ( (abs(residue3(r_i,r_j))) > max_residue ) max_residue = (abs(residue3(r_i,r_j)))
+        if ( (abs(residue4(r_i,r_j))) > max_residue ) max_residue = (abs(residue4(r_i,r_j)))
+        !
+        max_residue = log10(max_residue)
         !
         !
 end subroutine residue

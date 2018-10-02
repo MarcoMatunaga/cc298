@@ -18,8 +18,7 @@ real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 !real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
 real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
 real(8),dimension(:,:),allocatable             :: Identy
-real(8),dimension(:),allocatable               :: L_ksi, L_eta
-real(8)                                        :: coeff_cte
+real(8)                                        :: L_ksi, L_eta
 !
 integer index_i, index_j, i_sol, j_sol
 !
@@ -34,7 +33,6 @@ allocate(Id_x(dim,dim,imax),Id_y(dim,dim,jmax))
 allocate(main_x(dim,dim,imax),main_y(dim,dim,jmax))
 allocate(Bx_sys(dim,imax),By_sys(dim,jmax))
 allocate(Identy(dim,dim))
-allocate(L_ksi(dim),L_eta(dim))
 !
 ! create the two identies matrix
 !
@@ -97,33 +95,33 @@ looping_j_sol: do while ( j_sol <= jmax - 1 )
     !
 call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             !
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(3)*Identy(index_i,index_j)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do 
     !
     do i = 2, imax - 1
             !
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
-            
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
             !
 call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(3)*Identy(index_i,index_j)
+                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
             !
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
             !
 call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(1)*Identy(index_i,index_j)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
             !
@@ -132,13 +130,13 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
     i = imax
     !       
             !
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
+            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
             !
 call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi(1)*Identy(index_i,index_j)
+                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
     !
@@ -162,10 +160,10 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
     ! put artificial dissipation
     !
     do i = 1, imax
-        L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i)
+        L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,2)
         do index_i = 1, dim 
             do index_j = 1, dim
-                main_x(index_i,index_j,i) = Id_x(index_i,index_j,i) + L_ksi(2)*Identy(index_i,index_j)
+                main_x(index_i,index_j,i) = Id_x(index_i,index_j,i) + L_ksi*Identy(index_i,index_j)
             end do 
         end do 
     end do
@@ -190,35 +188,36 @@ end do looping_j_sol
         !
 call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
         !
-        L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
+        L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(3)*Identy(index_i,index_j)
+                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
             end do
         end do
         !
         !
         do j = 2, jmax - 1
             !
-            L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
+            L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
             !
 call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
             !
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(3)*Identy(index_i,index_j)
+                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
             !
             !
 call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
             !
+            L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(1)*Identy(index_i,index_j)
+                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
             !
@@ -231,11 +230,11 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         ! 
 call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
         !
-        L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
+        L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
         !
         do index_i = 1, dim
             do index_j = 1, dim
-                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta(1)*Identy(index_i,index_j)
+                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
             end do
         end do
         !
@@ -251,10 +250,10 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         ! solve the block tridiagonal i times
         ! call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til) 
         do j = 1, jmax 
-            L_eta = dis_imp_eta(i_sol,j,eps_dis_i)
+            L_eta = dis_imp_eta(i_sol,j,eps_dis_i,2)
             do index_i = 1, dim 
                 do index_j = 1, dim
-                    main_y(index_i,index_j,j) = Id_y(index_i,index_j,j) + L_eta(2)*Identy(index_i,index_j)
+                    main_y(index_i,index_j,j) = Id_y(index_i,index_j,j) + L_eta*Identy(index_i,index_j)
                 end do 
             end do 
         end do
@@ -295,9 +294,8 @@ deallocate(deltaQ_til_i,deltaQ_til_j, deltaQ)
 deallocate(Id_y)
 deallocate(main_x,main_y)
 deallocate(Identy)
-deallocate(L_ksi,L_eta)
 !
 !
 !
-209 format (500f12.6)
+!209 format (500f12.6)
 end subroutine implicit_beam_warming

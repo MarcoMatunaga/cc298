@@ -76,31 +76,45 @@ module functions
     !
     !
     !
-    function dis_imp_ksi(art_i,art_j,eps)
+    real(8) function dis_imp_ksi(art_i,art_j,eps,pos)
         implicit none
-        integer(4), intent(in) :: art_i, art_j
+        integer(4), intent(in) :: art_i, art_j, pos
         real(8),    intent(in) :: eps
-        double precision dis_imp_ksi(3)        
+        real(8),dimension(3)   :: vector
         !
         !
-                    dis_imp_ksi(1) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i-1,art_j))
-                    dis_imp_ksi(2) = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(2.0d0/metric_jacobian(art_i,art_j))
-                    dis_imp_ksi(3) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i+1,art_j))                    
+                if (pos == 1) then
+                    vector(1) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i-1,art_j))
+                else if (pos == 2) then 
+                    vector(2) = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(2.0d0/metric_jacobian(art_i,art_j))
+                else
+                    vector(3) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i+1,art_j))      
+                end if
+                    !
+                    dis_imp_ksi = vector(pos)
+                    !              
         !
         !
     end function dis_imp_ksi
     !
     !
-    function dis_imp_eta(art_i,art_j,eps)
+    real(8) function dis_imp_eta(art_i,art_j,eps,pos)
         implicit none
-        integer(4), intent(in) :: art_i, art_j
+        integer(4), intent(in) :: art_i, art_j, pos
         real(8),    intent(in) :: eps
-        double precision dis_imp_eta(3)        
+        real(8),dimension(3)   :: vector
         !
         !
-                    dis_imp_eta(1) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i,art_j-1))
-                    dis_imp_eta(2) = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(2.0d0/metric_jacobian(art_i,art_j))
-                    dis_imp_eta(3) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i,art_j+1)) 
+                if (pos == 1) then
+                    vector(1) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i,art_j-1))
+                else if (pos == 2) then 
+                    vector(2) = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(2.0d0/metric_jacobian(art_i,art_j))
+                else
+                    vector(3) = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)*(1.0d0/metric_jacobian(art_i,art_j+1)) 
+                end if
+                    !
+                    dis_imp_eta = vector(pos)
+                    !
         !
         !
     end function dis_imp_eta
