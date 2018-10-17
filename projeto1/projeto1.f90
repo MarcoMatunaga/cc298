@@ -13,7 +13,7 @@ integer(4),dimension(:),allocatable          :: CFL_ramp_iter
 !
 namelist /PAR_Flow/ gama, R, T_total,p_total 
 namelist /PAR_Time/ max_iter,time_method,res_conv
-namelist /PAR_Numeric/ which_diss, eps_dis_e, dis_factor, ramp, CFL_ramp_size, CFL
+namelist /PAR_Numeric/ which_diss, k2, k4, eps_dis_e, dis_factor, ramp, CFL_ramp_size, CFL
 namelist /PAR_Others/ dim 
 !
 !
@@ -113,7 +113,7 @@ do while ( max_residue > res_conv .and. iter < max_iter )
     call output_fluxes
     do j = 1, jmax
             do i = 1, imax
-               a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
+                a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
                 if (ramp == 1 .and. iter == CFL_ramp_iter(i_cfl) ) then                
                     CFL = CFL_ramp(i_cfl)
                     i_cfl = i_cfl + 1
@@ -134,7 +134,6 @@ do while ( max_residue > res_conv .and. iter < max_iter )
          call output_tecplot
     end if
     iter = iter + 1
-    write(*,*) iter, CFL
     !
     !
     call output_residue

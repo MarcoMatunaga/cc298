@@ -66,6 +66,9 @@ do j = 1, jmax
         end do
 end do
 !
+!
+!
+!
 ! remember that the Q_barra is multiplied by metric_jacobian
 ! when i call the jacobian i divide energy by rho which 
 ! cancels the metric_jacobian

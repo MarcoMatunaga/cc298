@@ -35,18 +35,21 @@ integer(4)                                   :: nsave, total_sol
 integer(4)                                   :: time_method
 ! artificial dissipation parameters
 integer(4)                                   :: which_diss
-real(8)                                      :: eps_dis_e, eps_dis_i, dis_factor
-real(8),dimension(:,:,:), allocatable        :: Q_dis, D4_ksi, D4_eta
-
+real(8)                                      :: eps_dis_e, eps_dis_i, dis_factor, k2, k4
+real(8),dimension(:,:,:),allocatable         :: Q_dis, D4_ksi, D4_eta
+! non linear dissipation parameters
+real(8),dimension(:,:),allocatable           :: nu_dis_eta, nu_dis_ksi
+real(8),dimension(:,:),allocatable           :: eps2_ksi, eps4_ksi
+real(8),dimension(:,:),allocatable           :: eps2_eta, eps4_eta
+real(8),dimension(:,:),allocatable           :: sigma
+    !
+    !
 contains
 !
 !
 !
     subroutine allocate_vars
         implicit none
-!
-!
-!
         allocate(meshx(imax,jmax), meshy(imax,jmax))
         allocate(delta_t(imax,jmax))
         allocate(residue1(imax,jmax), residue2(imax,jmax))
@@ -61,9 +64,6 @@ contains
         allocate(eta_x(imax,jmax), eta_y(imax,jmax))
         allocate(Q_barra(imax,jmax,dim), E_barra(imax,jmax,dim), F_barra(imax,jmax,dim))
         allocate(Q_dis(imax,jmax,dim), D4_ksi(imax,jmax,dim), D4_eta(imax,jmax,dim) )
-!
-!
-!
     end subroutine allocate_vars
 !
 !
@@ -84,8 +84,28 @@ contains
         deallocate(metric_jacobian)
         deallocate(Q_barra, E_barra, F_barra)
         deallocate(Q_dis, D4_ksi, D4_eta)
-!
-!
-!
     end subroutine deallocate_vars
+!
+!
+!
+    subroutine allocate_vars_non_linear
+        implicit none
+        allocate(nu_dis_ksi(imax,jmax),nu_dis_eta(imax,jmax))
+        allocate(eps2_ksi(imax,jmax),eps4_ksi(imax,jmax))
+        allocate(eps2_eta(imax,jmax),eps4_eta(imax,jmax))
+        allocate(sigma(imax,jmax))
+    end subroutine allocate_vars_non_linear
+!
+!
+!
+    subroutine deallocate_vars_non_linear
+        implicit none
+        deallocate(nu_dis_ksi,nu_dis_eta)
+        deallocate(eps2_ksi,eps4_ksi)
+        deallocate(eps2_eta,eps4_eta)
+        deallocate(sigma)
+    end subroutine deallocate_vars_non_linear
+!
+!
+!
 end module vars

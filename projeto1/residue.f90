@@ -41,6 +41,28 @@ else if (which_diss == 2) then
     D4_eta(r_i,r_j,4) = dis_eta2(r_i,r_j,4,eps_dis_e)
     !
     !
+else if (which_diss == 3) then 
+    !
+    !
+    call allocate_vars_non_linear
+    call non_linear_dissipation
+    !
+    !
+    D4_ksi(r_i,r_j,1) = non_lin_dis_ksi(r_i,r_j,eps2_ksi(r_i,r_j),eps4_ksi(r_i,r_j),1)
+    D4_ksi(r_i,r_j,2) = non_lin_dis_ksi(r_i,r_j,eps2_ksi(r_i,r_j),eps4_ksi(r_i,r_j),2)
+    D4_ksi(r_i,r_j,3) = non_lin_dis_ksi(r_i,r_j,eps2_ksi(r_i,r_j),eps4_ksi(r_i,r_j),3)
+    D4_ksi(r_i,r_j,4) = non_lin_dis_ksi(r_i,r_j,eps2_ksi(r_i,r_j),eps4_ksi(r_i,r_j),4)
+    !
+    !
+    D4_eta(r_i,r_j,1) = non_lin_dis_eta(r_i,r_j,eps2_eta(r_i,r_j),eps4_eta(r_i,r_j),1)
+    D4_eta(r_i,r_j,2) = non_lin_dis_eta(r_i,r_j,eps2_eta(r_i,r_j),eps4_eta(r_i,r_j),2)
+    D4_eta(r_i,r_j,3) = non_lin_dis_eta(r_i,r_j,eps2_eta(r_i,r_j),eps4_eta(r_i,r_j),3)
+    D4_eta(r_i,r_j,4) = non_lin_dis_eta(r_i,r_j,eps2_eta(r_i,r_j),eps4_eta(r_i,r_j),4)
+    !
+    !
+    call deallocate_vars_non_linear
+    !
+    !
 end if
 !
 !

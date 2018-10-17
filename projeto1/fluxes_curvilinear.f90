@@ -1,9 +1,10 @@
 subroutine fluxes_curvilinear
     use vars
     implicit none
-!
-!
-!
+!********
+!modify: calculate only in the inner points 
+! e pass the boundary points to the boundary subroutine
+!********
 E_barra = 0.0d0
 F_barra = 0.0d0
 !
