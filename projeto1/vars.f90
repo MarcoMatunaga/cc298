@@ -36,6 +36,7 @@ integer(4)                                   :: time_method
 ! artificial dissipation parameters
 integer(4)                                   :: which_diss
 real(8)                                      :: eps_dis_e, eps_dis_i, dis_factor, k2, k4
+real(8)                                      :: Dnonlinear_plus, Dnonlinear_minus
 real(8),dimension(:,:,:),allocatable         :: Q_dis, D4_ksi, D4_eta
 ! non linear dissipation parameters
 real(8),dimension(:,:),allocatable           :: nu_dis_eta, nu_dis_ksi

@@ -90,8 +90,7 @@ subroutine non_linear_dissipation
     !       maximum or minimum value for dissipation
     !******
     !
-    eps_dis_i  = dis_factor*(maxval(eps2_ksi)+maxvaL(eps4_ksi)) 
-    ! write(*,*) eps_dis_i
+    eps_dis_i  = dis_factor*(min(minval(eps2_ksi),minval(eps2_eta))+min(minval(eps4_eta),minvaL(eps4_ksi))) 
     !
     !
 end subroutine non_linear_dissipation
