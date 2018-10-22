@@ -151,11 +151,11 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
     ! *********
     !
         do i = 2, imax - 1
-            call residue(i,j_sol)
-            Bx_sys(1,i) = -residue1(i,j_sol)
-            Bx_sys(2,i) = -residue2(i,j_sol)
-            Bx_sys(3,i) = -residue3(i,j_sol)
-            Bx_sys(4,i) = -residue4(i,j_sol)
+            call compute_residue(i,j_sol)
+            Bx_sys(1,i) = -residue(i,j_sol,1)
+            Bx_sys(2,i) = -residue(i,j_sol,2)
+            Bx_sys(3,i) = -residue(i,j_sol,3)
+            Bx_sys(4,i) = -residue(i,j_sol,4)
         end do
     !
     ! we need to solve the block tridiagonal system j times

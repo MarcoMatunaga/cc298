@@ -77,10 +77,10 @@ subroutine non_linear_dissipation
     !
     do j_nld = 1, jmax
         do i_nld = 1, imax
-                sigma(i_nld,j_nld)      = abs(U_contravariant(i_nld,j_nld)) & 
-                                          + a(i_nld,j_nld)*sqrt(ksi_x(i_nld,j_nld)**2.0d0 + ksi_y(i_nld,j_nld)**2.0d0 )+ &
-                                          abs(V_contravariant(i_nld,j_nld)) &
-                                          + a(i_nld,j_nld)*sqrt(eta_x(i_nld,j_nld)**2.0d0 + eta_y(i_nld,j_nld)**2.0d0 )
+                sigma_ksi(i_nld,j_nld)      = abs(U_contravariant(i_nld,j_nld)) & 
+                                              + a(i_nld,j_nld)*sqrt(ksi_x(i_nld,j_nld)**2.0d0 + ksi_y(i_nld,j_nld)**2.0d0 )
+                sigma_eta(i_nld,j_nld)      = abs(V_contravariant(i_nld,j_nld)) &
+                                              + a(i_nld,j_nld)*sqrt(eta_x(i_nld,j_nld)**2.0d0 + eta_y(i_nld,j_nld)**2.0d0 )
         end do 
     end do
     !
@@ -91,6 +91,7 @@ subroutine non_linear_dissipation
     !******
     !
     eps_dis_i  = dis_factor*(maxval(eps2_ksi)+maxvaL(eps4_ksi)) 
+    ! write(*,*) eps_dis_i
     !
     !
 end subroutine non_linear_dissipation

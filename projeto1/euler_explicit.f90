@@ -23,11 +23,11 @@ end do
 !
 do j = 2, jmax - 1
         do i = 2, imax - 1
-            call residue(i,j)
-            Q_barra(i,j,1) = Q_barra(i,j,1) - residue1(i,j)
-            Q_barra(i,j,2) = Q_barra(i,j,2) - residue2(i,j)
-            Q_barra(i,j,3) = Q_barra(i,j,3) - residue3(i,j) 
-            Q_barra(i,j,4) = Q_barra(i,j,4) - residue4(i,j) 
+            call compute_residue(i,j)
+            Q_barra(i,j,1) = Q_barra(i,j,1) - residue(i,j,1)
+            Q_barra(i,j,2) = Q_barra(i,j,2) - residue(i,j,2)
+            Q_barra(i,j,3) = Q_barra(i,j,3) - residue(i,j,3) 
+            Q_barra(i,j,4) = Q_barra(i,j,4) - residue(i,j,4) 
         end do
 end do
 !

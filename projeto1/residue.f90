@@ -1,4 +1,4 @@
-subroutine residue(r_i,r_j)
+subroutine compute_residue(r_i,r_j)
     use vars
     use functions
     implicit none
@@ -60,47 +60,48 @@ else if (which_diss == 3) then
     D4_eta(r_i,r_j,4) = non_lin_dis_eta(r_i,r_j,eps2_eta(r_i,r_j),eps4_eta(r_i,r_j),4)
     !
     !
+    !write(*,*) D4_eta(r_i,r_j,1), D4_eta(r_i,r_j,2),D4_eta(r_i,r_j,3),D4_eta(r_i,r_j,4)
     call deallocate_vars_non_linear
     !
     !
 end if
 !
 !
-residue1(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,1) - E_barra(r_i-1,r_j,1))  & 
+residue(r_i,r_j,1) = 0.50d0*(E_barra(r_i+1,r_j,1) - E_barra(r_i-1,r_j,1))  & 
                     + 0.50d0*(F_barra(r_i,r_j+1,1) - F_barra(r_i,r_j-1,1)) 
         !
         !
-residue2(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,2) - E_barra(r_i-1,r_j,2))  &
+residue(r_i,r_j,2) = 0.50d0*(E_barra(r_i+1,r_j,2) - E_barra(r_i-1,r_j,2))  &
                     + 0.50d0*(F_barra(r_i,r_j+1,2) - F_barra(r_i,r_j-1,2)) 
         !
         !
-residue3(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,3) - E_barra(r_i-1,r_j,3)) & 
+residue(r_i,r_j,3) = 0.50d0*(E_barra(r_i+1,r_j,3) - E_barra(r_i-1,r_j,3)) & 
                     + 0.50d0*(F_barra(r_i,r_j+1,3) - F_barra(r_i,r_j-1,3)) 
         !
         !
-residue4(r_i,r_j) = 0.50d0*(E_barra(r_i+1,r_j,4) - E_barra(r_i-1,r_j,4)) &
+residue(r_i,r_j,4) = 0.50d0*(E_barra(r_i+1,r_j,4) - E_barra(r_i-1,r_j,4)) &
                     + 0.50d0*(F_barra(r_i,r_j+1,4) - F_barra(r_i,r_j-1,4)) 
         ! ***********************************
         ! posso juntar os dois blocos seguintes
         ! ***********************************
-        residue1(r_i,r_j) = residue1(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,1) + D4_eta(r_i,r_j,1))
-        residue2(r_i,r_j) = residue2(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,2) + D4_eta(r_i,r_j,2))
-        residue3(r_i,r_j) = residue3(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,3) + D4_eta(r_i,r_j,3))
-        residue4(r_i,r_j) = residue4(r_i,r_j) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,4) + D4_eta(r_i,r_j,4))
+        residue(r_i,r_j,1) = residue(r_i,r_j,1) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,1) + D4_eta(r_i,r_j,1))
+        residue(r_i,r_j,2) = residue(r_i,r_j,2) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,2) + D4_eta(r_i,r_j,2))
+        residue(r_i,r_j,3) = residue(r_i,r_j,3) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,3) + D4_eta(r_i,r_j,3))
+        residue(r_i,r_j,4) = residue(r_i,r_j,4) + metric_jacobian(r_i,r_j)*(D4_ksi(r_i,r_j,4) + D4_eta(r_i,r_j,4))
         !
         !
-        residue1(r_i,r_j) = delta_t(r_i,r_j)*residue1(r_i,r_j)
-        residue2(r_i,r_j) = delta_t(r_i,r_j)*residue2(r_i,r_j)
-        residue3(r_i,r_j) = delta_t(r_i,r_j)*residue3(r_i,r_j)
-        residue4(r_i,r_j) = delta_t(r_i,r_j)*residue4(r_i,r_j)
+        residue(r_i,r_j,1) = delta_t(r_i,r_j)*residue(r_i,r_j,1)
+        residue(r_i,r_j,2) = delta_t(r_i,r_j)*residue(r_i,r_j,2)
+        residue(r_i,r_j,3) = delta_t(r_i,r_j)*residue(r_i,r_j,3)
+        residue(r_i,r_j,4) = delta_t(r_i,r_j)*residue(r_i,r_j,4)
         !
         !
-        if ( (abs(residue1(r_i,r_j))) > max_residue ) max_residue = (abs(residue1(r_i,r_j)))
-        if ( (abs(residue2(r_i,r_j))) > max_residue ) max_residue = (abs(residue2(r_i,r_j)))
-        if ( (abs(residue3(r_i,r_j))) > max_residue ) max_residue = (abs(residue3(r_i,r_j)))
-        if ( (abs(residue4(r_i,r_j))) > max_residue ) max_residue = (abs(residue4(r_i,r_j)))
+        if ( (abs(residue(r_i,r_j,1))) > max_residue ) max_residue = (abs(residue(r_i,r_j,1)))
+        if ( (abs(residue(r_i,r_j,2))) > max_residue ) max_residue = (abs(residue(r_i,r_j,2)))
+        if ( (abs(residue(r_i,r_j,3))) > max_residue ) max_residue = (abs(residue(r_i,r_j,3)))
+        if ( (abs(residue(r_i,r_j,4))) > max_residue ) max_residue = (abs(residue(r_i,r_j,4)))
         !
         max_residue = log10(max_residue)
         !
         !
-end subroutine residue
+end subroutine compute_residue

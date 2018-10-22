@@ -123,20 +123,20 @@ module functions
         !
         !
         if (art_i == 2 ) then
-            non_lin_dis_ksi = sigma(art_i+1,art_j)*metric_jacobian(art_i+1,art_j) &
-                              - sigma(art_i-1,art_j)*metric_jacobian(art_i-1,art_j)
+            non_lin_dis_ksi = sigma_ksi(art_i+1,art_j)*metric_jacobian(art_i+1,art_j) &
+                              - sigma_ksi(art_i-1,art_j)*metric_jacobian(art_i-1,art_j)
             non_lin_dis_ksi = non_lin_dis_ksi*( eps2*(Q_dis(art_i+1,art_j,pos) - Q_dis(art_i,art_j,pos)) &
                               - eps4*(1.0d0*Q_dis(art_i+2,art_j,pos) - 4.0d0*Q_dis(art_i+1,art_j,pos) &
                               + 5.0d0*Q_dis(art_i,art_j,pos) ))
         else if (art_i == imax - 1 ) then
-            non_lin_dis_ksi = sigma(art_i+1,art_j)*metric_jacobian(art_i+1,art_j) &
-                              - sigma(art_i-1,art_j)*metric_jacobian(art_i-1,art_j)
+            non_lin_dis_ksi = sigma_ksi(art_i+1,art_j)*metric_jacobian(art_i+1,art_j) &
+                              - sigma_ksi(art_i-1,art_j)*metric_jacobian(art_i-1,art_j)
             non_lin_dis_ksi = non_lin_dis_ksi*( eps2*(Q_dis(art_i+1,art_j,pos) - Q_dis(art_i,art_j,pos)) &
                               - eps4*(1.0d0*Q_dis(art_i-2,art_j,pos) - 4.0d0*Q_dis(art_i-1,art_j,pos) &
                               + 5.0d0*Q_dis(art_i,art_j,pos) ))
         else 
-            non_lin_dis_ksi = sigma(art_i+1,art_j)*metric_jacobian(art_i+1,art_j) &
-                              - sigma(art_i-1,art_j)*metric_jacobian(art_i-1,art_j)
+            non_lin_dis_ksi = sigma_ksi(art_i+1,art_j)*metric_jacobian(art_i+1,art_j) &
+                              - sigma_ksi(art_i-1,art_j)*metric_jacobian(art_i-1,art_j)
             non_lin_dis_ksi = non_lin_dis_ksi*( eps2*(Q_dis(art_i+1,art_j,pos) - Q_dis(art_i,art_j,pos)) &
                               - eps4*(Q_dis(art_i+2,art_j,pos) - 3.0d0*Q_dis(art_i+1,art_j,pos) &
                               + 3.0d0*Q_dis(art_i,art_j,pos) - Q_dis(art_i-1,art_j,pos)))
@@ -153,20 +153,20 @@ module functions
         !
         !
         if (art_j == 2 ) then
-            non_lin_dis_eta = sigma(art_i,art_j+1)*metric_jacobian(art_i,art_j+1) &
-                              - sigma(art_i,art_j-1)*metric_jacobian(art_i,art_j-1)
+            non_lin_dis_eta = sigma_eta(art_i,art_j+1)*metric_jacobian(art_i,art_j+1) &
+                              - sigma_eta(art_i,art_j-1)*metric_jacobian(art_i,art_j-1)
             non_lin_dis_eta = non_lin_dis_eta*( eps2*(Q_dis(art_i,art_j+1,pos) - Q_dis(art_i,art_j,pos)) &
                               - eps4*(1.0d0*Q_dis(art_i,art_j+2,pos) - 4.0d0*Q_dis(art_i,art_j+1,pos) &
                               + 5.0d0*Q_dis(art_i,art_j,pos) ))
         else if (art_j == jmax - 1) then
-            non_lin_dis_eta = sigma(art_i,art_j+1)*metric_jacobian(art_i,art_j+1) &
-                              - sigma(art_i,art_j-1)*metric_jacobian(art_i,art_j-1)
+            non_lin_dis_eta = sigma_eta(art_i,art_j+1)*metric_jacobian(art_i,art_j+1) &
+                              - sigma_eta(art_i,art_j-1)*metric_jacobian(art_i,art_j-1)
             non_lin_dis_eta = non_lin_dis_eta*( eps2*(Q_dis(art_i,art_j+1,pos) - Q_dis(art_i,art_j,pos)) &
                               - eps4*(1.0d0*Q_dis(art_i,art_j-2,pos) - 4.0d0*Q_dis(art_i,art_j-1,pos) &
                               + 5.0d0*Q_dis(art_i,art_j+1,pos) ))
         else
-            non_lin_dis_eta = sigma(art_i,art_j+1)*metric_jacobian(art_i,art_j+1) &
-                              - sigma(art_i,art_j-1)*metric_jacobian(art_i,art_j-1)
+            non_lin_dis_eta = sigma_eta(art_i,art_j+1)*metric_jacobian(art_i,art_j+1) &
+                              - sigma_eta(art_i,art_j-1)*metric_jacobian(art_i,art_j-1)
             non_lin_dis_eta = non_lin_dis_eta*( eps2*(Q_dis(art_i,art_j+1,pos) - Q_dis(art_i,art_j,pos)) &
                               - eps4*(Q_dis(art_i,art_j+2,pos) - 3.0d0*Q_dis(art_i,art_j+1,pos) &
                               + 3.0d0*Q_dis(art_i,art_j,pos) - Q_dis(art_i,art_j-1,pos)))

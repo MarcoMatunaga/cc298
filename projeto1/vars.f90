@@ -3,7 +3,7 @@ implicit none
 ! flow, equations, variables vectors/matrixes
 real(8),dimension(:,:),allocatable           :: T, p, u, v, q_vel, a
 real(8),dimension(:,:),allocatable           :: U_contravariant, V_contravariant
-real(8),dimension(:,:),allocatable           :: residue1, residue2, residue3, residue4 
+real(8),dimension(:,:,:),allocatable         :: residue
 real(8),dimension(:,:,:),allocatable         :: Q_barra, E_barra, F_barra 
 real(8)                                      :: T_total, p_total
 ! vector dimension 
@@ -41,7 +41,7 @@ real(8),dimension(:,:,:),allocatable         :: Q_dis, D4_ksi, D4_eta
 real(8),dimension(:,:),allocatable           :: nu_dis_eta, nu_dis_ksi
 real(8),dimension(:,:),allocatable           :: eps2_ksi, eps4_ksi
 real(8),dimension(:,:),allocatable           :: eps2_eta, eps4_eta
-real(8),dimension(:,:),allocatable           :: sigma
+real(8),dimension(:,:),allocatable           :: sigma_ksi, sigma_eta
     !
     !
 contains
@@ -52,10 +52,9 @@ contains
         implicit none
         allocate(meshx(imax,jmax), meshy(imax,jmax))
         allocate(delta_t(imax,jmax))
-        allocate(residue1(imax,jmax), residue2(imax,jmax))
-        allocate(residue3(imax,jmax), residue4(imax,jmax))
+        allocate(residue(imax,jmax,dim))
         allocate(metric_jacobian(imax,jmax))
-        allocate( U_contravariant(imax,jmax), V_contravariant(imax,jmax))
+        allocate(U_contravariant(imax,jmax), V_contravariant(imax,jmax))
         allocate(p(imax,jmax), T(imax,jmax))
         allocate(u(imax,jmax), v(imax,jmax), a(imax,jmax), q_vel(imax,jmax))
         allocate(y_ksi(imax,jmax), y_eta(imax,jmax))
@@ -72,8 +71,7 @@ contains
         implicit none
         deallocate(meshx, meshy)
         deallocate(delta_t)
-        deallocate(residue1, residue2)
-        deallocate(residue3, residue4)
+        deallocate(residue)
         deallocate(U_contravariant, V_contravariant)
         deallocate(p, T)
         deallocate(u, v, a, q_vel)
@@ -93,7 +91,7 @@ contains
         allocate(nu_dis_ksi(imax,jmax),nu_dis_eta(imax,jmax))
         allocate(eps2_ksi(imax,jmax),eps4_ksi(imax,jmax))
         allocate(eps2_eta(imax,jmax),eps4_eta(imax,jmax))
-        allocate(sigma(imax,jmax))
+        allocate(sigma_ksi(imax,jmax), sigma_eta(imax,jmax))
     end subroutine allocate_vars_non_linear
 !
 !
@@ -103,7 +101,7 @@ contains
         deallocate(nu_dis_ksi,nu_dis_eta)
         deallocate(eps2_ksi,eps4_ksi)
         deallocate(eps2_eta,eps4_eta)
-        deallocate(sigma)
+        deallocate(sigma_ksi,sigma_eta)
     end subroutine deallocate_vars_non_linear
 !
 !
