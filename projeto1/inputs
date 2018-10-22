@@ -12,14 +12,14 @@ res_conv = -5.00
 /
 
 &PAR_Numeric
-which_diss = 1
+which_diss = 3
 k2 = 0.25
 k4 = 0.01
-eps_dis_e = 5.00
+eps_dis_e = 10.00
 dis_factor = 3.00
 ramp = 0
 CFL_ramp_size = 3
-CFL = 1.0
+CFL = 3.0
 /
 
 &PAR_Others

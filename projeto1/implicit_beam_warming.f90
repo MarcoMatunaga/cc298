@@ -90,8 +90,8 @@ end do
 !
 ! step i) a) I need: A, deltaQ_til, E_Barra, F_barra
 !
-i_sol = 2
-j_sol = 2
+i_sol = 2 ! change j_sol by j
+j_sol = 2 ! idem for i_sol
 looping_j_sol: do while ( j_sol <= jmax - 1 )
     !
     i = 1

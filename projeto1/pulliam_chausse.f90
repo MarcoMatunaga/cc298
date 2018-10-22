@@ -30,17 +30,25 @@ end do
 j = 2
 !
 !
+do while (j <= jmax - 1)
+    !
+    !
     i = 2   
     rho_t         = Q_barra(i+1,j,1)/metric_jacobian(i+1,j)
-    inverse_T_ksi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)  
+    inverse_T_ksi = inv_T_ksi(u(i+1,j),v(i+1,j),rho_t,a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
         call compute_residue(i,j)
-        aux_residue(1) = residue(i,j,1)
-        aux_residue(2) = residue(i,j,2)
-        aux_residue(3) = residue(i,j,3)
-        aux_residue(4) = residue(i,j,4)
+        aux_residue(1) = -residue(i,j,1)
+        aux_residue(2) = -residue(i,j,2)
+        aux_residue(3) = -residue(i,j,3)
+        aux_residue(4) = -residue(i,j,4)
     result = matmul(inverse_T_ksi,aux_residue)
+    call thomas_pulliam_chausse
     !
     !  
+    j = j + 1
+    !
+    !
+end do
 !
 !
 deallocate(Identy)
