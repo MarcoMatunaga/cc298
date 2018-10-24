@@ -113,6 +113,7 @@ do while ( max_residue > res_conv .and. iter < max_iter )
     call output_fluxes
     do j = 1, jmax
             do i = 1, imax
+
                 a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
                 if (ramp == 1 .and. iter == CFL_ramp_iter(i_cfl) ) then                
                     CFL = CFL_ramp(i_cfl)
