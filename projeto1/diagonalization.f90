@@ -9,13 +9,13 @@ contains
         implicit none
         integer(4),intent(in)                           :: size
         real(8),intent(in)                              :: U_c,a_temp,ksi_x_temp,ksi_y_temp
-        real(8),dimension(size,size)                    :: diag_ksi
+        real(8),dimension(size)                         :: diag_ksi
         diag_ksi = 0.0d0
         if (size == 4) then
-            diag_ksi(1,1) = U_c
-            diag_ksi(2,2) = U_c
-            diag_ksi(3,3) = U_c + a_temp*sqrt(ksi_x_temp**2.0d0+ksi_y_temp**2.0d0) 
-            diag_ksi(4,4) = U_c - a_temp*sqrt(ksi_x_temp**2.0d0+ksi_y_temp**2.0d0)
+            diag_ksi(1) = U_c
+            diag_ksi(2) = U_c
+            diag_ksi(3) = U_c + a_temp*sqrt(ksi_x_temp**2.0d0+ksi_y_temp**2.0d0) 
+            diag_ksi(4) = U_c - a_temp*sqrt(ksi_x_temp**2.0d0+ksi_y_temp**2.0d0)
         endif
     end function diag_ksi
 !
@@ -24,13 +24,13 @@ contains
         implicit none
         integer(4),intent(in)                           :: size
         real(8),intent(in)                              :: V_c,a_temp,eta_x_temp,eta_y_temp
-        real(8),dimension(size,size)                    :: diag_eta
+        real(8),dimension(size)                         :: diag_eta
         diag_eta = 0.0d0
         if (size == 4) then
-            diag_eta(1,1) = V_c
-            diag_eta(2,2) = V_c
-            diag_eta(3,3) = V_c + a_temp*sqrt(eta_x_temp**2.0d0+eta_y_temp**2.0d0) 
-            diag_eta(4,4) = V_c - a_temp*sqrt(eta_x_temp**2.0d0+eta_y_temp**2.0d0)
+            diag_eta(1) = V_c
+            diag_eta(2) = V_c
+            diag_eta(3) = V_c + a_temp*sqrt(eta_x_temp**2.0d0+eta_y_temp**2.0d0) 
+            diag_eta(4) = V_c - a_temp*sqrt(eta_x_temp**2.0d0+eta_y_temp**2.0d0)
         endif
     end function diag_eta
 !
