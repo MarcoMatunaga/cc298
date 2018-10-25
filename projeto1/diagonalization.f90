@@ -117,8 +117,8 @@ contains
         !
         !
         inv_T_ksi(4,1) = beta_t*(phi_temp**2.0d0 + a_temp*theta_til)
-        inv_T_ksi(4,2) = -beta_t*(ksi_x_temp_til*a_temp + gama - 1.0d0*u_temp )
-        inv_T_ksi(4,3) = -beta_t*(ksi_y_temp_til*a_temp + gama - 1.0d0*v_temp )
+        inv_T_ksi(4,2) = -beta_t*(ksi_x_temp_til*a_temp + (gama - 1.0d0)*u_temp )
+        inv_T_ksi(4,3) = -beta_t*(ksi_y_temp_til*a_temp + (gama - 1.0d0)*v_temp )
         inv_T_ksi(4,4) = beta_t*(gama - 1.0d0)
         !
         !
@@ -207,8 +207,8 @@ contains
         !
         !
         inv_T_eta(4,1) = beta_t*(phi_temp**2.0d0 + a_temp*theta_til)
-        inv_T_eta(4,2) = -beta_t*(eta_x_temp_til*a_temp + gama - 1.0d0*u_temp )
-        inv_T_eta(4,3) = -beta_t*(eta_y_temp_til*a_temp + gama - 1.0d0*v_temp )
+        inv_T_eta(4,2) = -beta_t*(eta_x_temp_til*a_temp + (gama - 1.0d0)*u_temp )
+        inv_T_eta(4,3) = -beta_t*(eta_y_temp_til*a_temp + (gama - 1.0d0)*v_temp )
         inv_T_eta(4,4) = beta_t*(gama - 1.0d0)
         !
         !
@@ -250,14 +250,14 @@ contains
         !
         N_matrix(3,1) = 0.0d0
         N_matrix(3,2) = (1.0d0/sqrt(2.0d0))*m2
-        N_matrix(3,3) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 + m1)
-        N_matrix(3,4) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 - m1)
+        N_matrix(3,3) = (1.0d0 + m1)*(1.0d0/sqrt(2.0d0))**2.0d0
+        N_matrix(3,4) = (1.0d0 - m1)*(1.0d0/sqrt(2.0d0))**2.0d0
         !
         !
         N_matrix(4,1) = 0.0d0
         N_matrix(4,2) = -(1.0d0/sqrt(2.0d0))*m2
-        N_matrix(4,3) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 - m1)
-        N_matrix(4,4) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 + m1)
+        N_matrix(4,3) = (1.0d0 - m1)*(1.0d0/sqrt(2.0d0))**2.0d0
+        N_matrix(4,4) = (1.0d0 + m1)*(1.0d0/sqrt(2.0d0))**2.0d0
         !
         !
     end function N_matrix
@@ -298,14 +298,14 @@ contains
         !
         inv_N_matrix(3,1) = 0.0d0
         inv_N_matrix(3,2) = -(1.0d0/sqrt(2.0d0))*m2
-        inv_N_matrix(3,3) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 + m1)
-        inv_N_matrix(3,4) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 - m1)
+        inv_N_matrix(3,3) = (1.0d0 + m1)*(1.0d0/sqrt(2.0d0))**2.0d0
+        inv_N_matrix(3,4) = (1.0d0 - m1)*(1.0d0/sqrt(2.0d0))**2.0d0
         !
         !
         inv_N_matrix(4,1) = 0.0d0
         inv_N_matrix(4,2) = (1.0d0/sqrt(2.0d0))*m2
-        inv_N_matrix(4,3) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 - m1)
-        inv_N_matrix(4,4) = (1.0d0/sqrt(2.0d0))**2.0d0*(1.0d0 + m1)
+        inv_N_matrix(4,3) = (1.0d0 - m1)*(1.0d0/sqrt(2.0d0))**2.0d0
+        inv_N_matrix(4,4) = (1.0d0 + m1)*(1.0d0/sqrt(2.0d0))**2.0d0
         !
         !
     end function inv_N_matrix

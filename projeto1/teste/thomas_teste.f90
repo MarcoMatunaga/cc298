@@ -6,6 +6,7 @@ program teste_tridiagonal
 lower = -1.0d0
 main  = 2.04d0
 upper = -1.0d0
+lower(1) = 3.0d0
 !
 !
 d_r(1) = 40.8d0

@@ -36,6 +36,10 @@ allocate(Identy(dim,dim))
 !
 ! create the two identies matrix
 !
+!************
+! we can eliminate the variables in the y direction
+! it is possible to allocate and deallocate the arrays
+!************
 Id_x = 0.0d0
 Id_y = 0.0d0
 do i = 1, dim
