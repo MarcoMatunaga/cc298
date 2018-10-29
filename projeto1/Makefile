@@ -13,8 +13,8 @@ FC = gfortran
 #FLAGS = -O0 -g -fpe:0 -traceback -check all -check bounds -check uninit -ftrapuv -debug all -I/usr/include
 #FLAGS = -O0 -g -mkl
 # gfortran find bad operations (be careful!!)
-FLAGS = -g -fbacktrace -ffpe-trap=zero,overflow,underflow -fcheck=all -fcheck=bounds -Wall
-#FLAGS = -g -fbacktrace -fcheck=all -fcheck=bounds -Wall
+#FLAGS = -g -fbacktrace -ffpe-trap=zero,overflow,underflow -fcheck=all -fcheck=bounds -Wall
+FLAGS = -g -fbacktrace -fcheck=all -fcheck=bounds -Wall
 #FLAGS = -g 
 # linkagem de bibliotecas ldd(comando linux para listar as bibliotecas)
 LIBS = -lblas -llapack

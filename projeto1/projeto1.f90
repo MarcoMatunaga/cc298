@@ -129,7 +129,6 @@ do while ( max_residue > res_conv .and. iter < max_iter )
     if (time_method == 1) call euler_explicit
     if (time_method == 2) call implicit_beam_warming
     if (time_method == 3) call pulliam_chausse
-    !write(*,*) 'oi'
     ! if (time_method == 4) call sw_1st
     ! if (time_method == 5) call sw_2nd
     !
