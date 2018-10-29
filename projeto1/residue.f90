@@ -10,6 +10,7 @@ integer r_i, r_j
 ! which means the norma_infinity
 !
 max_residue = -100.0d0
+residue = 0.0d0
 !
 if (which_diss == 1) then 
     !

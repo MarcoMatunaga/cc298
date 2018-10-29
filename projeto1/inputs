@@ -6,8 +6,8 @@ p_total = 101360.00
 /
 
 &PAR_Time
-max_iter = 5000
-time_method = 3
+max_iter = 10000
+time_method = 2
 res_conv = -5.00
 /
 
@@ -16,7 +16,7 @@ which_diss = 1
 k2 = 0.25
 k4 = 0.01
 eps_dis_e = 10.00
-dis_factor = 0.00
+dis_factor = 2.00
 ramp = 0
 CFL_ramp_size = 3
 CFL = 0.1
