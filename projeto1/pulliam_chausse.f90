@@ -32,8 +32,8 @@ allocate(result(dim))
 allocate(diag_minus(dim),diag_plus(dim))
 !
 !
-allocate(lower(imax),main(imax),upper(imax))
-allocate(x_sys(imax),d_sys(imax),aux_mult(dim))
+allocate(lower(imax-2),main(imax-2),upper(imax-2))
+allocate(x_sys(imax-2),d_sys(imax-2),aux_mult(dim))
 !
 !
 diag_minus = 0.0d0
@@ -43,7 +43,7 @@ x1_sys = 0.0d0
 x_sys  = 0.0d0
 lower  = 0.0d0
 upper  = 0.0d0
-main   = 0.0d0
+main   = 1.0d0
 aux_mult = 0.0d0
 right_side = 0.0d0
 !
@@ -51,11 +51,7 @@ right_side = 0.0d0
 do j = 2, jmax - 1
     do i = 2, imax - 1
         call compute_residue(i,j)
-        ! write(*,*) 'l1',aux_mult(1),aux_mult(2),aux_mult(3),aux_mult(4)
-        ! write(*,*) 'l1',residue(i,j,1),residue(i,j,2),residue(i,j,3),residue(i,j,4)
         aux_mult(1:dim) = -residue(i,j,1:dim) 
-        ! write(*,*) 'l2',aux_mult(1),aux_mult(2),aux_mult(3),aux_mult(4)
-        ! write(*,*) 'l2',residue(i,j,1),residue(i,j,2),residue(i,j,3),residue(i,j,4)
         rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
         inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
         result = matmul(inv_t_xi,aux_mult)
@@ -69,48 +65,29 @@ do while (index <= dim)
         !
         do j = 2, jmax - 1
         !
-                i = 1
-                !
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,3)
-                diag_plus  = diag_ksi(U_contravariant(i+1,j),a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
-                    upper(i) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,2)
-                    main(i)  = 1.0d0 + L_ksi
-                !
             do i = 2, imax - 1
                 !
-                d_sys(i) = right_side(i,j,index)
+                d_sys(i-1) = right_side(i,j,index)
                 !
                 L_ksi = dis_imp_eta(i,j,eps_dis_i,3)
                 diag_plus  = diag_ksi(U_contravariant(i+1,j),a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
-                    upper(i) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi
+                    upper(i-1) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi
                 L_ksi = dis_imp_eta(i,j,eps_dis_i,1)
                 diag_minus = diag_ksi(U_contravariant(i-1,j),a(i-1,j),ksi_x(i-1,j),ksi_y(i-1,j),dim)
-                    lower(i) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_ksi
+                    lower(i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_ksi
                 L_ksi = dis_imp_eta(i,j,eps_dis_i,2)
-                    main(i) = 1.0d0 + L_ksi
+                    main(i-1) = main(i-1) + L_ksi
                 !
             end do 
-                !
-                i = imax
-                !
-                diag_minus = diag_ksi(U_contravariant(i-1,j),a(i-1,j),ksi_x(i-1,j),ksi_y(i-1,j),dim)
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,1)
-                    lower(i) = -0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,2)
-                    main(i)  = 1.0d0 + L_ksi
-                !
             !    a - sub-diagonal (means it is the diagonal below the main diagonal)
             !    b - the main diagonal
             !    c - sup-diagonal (means it is the diagonal above the main diagonal)
             !    d - right part
             !    x - the answer
             !    n - number of equations
-            call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,imax)
+            call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,imax-2)
             do i = 2, imax - 1
-                    !write(*,*) iter,i,j,lower(index+(i-1)*dim),main(index+(i-1)*dim),&
-                    !          upper(index+(i-1)*dim),x_sys(index+(i-1)*dim)
-                    x1_sys(i,j,index) = x_sys(i)
+                    x1_sys(i,j,index) = x_sys(i-1)
             end do
         !
         end do
@@ -124,15 +101,15 @@ deallocate(x_sys,d_sys)
 !
 ! start to solve the system in the eta location
 !
-allocate(lower(jmax),main(jmax),upper(jmax))
-allocate(x_sys(jmax),d_sys(jmax))
+allocate(lower(jmax-2),main(jmax-2),upper(jmax-2))
+allocate(x_sys(jmax-2),d_sys(jmax-2))
 !
 !
 d_sys = 0.0d0
 x_sys  = 0.0d0
 lower  = 0.0d0
 upper  = 0.0d0
-main   = 0.0d0
+main   = 1.0d0
 aux_mult = 0.0d0
 right_side = 0.0d0
 !
@@ -151,42 +128,25 @@ index = 1
 do while (index <= dim)
     do i = 2, imax - 1
         !
-        j = 1
-        !
-        diag_plus = diag_eta(V_contravariant(i,j+1),a(i,j+1),eta_x(i,j+1),eta_y(i,j+1),dim)
-        L_eta = dis_imp_eta(i,j,eps_dis_i,3)
-            upper(j) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_eta
-        L_eta = dis_imp_eta(i,j,eps_dis_i,2)
-            main(j)  = 1.0d0 + L_eta
-        !
         do j = 2, jmax - 1
             !
-            d_sys(j) = right_side(i,j,index)
+            d_sys(j-1) = right_side(i,j,index)
             !
             L_eta = dis_imp_eta(i,j,eps_dis_i,3)
             diag_plus = diag_eta(V_contravariant(i,j+1),a(i,j+1),eta_x(i,j+1),eta_y(i,j+1),dim)
-                upper(j) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_eta
+                upper(j-1) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_eta
             diag_minus = diag_eta(V_contravariant(i,j-1),a(i,j-1),eta_x(i,j-1),eta_y(i,j-1),dim)
             L_eta = dis_imp_eta(i,j,eps_dis_i,1)
-                lower(j) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_eta
+                lower(j-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_eta
             L_eta = dis_imp_eta(i,j,eps_dis_i,2)
-                main(j) = 1.0d0 + L_eta
+                main(j-1) = main(j-1) + L_eta
             !
         end do
         !
-        j = jmax
-        !
-        diag_minus = diag_eta(V_contravariant(i,j-1),a(i,j-1),eta_x(i,j-1),eta_y(i,j-1),dim)
-        L_eta = dis_imp_eta(i,j,eps_dis_i,1) 
-            lower(j) = -0.50d0*delta_t(i,j)*diag_plus(index) + L_eta
-        L_eta = dis_imp_eta(i,j,eps_dis_i,2)
-            main(j)  = 1.0d0 + L_eta
-        !
-        call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,jmax)
+        call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,jmax-2)
         do j = 2, jmax - 1
-            !write(*,*) iter,i,j,lower(index+(j-1)*dim),main(index+(j-1)*dim),&
-            !           upper(index+(j-1)*dim),x_sys(index+(j-1)*dim)
-            x1_sys(i,j,index) = x_sys(j)
+            x1_sys(i,j,index) = x_sys(j-1)
+            !write(*,*) iter,x_sys(8)
         end do
         !
     end do
