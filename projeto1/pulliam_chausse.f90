@@ -63,11 +63,6 @@ do index = 1, dim
     !
     do j_sol = 2, jmax - 1
         write(*,*) iter,index,j_sol
-
-        i = 1
-        L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
-        diag_plus  = diag_ksi(U_contravariant(i+1,j_sol),a(i+1,j_sol),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim)
-        upper(i) = 0.50d0*delta_t(i,j_sol)*diag_plus(index) + L_ksi
         do i = 2, imax - 1
             !
             d_sys(i-1) = right_side(i,j_sol,index)
@@ -125,8 +120,6 @@ do j = 2, jmax - 1
     end do 
 end do
 !
-index = 1
-!
 do index = 1, dim
     ! do i = 2, imax - 1
     do i_sol = 2, imax - 1
@@ -178,8 +171,8 @@ deallocate(result,aux_mult,Teta)
 !
 ! update the solution vector
 !
-do i = 2, imax - 1
-    do j = 2, jmax - 1
+do j = 2, jmax - 1
+    do i = 2, imax - 1
         !
         Q_barra(i,j,1) = Q_barra(i,j,1) + right_side(i,j,1) 
         Q_barra(i,j,2) = Q_barra(i,j,2) + right_side(i,j,2) 
@@ -194,7 +187,7 @@ end do
             open(999,file='pc')
             do j = 2, jmax - 1
                 do i = 2, imax - 1 
-                    write(999,*) iter,i,j,Q_barra(i,j,1)     
+                    write(999,*) iter,i,j,Q_barra(i,j,1)/metric_jacobian(i,j)     
                 end do 
             end do
             close(999)    

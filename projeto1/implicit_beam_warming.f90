@@ -70,9 +70,6 @@ do j = 1, jmax
         end do
 end do
 !
-!
-!
-!
 ! remember that the Q_barra is multiplied by metric_jacobian
 ! when i call the jacobian i divide energy by rho which 
 ! cancels the metric_jacobian
@@ -98,18 +95,6 @@ i_sol = 2 ! change j_sol by j
 j_sol = 2 ! idem for i_sol
 looping_j_sol: do while ( j_sol <= jmax - 1 )
     !
-    i = 1
-    !
-call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
-            !
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
-            !
-            do index_i = 1, dim
-                do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
-                end do
-            end do 
-    !
     do i = 2, imax - 1
             !
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
@@ -118,7 +103,7 @@ call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_s
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_plus(index_i,index_j,i) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
+                    A_plus(index_i,index_j,i-1) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
             !
@@ -128,24 +113,12 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
+                    A_minus(index_i,index_j,i-1) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
             !
     end do
     !
-    i = imax
-    !       
-            !
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
-            !
-call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
-            !
-            do index_i = 1, dim
-                do index_j = 1, dim
-                    A_minus(index_i,index_j,i) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
-                end do
-            end do
     !
     ! now create the vector B_sys, i.e., vector b of the system
     !
@@ -156,33 +129,34 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
     !
         do i = 2, imax - 1
             call compute_residue(i,j_sol)
-            Bx_sys(1,i) = -residue(i,j_sol,1)
-            Bx_sys(2,i) = -residue(i,j_sol,2)
-            Bx_sys(3,i) = -residue(i,j_sol,3)
-            Bx_sys(4,i) = -residue(i,j_sol,4)
+            Bx_sys(1,i-1) = -residue(i,j_sol,1)
+            Bx_sys(2,i-1) = -residue(i,j_sol,2)
+            Bx_sys(3,i-1) = -residue(i,j_sol,3)
+            Bx_sys(4,i-1) = -residue(i,j_sol,4)
         end do
     !
     ! we need to solve the block tridiagonal system j times
     ! blktriad(maind,lower,upper,id,md,xb,x)
     ! put artificial dissipation
     !
-    do i = 1, imax
+    do i = 2, imax - 1
         L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,2)
         do index_i = 1, dim 
             do index_j = 1, dim
-                main_x(index_i,index_j,i) = Id_x(index_i,index_j,i) + L_ksi*Identy(index_i,index_j)
+                main_x(index_i,index_j,i-1) = Id_x(index_i,index_j,i) + L_ksi*Identy(index_i,index_j)
             end do 
         end do 
     end do
-    call blktriad(main_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til_i) 
+    write(*,*) main_x, Id_x(1,1,1), Identy(1,1), L_ksi
+    call blktriad(main_x,A_minus,A_plus,dim,imax-2,Bx_sys,deltaQ_til_i) 
     !
     ! update j_sol
     !
     do i = 2, imax - 1
-        deltaQ_til(1,i,j_sol) = deltaQ_til_i(1,i)
-        deltaQ_til(2,i,j_sol) = deltaQ_til_i(2,i)
-        deltaQ_til(3,i,j_sol) = deltaQ_til_i(3,i)
-        deltaQ_til(4,i,j_sol) = deltaQ_til_i(4,i)
+        deltaQ_til(1,i,j_sol) = deltaQ_til_i(1,i-1)
+        deltaQ_til(2,i,j_sol) = deltaQ_til_i(2,i-1)
+        deltaQ_til(3,i,j_sol) = deltaQ_til_i(3,i-1)
+        deltaQ_til(4,i,j_sol) = deltaQ_til_i(4,i-1)
     end do 
     j_sol = j_sol + 1
 end do looping_j_sol
@@ -191,17 +165,6 @@ end do looping_j_sol
     !
     do while ( i_sol <= imax - 1 )
     !
-        j = 1
-        !
-call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
-        !
-        L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
-        !
-        do index_i = 1, dim
-            do index_j = 1, dim
-                B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
-            end do
-        end do
         !
         !
         do j = 2, jmax - 1
@@ -213,7 +176,7 @@ call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_plus(index_i,index_j,j) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
+                    B_plus(index_i,index_j,j-1) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
             !
@@ -224,55 +187,41 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
             !
             do index_i = 1, dim
                 do index_j = 1, dim
-                    B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
+                    B_minus(index_i,index_j,j-1) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
             !
             !
         end do
         !
-        !
-        j = jmax
-        !
-        ! 
-call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
-        !
-        L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
-        !
-        do index_i = 1, dim
-            do index_j = 1, dim
-                B_minus(index_i,index_j,j) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
-            end do
-        end do
-        !
         ! now create By_sys
         !
         do j = 2, jmax - 1
-            By_sys(1,j) = deltaQ_til(1,i_sol,j)
-            By_sys(2,j) = deltaQ_til(2,i_sol,j)
-            By_sys(3,j) = deltaQ_til(3,i_sol,j)
-            By_sys(4,j) = deltaQ_til(4,i_sol,j)
+            By_sys(1,j-1) = deltaQ_til(1,i_sol,j)
+            By_sys(2,j-1) = deltaQ_til(2,i_sol,j)
+            By_sys(3,j-1) = deltaQ_til(3,i_sol,j)
+            By_sys(4,j-1) = deltaQ_til(4,i_sol,j)
         end do
         !
         ! solve the block tridiagonal i times
         ! call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til) 
-        do j = 1, jmax 
+        do j = 2, jmax - 1
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,2)
             do index_i = 1, dim 
                 do index_j = 1, dim
-                    main_y(index_i,index_j,j) = Id_y(index_i,index_j,j) + L_eta*Identy(index_i,index_j)
+                    main_y(index_i,index_j,j-1) = Id_y(index_i,index_j,j) + L_eta*Identy(index_i,index_j)
                 end do 
             end do 
         end do
-        call blktriad(main_y,B_minus,B_plus,dim,jmax,By_sys,deltaQ_til_j)
+        call blktriad(main_y,B_minus,B_plus,dim,jmax-2,By_sys,deltaQ_til_j)
         !
         ! add one to the index loop
         !
         do j = 2, jmax - 1
-            deltaQ(i_sol,j,1) = deltaQ_til_j(1,j)        
-            deltaQ(i_sol,j,2) = deltaQ_til_j(2,j)
-            deltaQ(i_sol,j,3) = deltaQ_til_j(3,j)
-            deltaQ(i_sol,j,4) = deltaQ_til_j(4,j)          
+            deltaQ(i_sol,j,1) = deltaQ_til_j(1,j-1)        
+            deltaQ(i_sol,j,2) = deltaQ_til_j(2,j-1)
+            deltaQ(i_sol,j,3) = deltaQ_til_j(3,j-1)
+            deltaQ(i_sol,j,4) = deltaQ_til_j(4,j-1)          
         end do 
         !
         ! update Q_barra
@@ -291,7 +240,7 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
             open(998,file='gabarito')
             do j = 2, jmax - 1
                 do i = 2, imax - 1 
-                    write(998,*) iter,i,j,Q_barra(i,j,1)     
+                    write(998,*) iter,i,j,Q_barra(i,j,1)/metric_jacobian(i,j)     
                 end do
             end do 
             close(998)    
