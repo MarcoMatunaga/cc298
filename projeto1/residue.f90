@@ -129,6 +129,7 @@ residue(r_i,r_j,4) = 0.50d0*(E_barra(r_i+1,r_j,4) - E_barra(r_i-1,r_j,4)) &
         if ( (abs(residue(r_i,r_j,4))) > max_residue ) max_residue = (abs(residue(r_i,r_j,4)))
         !
         max_residue = log10(max_residue)
+        if (isnan(max_residue)) stop 'Divergiu :('
         !
         !
 end subroutine compute_residue

@@ -108,7 +108,8 @@ max_residue = 1.0d0
 i_cfl = 1
 !
 !
-do while ( max_residue > res_conv .and. iter < max_iter )
+do 
+    if ( max_residue < res_conv .or. iter > max_iter ) exit
     call fluxes_curvilinear 
     call output_fluxes
     do j = 1, jmax
@@ -133,11 +134,11 @@ do while ( max_residue > res_conv .and. iter < max_iter )
     ! if (time_method == 5) call sw_2nd
     !
     !
+    iter = iter + 1
     if ( mod(iter,(max_iter/10)) == 0 ) then
          nsave = nsave + 1
          call output_tecplot
     end if
-    iter = iter + 1
     !
     !
     call output_residue

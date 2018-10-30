@@ -278,7 +278,7 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         ! update Q_barra
         !
         do j = 2, jmax - 1
-            Q_barra(i_sol,j,1) = deltaQ(i_sol,j,1) + Q_barra(i_sol,j,1)         
+            Q_barra(i_sol,j,1) = deltaQ(i_sol,j,1) + Q_barra(i_sol,j,1)
             Q_barra(i_sol,j,2) = deltaQ(i_sol,j,2) + Q_barra(i_sol,j,2)
             Q_barra(i_sol,j,3) = deltaQ(i_sol,j,3) + Q_barra(i_sol,j,3)
             Q_barra(i_sol,j,4) = deltaQ(i_sol,j,4) + Q_barra(i_sol,j,4)   
@@ -286,6 +286,16 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         i_sol = i_sol + 1
     end do 
 !
+!
+        if (iter == 50) then 
+            open(998,file='gabarito')
+            do j = 2, jmax - 1
+                do i = 2, imax - 1 
+                    write(998,*) iter,i,j,Q_barra(i,j,1)     
+                end do
+            end do 
+            close(998)    
+        end if
 !
 deallocate(Id_x)
 deallocate(Bx_sys)
