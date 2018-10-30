@@ -51,7 +51,7 @@ right_side = 0.0d0
 do j = 2, jmax - 1
     do i = 2, imax - 1
         call compute_residue(i,j)
-        aux_mult(1:dim) = -residue(i,j,1:dim) 
+        aux_mult(1:dim) = -residue(i,j,1:dim)
         rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
         inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
         result = matmul(inv_t_xi,aux_mult)
@@ -69,13 +69,13 @@ do while (index <= dim)
                 !
                 d_sys(i-1) = right_side(i,j,index)
                 !
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,3)
+                L_ksi = dis_imp_ksi(i,j,eps_dis_i,3)
                 diag_plus  = diag_ksi(U_contravariant(i+1,j),a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
                     upper(i-1) = 0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,1)
+                L_ksi = dis_imp_ksi(i,j,eps_dis_i,1)
                 diag_minus = diag_ksi(U_contravariant(i-1,j),a(i-1,j),ksi_x(i-1,j),ksi_y(i-1,j),dim)
                     lower(i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_ksi
-                L_ksi = dis_imp_eta(i,j,eps_dis_i,2)
+                L_ksi = dis_imp_ksi(i,j,eps_dis_i,2)
                     main(i-1) = main(i-1) + L_ksi
                 !
             end do 
@@ -146,7 +146,7 @@ do while (index <= dim)
         call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,jmax-2)
         do j = 2, jmax - 1
             x1_sys(i,j,index) = x_sys(j-1)
-            !write(*,*) iter,x_sys(8)
+            if (index == 1) write(*,*) x1_sys(i,2,index), x_sys(1)
         end do
         !
     end do
@@ -156,6 +156,7 @@ end do
 !
 deallocate(lower,main,upper)
 deallocate(x_sys,d_sys)
+deallocate(diag_minus,diag_plus)
 !
 !
 do j = 2, jmax - 1
@@ -171,14 +172,16 @@ end do
 deallocate(x1_sys)
 deallocate(inv_t_xi,n_inverse)
 deallocate(result,aux_mult,Teta)
-deallocate(diag_minus,diag_plus)
 !
 ! update the solution vector
 !
 do j = 2, jmax - 1
     do i = 2, imax - 1
         !
-        Q_barra(i,j,1:dim) = right_side(i,j,1:dim) + Q_barra(i,j,1:dim)
+        Q_barra(i,j,1) = right_side(i,j,1) + Q_barra(i,j,1)
+        Q_barra(i,j,2) = right_side(i,j,2) + Q_barra(i,j,2)
+        Q_barra(i,j,3) = right_side(i,j,3) + Q_barra(i,j,3)
+        Q_barra(i,j,4) = right_side(i,j,4) + Q_barra(i,j,4)
         !
     end do
 end do
