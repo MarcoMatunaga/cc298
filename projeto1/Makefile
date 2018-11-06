@@ -13,7 +13,7 @@ FC = gfortran
 #FLAGS = -O0 -g -mkl
 # gfortran find bad operations (be careful!!)
 #FLAGS = -g -fbacktrace -ffpe-trap=zero,overflow,underflow -fcheck=all -fcheck=bounds -Wall
-FLAGS = -g -c -fbacktrace -fcheck=all -fcheck=bounds -Wall
+FLAGS = -g -fbacktrace -fcheck=all -fcheck=bounds -Wall
 #FLAGS = -g 
 # linkagem de bibliotecas ldd(comando linux para listar as bibliotecas)
 LIBS = -lblas -llapack
@@ -21,7 +21,7 @@ LIBS = -lblas -llapack
 #--------------------------------------------------------------------------------------
 
 %.o : %.f90
-	$(FC) $(FLAGS) $*.f90 $(LIBS)
+	$(FC) $(FLAGS) -c $*.f90 $(LIBS)
 
 $(NAME) : $(OFILES)
 	$(FC) $(FLAGS) $(OFILES) -o $(NAME) $(LIBS)

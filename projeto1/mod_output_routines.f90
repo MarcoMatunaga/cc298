@@ -200,10 +200,9 @@ contains
         use vars
         implicit none
         !
+        open(5, file="residue.dat")
+        write(5,*) iter, max_residue
         !
-        !
-    open(5, file="residue.dat")
-    write(5,*) iter, max_residue
     end subroutine output_residue
 !
 !

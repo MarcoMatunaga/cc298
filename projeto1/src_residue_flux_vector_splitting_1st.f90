@@ -5,6 +5,7 @@ subroutine residue_flux_vector_splitting_1st(ind_i,ind_j,Epos,Eneg,Fpos,Fneg,flu
     real(8),dimension(imax,jmax,dim),intent(in)         :: Epos, Eneg, Fpos, Fneg
     real(8),dimension(imax,jmax,dim),intent(out)        :: fluxresidue
     !
+    fluxresidue = 0.0d0
     max_residue = -100.0d0
     fluxresidue(ind_i,ind_j,1) = delta_t(ind_i,ind_j)*( Epos(ind_i,ind_j,1) - Epos(ind_i-1,ind_j,1) &
                                                        + Eneg(ind_i+1,ind_j,1) - Eneg(ind_i,ind_j,1) &
