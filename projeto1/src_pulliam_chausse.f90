@@ -62,7 +62,7 @@ end do
 do index = 1, dim
     !
     do j_sol = 2, jmax - 1
-        write(*,*) iter,index,j_sol
+        !
         do i = 2, imax - 1
             !
             d_sys(i-1) = right_side(i,j_sol,index)
@@ -84,10 +84,11 @@ do index = 1, dim
         !    x - the answer
         !    n - number of equations
         call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,imax-2)
+        !
         do i = 2, imax - 1
             x1_sys(i,j_sol,index) = x_sys(i-1)
         end do
-
+        !
     end do
     !
 end do

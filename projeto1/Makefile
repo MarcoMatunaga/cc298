@@ -1,9 +1,8 @@
 NAME = bocal
 
-#MODFILES = modules/vars.f90
-F90FILES = vars.f90 output_routines.f90 functions.f90 diagonalization.f90 mesh.f90 jacobian_eta.f90 jacobian_ksi.f90 artificial_dissipation.f90 non_linear_dissipation.f90 thomas_pulliam_chausse.f90 metric_terms.f90 euler_explicit.f90 pulliam_chausse.f90 implicit_beam_warming.f90 blktriad.f90 inv.f90 initial_cond_curv.f90 fluxes_curvilinear.f90 boundary_conditions_curv.f90 residue.f90 projeto1.f90
-
-#OFILES = $(MODFILES:modules/*.f90=.o) $(F90FILES:.f90=.o)
+# MODFILES = mod*.f90
+F90FILES = mod_vars.f90 mod_output_routines.f90 mod_functions.f90 mod_diagonalization.f90 mod_flux_vector_splitting.f90 src*.f90
+# F90FILES = vars.f90 output_routines.f90 functions.f90 diagonalization.f90 mod_flux_vector_splitting.f90 mesh.f90 jacobian_eta.f90 jacobian_ksi.f90 artificial_dissipation.f90 non_linear_dissipation.f90 thomas_pulliam_chausse.f90 metric_terms.f90 euler_explicit.f90 pulliam_chausse.f90 implicit_beam_warming.f90 blktriad.f90 inv.f90 initial_cond_curv.f90 fluxes_curvilinear.f90 boundary_conditions_curv.f90 residue.f90 projeto1.f90
 OFILES = $(F90FILES:.f90=.o)
 
 #FC = ifort
@@ -14,7 +13,7 @@ FC = gfortran
 #FLAGS = -O0 -g -mkl
 # gfortran find bad operations (be careful!!)
 #FLAGS = -g -fbacktrace -ffpe-trap=zero,overflow,underflow -fcheck=all -fcheck=bounds -Wall
-FLAGS = -g -fbacktrace -fcheck=all -fcheck=bounds -Wall
+FLAGS = -g -c -fbacktrace -fcheck=all -fcheck=bounds -Wall
 #FLAGS = -g 
 # linkagem de bibliotecas ldd(comando linux para listar as bibliotecas)
 LIBS = -lblas -llapack
@@ -22,7 +21,7 @@ LIBS = -lblas -llapack
 #--------------------------------------------------------------------------------------
 
 %.o : %.f90
-	$(FC) $(FLAGS) -c $*.f90 $(LIBS)
+	$(FC) $(FLAGS) $*.f90 $(LIBS)
 
 $(NAME) : $(OFILES)
 	$(FC) $(FLAGS) $(OFILES) -o $(NAME) $(LIBS)
