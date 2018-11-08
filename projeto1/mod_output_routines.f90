@@ -80,11 +80,11 @@ contains
     !
     close(6)
     end subroutine output_metric_terms
-    !
+    
     ! plot the fluxes E and F 
-    !
+    
     ! testar os fluxos
-    !
+    
     subroutine output_fluxes
         use vars
         implicit none
@@ -127,9 +127,9 @@ contains
              mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
          end do
      end do
-    !
+    
     ! condicoes de contorno e iniciais
-    !
+    
     open(3,file='teste_init.dat')
     write(3,*) 'TITLE = "Projeto1" '
     write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv" "p" "mach" '
@@ -187,13 +187,9 @@ contains
         end do
     end do
     close(3)
-    !
-    !
-    !
+    
     deallocate(u_out, v_out, p_out, rho, mach)
-    !
-    !
-    !
+
     end subroutine output_final
 
     subroutine output_residue
@@ -213,8 +209,7 @@ contains
         real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach, q_vel_out
         character (len=100) :: fname = '.dat'
         character (len=100) :: FileTag    
-    !
-    !
+
     FileTag = convert(nsave)
     allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
     allocate(q_vel_out(imax,jmax))

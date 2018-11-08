@@ -1,7 +1,7 @@
 NAME = bocal
 
 # MODFILES = mod*.f90
-F90FILES = mod_vars.f90 mod_output_routines.f90 mod_functions.f90 mod_diagonalization.f90 mod_flux_vector_splitting.f90 src*.f90
+F90FILES = mod_vars.f90 mod_output_routines.f90 mod_functions.f90 mod_diagonalization.f90 mod_flux_vector_splitting.f90 mod_vars_sw.f90 mod_vars_proj3.f90 src*.f90
 # F90FILES = vars.f90 output_routines.f90 functions.f90 diagonalization.f90 mod_flux_vector_splitting.f90 mesh.f90 jacobian_eta.f90 jacobian_ksi.f90 artificial_dissipation.f90 non_linear_dissipation.f90 thomas_pulliam_chausse.f90 metric_terms.f90 euler_explicit.f90 pulliam_chausse.f90 implicit_beam_warming.f90 blktriad.f90 inv.f90 initial_cond_curv.f90 fluxes_curvilinear.f90 boundary_conditions_curv.f90 residue.f90 projeto1.f90
 OFILES = $(F90FILES:.f90=.o)
 
