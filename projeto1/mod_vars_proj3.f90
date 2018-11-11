@@ -1,11 +1,11 @@
 module vars_proj3
     use vars
 implicit none
-    real(8)                         :: u_p3, v_p3, p_p3, rho
-    real(8)                         :: Height, Length
-    real(8)                         :: shock_angle, mach_inlet, turn_angle, mach_inlet_n
-    real(8)                         :: mach_2, mach_2_n
-    real(8)                         :: x_wall, x_a, y_sol, shock_r_angle, lambda_shock, khi, x_3, z, x_ana
+    real(8)                      :: u_p3, v_p3, p_p3, rho
+    real(8)                      :: Height, Length
+    real(8)                      :: shock_angle, mach_inlet, turn_angle, mach_inlet_n
+    real(8)                      :: mach_2, mach_2_n
+    real(8)                      :: x_wall, x_a, y_sol, shock_r_angle, lambda_shock, khi, x_3, z, x_ana
 contains
     
     subroutine analytical
@@ -56,7 +56,7 @@ contains
             do while (x_ana >= x_a .and. x_ana < x_3)
                  rho =  (gama + 1.0d0)*mach_inlet_n**2.0d0/(2.0d0 + (gama - 1.0d0)*mach_inlet_n**2.0d0)
                  p_p3   =  (1.0d0 + (2.0d0*gama/( gama + 1.0d0 ))*(mach_inlet_n**2.0d0 - 1.0d0) ) / gama
-                 write(9,'(3es11.3e2)') x_ana, p, rho
+                 write(9,'(3es11.3e2)') x_ana, p_p3, rho
                  x_ana = x_ana + 0.01d0  
             end do
             

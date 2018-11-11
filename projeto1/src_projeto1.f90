@@ -36,9 +36,7 @@ call allocate_vars
 if (which_boundary == 1) then 
     open(1,file='mesh') 
     read(1,*) imax,jmax
-    write(*,*) jmax
     jmax = jmax + 1
-    write(*,*) jmax
     call mesh
     call metric_terms
     call output_metric_terms
@@ -142,7 +140,11 @@ do
     if (time_method == 3) call pulliam_chausse
     if (time_method == 4) call sw_1st
     ! if (time_method == 5) call sw_2nd
-    
+    ! if (time_method == 6) call ausm_plus_1st
+    ! if (time_method == 7) call ausm_plus_2nd
+    ! if (time_method == 8) call van_leer_1st
+    ! if (time_method == 9) call van_leer_2nd
+
     iter = iter + 1
     if ( mod(iter,(max_iter/10)) == 0 ) then
          nsave = nsave + 1

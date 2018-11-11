@@ -6,6 +6,9 @@ subroutine fluxes_curvilinear
 !modify: calculate only in the inner points 
 ! e pass the boundary points to the boundary subroutine
 !********
+!********
+!change the way you calculate
+!********
 E_barra = 0.0d0
 F_barra = 0.0d0
 

@@ -56,29 +56,28 @@ contains
         !
         !
         end function convert
-    !
-    !
-    !
+
     subroutine output_metric_terms 
         use vars
         implicit none
-    !
-    !
-    !
-    open(6, file="metric_terms.dat")
-    write(6,*) 'TITLE = "Projeto1" '
-    write(6,*) 'VARIABLES = "x" "y" "i" "j" "x_ksi" "y_ksi" "x_eta" "y_eta" "metric_jacobian" ' 
-    write(6,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT'
-    do j = 1, jmax - 1
-        do i = 1, imax
-            write(6,*) meshx(i,j), meshy(i,j), i,j, x_ksi(i,j), y_ksi(i,j), &
-                                   x_eta(i,j), y_eta(i,j), metric_jacobian(i,j)
-        end do 
-    end do
-    !
-    !
-    !
-    close(6)
+        integer(4)                  :: ind_j
+    
+    ind_j = jmax
+        if (which_boundary == 1) ind_j = jmax - 1
+        
+        open(6, file="metric_terms.dat")
+        write(6,*) 'TITLE = "Projeto1" '
+        write(6,*) 'VARIABLES = "x" "y" "i" "j" "x_ksi" "y_ksi" "x_eta" "y_eta" "metric_jacobian" ' 
+        write(6,*) 'ZONE I = ', imax, ' J =', ind_j, ' DATAPACKING = POINT'
+        do j = 1, ind_j
+            do i = 1, imax
+                write(6,*) meshx(i,j), meshy(i,j), i,j, x_ksi(i,j), y_ksi(i,j), &
+                                       x_eta(i,j), y_eta(i,j), metric_jacobian(i,j)
+            end do 
+        end do
+
+        close(6)
+
     end subroutine output_metric_terms
     
     ! plot the fluxes E and F 
@@ -88,107 +87,106 @@ contains
     subroutine output_fluxes
         use vars
         implicit none
-        !
-        !
-        !
-    open(4, file='teste_fluxes.dat')
-    write(4,*) 'TITLE = "Projeto1" '
-    write(4,*) 'VARIABLES = "E_1" "E_2" "E_3" "E_4" '
-    write(4,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
-    do j = 1, jmax - 1
-        do i = 1, imax
-            write(4,'(4EN20.10)') E_barra(i,j,1), E_barra(i,j,2), E_barra(i,j,3), E_barra(i,j,4) 
+        integer(4)                  :: ind_j
+    
+    ind_j = jmax
+        if (which_boundary == 1) ind_j = jmax - 1
+
+        open(4, file='teste_fluxes.dat')
+        write(4,*) 'TITLE = "Projeto1" '
+        write(4,*) 'VARIABLES = "E_1" "E_2" "E_3" "E_4" '
+        write(4,*) 'ZONE I = ', imax, ' J =', ind_j, ' DATAPACKING = POINT' 
+        do j = 1, ind_j
+            do i = 1, imax
+                write(4,'(4EN20.10)') E_barra(i,j,1), E_barra(i,j,2), E_barra(i,j,3), E_barra(i,j,4) 
+            end do
         end do
-    end do
-    close(4)
-    !
-    !
-    !
+        close(4)
+    
     end subroutine output_fluxes
-    !
-    !
-    !
-    !
+    
     subroutine output_inicial
         use vars 
         implicit none
-        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach
-    !
-    !
-    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
-    !
-     do j = 1, jmax - 1
-         do i = 1, imax
-             rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
-             u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
-             v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
-             p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
-                          - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
-             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
+        integer(4)                  :: ind_j
+        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho_out, mach
+    
+        allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho_out(imax,jmax), mach(imax,jmax) )
+            
+            ind_j = jmax
+
+        if (which_boundary == 1) ind_j = jmax - 1
+
+         do j = 1, ind_j
+             do i = 1, imax
+                 rho_out(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
+                 u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
+                 v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
+                 p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
+                              - 0.5d0*rho_out(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
+                 mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho_out(i,j) )
+             end do
          end do
-     end do
     
-    ! condicoes de contorno e iniciais
-    
-    open(3,file='teste_init.dat')
-    write(3,*) 'TITLE = "Projeto1" '
-    write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv" "p" "mach" '
-    write(3,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
-    do j = 1, jmax - 1
-        do i = 1, imax
-            !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), p(i,j), mach(i,j)
+        ! condicoes de contorno e iniciais
+        
+        open(3,file='teste_init.dat')
+        write(3,*) 'TITLE = "Projeto1" '
+        write(3,*) 'VARIABLES =  "X" "Y" "i" "j" "p_curv" "p" "mach" '
+        write(3,*) 'ZONE I = ', imax, ' J =', ind_j, ' DATAPACKING = POINT' 
+        do j = 1, ind_j
+            do i = 1, imax
+                !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
+                !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
+                write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), p(i,j), mach(i,j)
+            end do
         end do
-    end do
-    close(3)
-    !
-    !
-    !
-    deallocate(u_out, v_out, p_out, rho, mach)
-    !
-    !
-    !
+        close(3)
+    
+        deallocate(u_out, v_out, p_out, rho_out, mach)
+    
     end subroutine output_inicial
-    !
-    !
-    !
+    
     subroutine output_final
         use vars 
         implicit none
-        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach
-    !
-    !
-    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
-    !
-     do j = 1, jmax - 1
-         do i = 1, imax
-             rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
-             u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
-             v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
-             p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
-                          - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
-             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
-         end do
-     end do
-    !
-    ! condicoes de contorno e iniciais
-    !
-    open(3,file='final.dat')
-    write(3,*) 'TITLE = "Projeto1" '
-    write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho" "p" "e" "mach" '
-    write(3,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
-    do j = 1, jmax - 1
-        do i = 1, imax
-            !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(3,'(10ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), rho(i,j), p_out(i,j), & 
-            Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
-        end do
-    end do
-    close(3)
+        integer(4)                  :: ind_j
+        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho_out, mach
     
-    deallocate(u_out, v_out, p_out, rho, mach)
+        allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho_out(imax,jmax), mach(imax,jmax) )
+            
+            ind_j = jmax
+
+        if (which_boundary == 1) ind_j = jmax - 1
+        
+        do j = 1, ind_j
+             do i = 1, imax
+                 rho_out(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
+                 u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
+                 v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
+                 p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
+                              - 0.5d0*rho_out(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
+                 mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho_out(i,j) )
+             end do
+        end do
+        
+        ! condicoes de contorno e iniciais
+        
+        open(3,file='final.dat')
+        write(3,*) 'TITLE = "Projeto1" '
+        write(3,*) 'VARIABLES = "X" "Y" "u" "v" "rho_out" "p" "e" "mach" '
+        write(3,*) 'ZONE I = ', imax, ' J =', ind_j, ' DATAPACKING = POINT' 
+        do j = 1, ind_j
+            do i = 1, imax
+                !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
+                !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
+                write(3,'(10ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), rho_out(i,j), p_out(i,j), & 
+                Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
+            end do
+        end do
+        close(3)
+        
+        deallocate(u_out, v_out, p_out, rho_out, mach)
 
     end subroutine output_final
 
@@ -206,50 +204,49 @@ contains
     subroutine output_tecplot
         use vars 
         implicit none
-        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho, mach, q_vel_out
+        integer(4)                  :: ind_j
+        real(8),dimension(:,:),allocatable           :: p_out, u_out, v_out, rho_out, mach, q_vel_out
         character (len=100) :: fname = '.dat'
         character (len=100) :: FileTag    
 
     FileTag = convert(nsave)
-    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho(imax,jmax), mach(imax,jmax) )
+    allocate(p_out(imax,jmax), u_out(imax,jmax), v_out(imax,jmax), rho_out(imax,jmax), mach(imax,jmax) )
     allocate(q_vel_out(imax,jmax))
-    !
-     do j = 1, jmax - 1
+    
+    ind_j = jmax
+    if (which_boundary == 1) ind_j = jmax - 1
+
+     do j = 1, ind_j
          do i = 1, imax
-             rho(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
+             rho_out(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
              u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
              v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
              p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
-                          - 0.5d0*rho(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
-             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho(i,j) )
+                          - 0.5d0*rho_out(i,j)*( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) )
+             mach(i,j)  = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 ) / sqrt( gama*p_out(i,j)/rho_out(i,j) )
              q_vel_out(i,j) = sqrt( u_out(i,j)**2.0d0 + v_out(i,j)**2.0d0 )
          end do
      end do
-    !
+    
     ! condicoes de contorno e iniciais
-    !
+    
     open(7,file=trim(FileTag)//trim(fname))
     write(7,*) 'TITLE = "Projeto1" '
-    write(7,*) 'VARIABLES = "X" "Y" "u" "v" "q_vel_out" "rho" "p" "e" "mach" '
-    write(7,*) 'ZONE I = ', imax, ' J =', jmax - 1, ' DATAPACKING = POINT' 
-    do j = 1, jmax - 1
+    write(7,*) 'VARIABLES = "X" "Y" "u" "v" "q_vel_out" "rho_out" "p" "e" "mach" '
+    write(7,*) 'ZONE I = ', imax, ' J =', ind_j, ' DATAPACKING = POINT' 
+    do j = 1, ind_j
         do i = 1, imax
             !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            write(7,'(15ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), q_vel_out(i,j), rho(i,j), p_out(i,j), & 
+            write(7,'(15ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), q_vel_out(i,j), rho_out(i,j), p_out(i,j), & 
             Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
         end do
     end do
     close(7)
-    !
-    !
-    !
-    deallocate(u_out, v_out, p_out, rho, mach)
+
+    deallocate(u_out, v_out, p_out, rho_out, mach)
     deallocate(q_vel_out)
-    !
-    !
+
     end subroutine
-    !
-    !
-    !
+
 end module output_routines

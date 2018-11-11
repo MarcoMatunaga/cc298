@@ -11,7 +11,7 @@ subroutine boundary_conditions_curv
 ! inlet boundary
 
 i = 1
-do j = 1, jmax - 1
+do j = 1, jmax 
     u(i,j)  = Q_barra(i+1,j,2)/Q_barra(i+1,j,1)
     v(i,j)  = u(i,j)*dtan(theta)  
     T(i,j)  = T_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u(i,j)/a_cr)**2.0d0))
@@ -84,7 +84,7 @@ end do
 ! outlet boundary
 
 i = imax
-do j = 2, jmax
+do j = 1, jmax
     u(i,j)     = Q_barra(i,j,2)/Q_barra(i,j,1)
     v(i,j)     = Q_barra(i,j,3)/Q_barra(i,j,1)
     a(i,j)     = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))

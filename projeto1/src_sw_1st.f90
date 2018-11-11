@@ -30,26 +30,27 @@ do j = 2, jmax - 1
                 diag_pos(index,index) = eig_pos
                 diag_neg(index,index) = eig_neg 
             end do 
-            !
+            
             rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
             inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
-            !
+            
             t_xi     = T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
-            !
+            
             aux_mult     = matmul(diag_pos,inv_t_xi)
             A_pos        = matmul(t_xi,aux_mult)
-            !
+            
             aux_mult     = matmul(diag_neg,inv_t_xi)
             A_neg        = matmul(t_xi,aux_mult)
-            !
+            
             do index_j = 1, dim
                 do index_i = 1, dim  
                     A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
                     A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
                 end do
             end do 
+            
     end do 
-    !
+    
     do i = 2, imax - 1
         !**** colocar a subroutina do residuo com 
         !**** intervalo ao inves de indice por indice
@@ -59,9 +60,9 @@ do j = 2, jmax - 1
         B_sys(3,i-1) = -flux_residue(i,j,3) 
         B_sys(4,i-1) = -flux_residue(i,j,4) 
     end do
-    !
+    
     ! set the matrixes
-    !
+    
     do i = 2, imax - 1
         do index_j = 1, dim 
             do index_i = 1, dim 

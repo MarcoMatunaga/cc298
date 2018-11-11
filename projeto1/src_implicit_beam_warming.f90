@@ -94,40 +94,38 @@ i_sol = 2 ! change j_sol by j
 j_sol = 2 ! idem for i_sol
 !looping_j_sol: do while ( j_sol <= jmax - 1 )
 looping_j_sol: do j_sol = 2, jmax - 1
-    !
+    
     do i = 2, imax - 1
-            !
+            
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
-            !
+            
 call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
-            !
+            
             do index_i = 1, dim
                 do index_j = 1, dim
                     A_plus(index_i,index_j,i-1) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
-            if (iter == 0) write(*,*) A_barra
-            !
+            
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
-            !
+
 call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
-            !
+            
             do index_i = 1, dim
                 do index_j = 1, dim
                     A_minus(index_i,index_j,i-1) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
                 end do
             end do
-            !
+            
     end do
-    !
-    !
+
     ! now create the vector B_sys, i.e., vector b of the system
     !
     ! *********
     ! i really can dropp the j index because the subroutine call 
     ! is made for each value of the index j
     ! *********
-    !
+
         do i = 2, imax - 1
             call compute_residue(i,j_sol)
             Bx_sys(1,i-1) = -residue(i,j_sol,1)
@@ -135,11 +133,11 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
             Bx_sys(3,i-1) = -residue(i,j_sol,3)
             Bx_sys(4,i-1) = -residue(i,j_sol,4)
         end do
-    !
+    
     ! we need to solve the block tridiagonal system j times
     ! blktriad(maind,lower,upper,id,md,xb,x)
     ! put artificial dissipation
-    !
+    
     do i = 2, imax - 1
         L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,2)
         do index_i = 1, dim 
@@ -148,11 +146,11 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
             end do 
         end do 
     end do
-    ! write(*,*) main_x, Id_x(1,1,1), Identy(1,1), L_ksi
+
     call blktriad(main_x,A_minus,A_plus,dim,imax-2,Bx_sys,deltaQ_til_i) 
-    !
+    
     ! update j_sol
-    !
+    
     do i = 2, imax - 1
         deltaQ_til(1,i,j_sol) = deltaQ_til_i(1,i-1)
         deltaQ_til(2,i,j_sol) = deltaQ_til_i(2,i-1)
@@ -160,7 +158,9 @@ call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_s
         deltaQ_til(4,i,j_sol) = deltaQ_til_i(4,i-1)
     end do 
     ! j_sol = j_sol + 1
+
 end do looping_j_sol
+
         if (iter == 0) then 
             open(995,file= 'bw_first_system')
             do j = 2, jmax - 1
@@ -173,52 +173,50 @@ end do looping_j_sol
             end do 
             close(995)    
         end if
-    !
+    
     ! step ii)
-    !
+    
     !do while ( i_sol <= imax - 1 )
     do i_sol = 2, imax - 1
-    !
-        !
-        !
+        
         do j = 2, jmax - 1
-            !
+            
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
-            !
+            
 call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
-            !
-            !
+            
+            
             do index_i = 1, dim
                 do index_j = 1, dim
                     B_plus(index_i,index_j,j-1) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
-            !
-            !
+            
+            
 call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
-            !
+            
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
-            !
+            
             do index_i = 1, dim
                 do index_j = 1, dim
                     B_minus(index_i,index_j,j-1) = -0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
-            !
-            !
+            
+            
         end do
-        !
+        
         ! now create By_sys
-        !
+        
         do j = 2, jmax - 1
             By_sys(1,j-1) = deltaQ_til(1,i_sol,j)
             By_sys(2,j-1) = deltaQ_til(2,i_sol,j)
             By_sys(3,j-1) = deltaQ_til(3,i_sol,j)
             By_sys(4,j-1) = deltaQ_til(4,i_sol,j)
         end do
-        !
+        
         ! solve the block tridiagonal i times
-        ! call blktriad(Id_x,A_minus,A_plus,dim,imax,Bx_sys,deltaQ_til) 
+
         do j = 2, jmax - 1
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,2)
             do index_i = 1, dim 
@@ -227,19 +225,20 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
                 end do 
             end do 
         end do
+
         call blktriad(main_y,B_minus,B_plus,dim,jmax-2,By_sys,deltaQ_til_j)
-        !
+        
         ! add one to the index loop
-        !
+        
         do j = 2, jmax - 1
             deltaQ(i_sol,j,1) = deltaQ_til_j(1,j-1)        
             deltaQ(i_sol,j,2) = deltaQ_til_j(2,j-1)
             deltaQ(i_sol,j,3) = deltaQ_til_j(3,j-1)
             deltaQ(i_sol,j,4) = deltaQ_til_j(4,j-1)          
         end do 
-        !
+        
         ! update Q_barra
-        !
+        
         do j = 2, jmax - 1
             Q_barra(i_sol,j,1) = deltaQ(i_sol,j,1) + Q_barra(i_sol,j,1)
             Q_barra(i_sol,j,2) = deltaQ(i_sol,j,2) + Q_barra(i_sol,j,2)
@@ -248,8 +247,7 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         end do 
         ! i_sol = i_sol + 1
     end do 
-!
-!
+
         if (iter == 8) then 
             open(998,file='bw')
             do j = 2, jmax - 1
@@ -262,7 +260,7 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
             end do 
             close(998)    
         end if
-        !
+        
         if (iter == 0) then 
             open (996,file='t_matrices') 
             do j = 2, jmax - 1
@@ -275,7 +273,7 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
             end do 
             close(996) 
         end if
-        !
+        
         inv_T_xi = 0.0d0
         do j = 2, jmax - 1
             do i = 2, imax - 1 
@@ -286,7 +284,7 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
                 if (iter == 0) write(*,*) inv_T_xi(4,1),inv_T_xi(4,2),inv_T_xi(4,3),inv_T_xi(4,4)
             end do
         end do 
-!
+
 deallocate(Id_x)
 deallocate(Bx_sys)
 deallocate(By_sys)
