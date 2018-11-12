@@ -6,10 +6,7 @@ program proj1
         use vars_proj3
         use output_routines
         implicit none
-integer(4)                                   :: i_cfl
-integer(4)                                   :: ramp, CFL_ramp_size
-real(8),dimension(:),allocatable             :: CFL_ramp
-integer(4),dimension(:),allocatable          :: CFL_ramp_iter
+
 
 namelist /PAR_Flow/ gama, R, T_total, p_total 
 namelist /PAR_Flow_shock/ mach_inlet, shock_angle
@@ -27,7 +24,6 @@ read(8,PAR_Analytical)
 read(8,PAR_Others)
 close(8)
 
-allocate(CFL_ramp(CFL_ramp_size),CFL_ramp_iter(CFL_ramp_size))
 call allocate_vars
     
     delta_eta = 1.0d0
@@ -77,30 +73,6 @@ end if
     iter = 0
     a_cr = sqrt((2.0d0*gama)*((gama-1.0d0)/(gama+1.0d0))*c_v*T_total)
     
-    ! max CFL if the CFL_ramp is on
-    ! ramp = 1 there is a CFL ramp
-    ! ramp = 0 no CFL ramp
-    
-    
-    ! ***********
-    ! outra possibilidade subir o CFL 
-    ! a cada determinado numero delta de iteracoes
-    ! ***********
-    
-    ! CFL_ramp = iter, CFL
-    
-    CFL_ramp_iter(1) = 0
-    CFL_ramp_iter(2) = 200
-
-    ! deal this as percentage
-    CFL_ramp_iter(3) = 750
-    
-    ! set the CFL numbers
-    
-    CFL_ramp(1) = 5.00d0
-    CFL_ramp(2) = 10.0d0
-    CFL_ramp(3) = CFL
-
 ! add one more point on the index j due to the symmetry line
 
 if (which_boundary == 1) then 
@@ -112,7 +84,6 @@ else
 end if 
 
 max_residue = 1.0d0
-i_cfl = 1
 call output_inicial 
 
 do 
@@ -120,18 +91,7 @@ do
 
     call fluxes_curvilinear 
     call output_fluxes
-
-    do j = 1, jmax
-            do i = 1, imax
-                a(i,j) = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
-                if (ramp == 1 .and. iter == CFL_ramp_iter(i_cfl) ) then                
-                    CFL = CFL_ramp(i_cfl)
-                    i_cfl = i_cfl + 1
-                end if
-                delta_t(i,j) = CFL/(max( abs(U_contravariant(i,j)) + a(i,j)*sqrt(ksi_x(i,j)**2.0d0 + ksi_y(i,j)**2.0d0 ), &
-                                         abs(V_contravariant(i,j)) + a(i,j)*sqrt(eta_x(i,j)**2.0d0 + eta_y(i,j)**2.0d0 )))
-            end do
-    end do
+    call calculate_CFL
     
     ! time marching
     
@@ -163,8 +123,6 @@ close(5)
 
 call output_final
 call deallocate_vars
-deallocate(CFL_ramp,CFL_ramp_iter)
-
 
 close(2)
 

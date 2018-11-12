@@ -20,13 +20,16 @@ module fluxes_pos_neg
         real(8),intent(in)                  :: eigen1,eigen3,eigen4
         integer(4),intent(in)               :: ind_i,ind_j
         real(8),dimension(dim)              :: fluxes_split
-        real(8)                             :: rho_temp, u_temp, v_temp, temp, a_temp
+        real(8)                             :: rho_temp, u_temp, v_temp, temp, a_temp, p_temp
         real(8)                             :: k1_til, k2_til, wII
 
         rho_temp = Q_barra(ind_i,ind_j,1)/metric_jacobian(ind_i,ind_j)
-        u_temp = u(ind_i,ind_j)
-        v_temp = v(ind_i,ind_j)
-        a_temp = a(ind_i,ind_j)
+        u_temp = Q_barra(ind_i,ind_j,2)/Q_barra(ind_i,ind_j,1)
+        v_temp = Q_barra(ind_i,ind_j,3)/Q_barra(ind_i,ind_j,1)
+        p_temp = (gama-1.0d0) * (Q_barra(ind_i,ind_j,4)/metric_jacobian(ind_i,ind_j) & 
+               - 0.5d0*( (Q_barra(ind_i,ind_j,2)/metric_jacobian(ind_i,ind_j))**2.0d0 &
+               + (Q_barra(ind_i,ind_j,3)/metric_jacobian(ind_i,ind_j))**2.0d0)/rho_temp)
+        a_temp = sqrt(gama*p_temp/rho_temp)
         k1_til = k1/sqrt(k1**2.0d0 + k2**2.0d0)
         k2_til = k2/sqrt(k1**2.0d0 + k2**2.0d0)
         
@@ -65,18 +68,25 @@ module fluxes_pos_neg
         real(8),dimension(dim)                           :: aux_eta_pos, aux_eta_neg
         real(8),dimension(dim)                           :: eta_neg, eta_pos
         real(8),dimension(dim)                           :: ksi_neg, ksi_pos
+        real(8)                                          :: a_temp, p_temp, rho_temp
         integer(4)                                       :: aux_i, aux_j, pos
         
         flux_eta_neg = 0.0d0
         flux_eta_pos = 0.0d0
         flux_ksi_neg = 0.0d0
         flux_ksi_pos = 0.0d0
-        
+    
         do aux_j = 1, jmax
             do aux_i = 1, imax
                 
-                eig_v_ksi = diag_ksi(U_contravariant(aux_i,aux_j),a(aux_i,aux_j),ksi_x(aux_i,aux_j),ksi_y(aux_i,aux_j),dim)
-                eig_v_eta = diag_eta(V_contravariant(aux_i,aux_j),a(aux_i,aux_j),eta_x(aux_i,aux_j),eta_y(aux_i,aux_j),dim)
+                rho_temp = Q_barra(aux_i,aux_j,1)/metric_jacobian(aux_i,aux_j)
+                p_temp = (gama-1.0d0) * (Q_barra(aux_i,aux_j,4)/metric_jacobian(aux_i,aux_j) & 
+                        - 0.5d0*( (Q_barra(aux_i,aux_j,2)/metric_jacobian(aux_i,aux_j))**2.0d0 &
+                        + (Q_barra(aux_i,aux_j,3)/metric_jacobian(aux_i,aux_j))**2.0d0)/rho_temp)
+                a_temp = sqrt(gama*p_temp/rho_temp)           
+
+                eig_v_ksi = diag_ksi(U_contravariant(aux_i,aux_j),a_temp,ksi_x(aux_i,aux_j),ksi_y(aux_i,aux_j),dim)
+                eig_v_eta = diag_eta(V_contravariant(aux_i,aux_j),a_temp,eta_x(aux_i,aux_j),eta_y(aux_i,aux_j),dim)
                 
                 do pos = 1, dim
                     call eigen_values_calculate(eig_v_ksi(pos),ksi_pos(pos),ksi_neg(pos))

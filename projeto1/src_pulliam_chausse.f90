@@ -10,10 +10,10 @@ subroutine pulliam_chausse
     real(8),dimension(:,:),allocatable                 :: inv_t_xi , n_inverse
     real(8),dimension(:,:),allocatable                 :: Teta
     real(8),dimension(:,:,:),allocatable               :: x1_sys, right_side
-    real(8)                                            :: rho_t, L_ksi, L_eta
+    real(8),dimension(:,:),allocatable                 :: u,v,p,rho,a
+    real(8)                                            :: L_ksi, L_eta
     integer(4)                                         :: index, i_sol, j_sol
-!
-!
+
 do j = 1, jmax
         do i = 1, imax
             Q_dis(i,j,1) = Q_barra(i,j,1)/metric_jacobian(i,j)
@@ -22,20 +22,29 @@ do j = 1, jmax
             Q_dis(i,j,4) = Q_barra(i,j,4)/metric_jacobian(i,j)
         end do
 end do
-!
-!
+
 allocate(x1_sys(imax,jmax,dim))
 allocate(right_side(imax,jmax,dim))
+allocate(rho(imax,jmax),u(imax,jmax),v(imax,jmax),p(imax,jmax),a(imax,jmax))
 allocate(inv_t_xi(dim,dim),n_inverse(dim,dim))
 allocate(Teta(dim,dim))
 allocate(result(dim))
 allocate(diag_minus(dim),diag_plus(dim))
-!
-!
+
+do j = 1, jmax
+    do i = 1, imax
+        u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
+        v(i,j)   = Q_barra(i,j,3)/Q_barra(i,j,1)
+        rho(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
+        p(i,j)   = (gama-1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
+                   - 0.50d0*rho(i,j)*(u(i,j)**2.0d0+v(i,j)**2.0d0))
+        a(i,j)   = sqrt(gama*p(i,j)/rho(i,j))
+    end do 
+end do 
+
 allocate(lower(imax-2),main(imax-2),upper(imax-2))
 allocate(x_sys(imax-2),d_sys(imax-2),aux_mult(dim))
-!
-!
+
 diag_minus = 0.0d0
 diag_plus  = 0.0d0
 d_sys = 0.0d0
@@ -46,19 +55,17 @@ upper  = 0.0d0
 main   = 1.0d0
 aux_mult = 0.0d0
 right_side = 0.0d0
-!
-!
+
 do j = 2, jmax - 1
     do i = 2, imax - 1
         call compute_residue(i,j)
         aux_mult(1:dim) = -residue(i,j,1:dim)
-        rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
-        inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+        inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
         result = matmul(inv_t_xi,aux_mult)
         right_side(i,j,1:dim) = result(1:dim)
     end do 
 end do
-!
+
 do index = 1, dim
     !
     do j_sol = 2, jmax - 1
@@ -70,9 +77,11 @@ do index = 1, dim
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
             diag_plus  = diag_ksi(U_contravariant(i+1,j_sol),a(i+1,j_sol),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim)
                 upper(i-1) = 0.50d0*delta_t(i,j_sol)*diag_plus(index) + L_ksi
+
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
             diag_minus = diag_ksi(U_contravariant(i-1,j_sol),a(i-1,j_sol),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim)
                 lower(i-1) = -0.50d0*delta_t(i,j_sol)*diag_minus(index) + L_ksi
+
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,2)
                 main(i-1) = main(i-1) + L_ksi
             !
@@ -126,18 +135,20 @@ do index = 1, dim
     do i_sol = 2, imax - 1
         !
         do j = 2, jmax - 1
-            !
+            
             d_sys(j-1) = right_side(i_sol,j,index)
-            !
+            
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
             diag_plus = diag_eta(V_contravariant(i_sol,j+1),a(i_sol,j+1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim)
                 upper(j-1) = 0.50d0*delta_t(i_sol,j)*diag_plus(index) + L_eta
-            diag_minus = diag_eta(V_contravariant(i_sol,j-1),a(i_sol,j-1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim)
+
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
+            diag_minus = diag_eta(V_contravariant(i_sol,j-1),a(i_sol,j-1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim)
                 lower(j-1) = -0.50d0*delta_t(i_sol,j)*diag_minus(index) + L_eta
+
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,2)
                 main(j-1) = main(j-1) + L_eta
-            !
+            
         end do
         !
         call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,jmax-2)
@@ -158,8 +169,7 @@ deallocate(diag_minus,diag_plus)
 !
 do j = 2, jmax - 1
     do i = 2, imax - 1
-        rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
-        Teta = T_eta(u(i,j),v(i,j),rho_t,a(i,j),eta_x(i,j),eta_y(i,j),dim)
+        Teta = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
         aux_mult(1:dim) = x1_sys(i,j,1:dim)
         result = matmul(Teta,aux_mult)
         right_side(i,j,1:dim) = result(1:dim)
@@ -169,9 +179,9 @@ end do
 deallocate(x1_sys)
 deallocate(inv_t_xi,n_inverse)
 deallocate(result,aux_mult,Teta)
-!
+deallocate(u,v,p,rho,a)
 ! update the solution vector
-!
+
 do j = 2, jmax - 1
     do i = 2, imax - 1
         !
@@ -182,8 +192,8 @@ do j = 2, jmax - 1
         !
     end do
 end do
-!
-!
+
+
         if (iter == 50) then 
             open(999,file='pc')
             do j = 2, jmax - 1
@@ -193,8 +203,8 @@ end do
             end do
             close(999)    
         end if
-!
+
 deallocate(right_side)
-!
-!
+
+
 end subroutine pulliam_chausse

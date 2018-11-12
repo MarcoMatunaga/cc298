@@ -1,12 +1,12 @@
-!
+
 ! implicit_beam_warming
-!
+
 subroutine implicit_beam_warming
     use vars
     use functions
     use diagonalization
     implicit none
-!
+
 real(8),dimension(:,:),allocatable             :: A_barra, B_barra, M_barra
 real(8),dimension(:,:,:),allocatable           :: A_plus, A_minus
 real(8),dimension(:,:,:),allocatable           :: B_plus, B_minus
@@ -20,11 +20,10 @@ real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
 real(8),dimension(:,:),allocatable             :: Identy
 real(8),dimension(dim,dim)                     :: inv_t_xi
 real(8)                                        :: L_ksi, L_eta
-!
+real(8)                                        :: u, v, p, a, rho
+
 integer index_i, index_j, i_sol, j_sol
-!
-!
-!
+
 allocate(A_barra(dim,dim), B_barra(dim,dim), M_barra(dim,dim))
 allocate(A_minus(dim,dim,imax), A_plus(dim,dim,imax))
 allocate(B_minus(dim,dim,jmax), B_plus(dim,dim,jmax))
@@ -34,9 +33,9 @@ allocate(Id_x(dim,dim,imax),Id_y(dim,dim,jmax))
 allocate(main_x(dim,dim,imax),main_y(dim,dim,jmax))
 allocate(Bx_sys(dim,imax),By_sys(dim,jmax))
 allocate(Identy(dim,dim))
-!
+
 ! create the two identies matrix
-!
+
 !************
 ! we can eliminate the variables in the y direction
 ! it is possible to allocate and deallocate the arrays
@@ -98,8 +97,9 @@ looping_j_sol: do j_sol = 2, jmax - 1
     do i = 2, imax - 1
             
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
-            
-call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
+            u = Q_barra(i+1,j_sol,2)/Q_barra(i+1,j_sol,1)
+            v = Q_barra(i+1,j_sol,3)/Q_barra(i+1,j_sol,1)
+call jacobian_ksi(u,v,Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
             
             do index_i = 1, dim
                 do index_j = 1, dim
@@ -108,8 +108,9 @@ call jacobian_ksi(u(i+1,j_sol),v(i+1,j_sol),Q_barra(i+1,j_sol,4),Q_barra(i+1,j_s
             end do
             
             L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
-
-call jacobian_ksi(u(i-1,j_sol),v(i-1,j_sol),Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
+            u = Q_barra(i-1,j_sol,2)/Q_barra(i-1,j_sol,1)
+            v = Q_barra(i-1,j_sol,3)/Q_barra(i-1,j_sol,1)
+call jacobian_ksi(u,v,Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
             
             do index_i = 1, dim
                 do index_j = 1, dim
@@ -181,19 +182,21 @@ end do looping_j_sol
         
         do j = 2, jmax - 1
             
+            u = Q_barra(i_sol,j+1,2)/Q_barra(i_sol,j+1,1)
+            v = Q_barra(i_sol,j+1,3)/Q_barra(i_sol,j+1,1)
+call jacobian_eta(u,v,Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
+            
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
-            
-call jacobian_eta(u(i_sol,j+1),v(i_sol,j+1),Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
-            
-            
+
             do index_i = 1, dim
                 do index_j = 1, dim
                     B_plus(index_i,index_j,j-1) = 0.5d0*delta_t(i_sol,j)*B_barra(index_i,index_j) + L_eta*Identy(index_i,index_j)
                 end do
             end do
             
-            
-call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
+            u = Q_barra(i_sol,j-1,2)/Q_barra(i_sol,j-1,1)
+            v = Q_barra(i_sol,j-1,3)/Q_barra(i_sol,j-1,1)
+call jacobian_eta(u,v,Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
             
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
             
@@ -265,10 +268,12 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
             open (996,file='t_matrices') 
             do j = 2, jmax - 1
                 do i = 2, imax - 1 
-                    write(996,*)  'ksi',U_contravariant(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),&
-                                        u(i,j),v(i,j),Q_barra(i,j,1)/metric_jacobian(i,j)
-                    write(996,*)  'eta',V_contravariant(i,j),a(i,j),eta_x(i,j),eta_y(i,j),&
-                                        u(i,j),v(i,j),Q_barra(i,j,1)/metric_jacobian(i,j)
+                    u = Q_barra(i,j,2)/Q_barra(i,j,1)
+                    v = Q_barra(i,j,3)/Q_barra(i,j,1)
+                    write(996,*)  'ksi',U_contravariant(i,j),a,ksi_x(i,j),ksi_y(i,j),&
+                                        u,v,Q_barra(i,j,1)/metric_jacobian(i,j)
+                    write(996,*)  'eta',V_contravariant(i,j),a,eta_x(i,j),eta_y(i,j),&
+                                        u,v,Q_barra(i,j,1)/metric_jacobian(i,j)
                 end do
             end do 
             close(996) 
@@ -277,7 +282,12 @@ call jacobian_eta(u(i_sol,j-1),v(i_sol,j-1),Q_barra(i_sol,j-1,4),Q_barra(i_sol,j
         inv_T_xi = 0.0d0
         do j = 2, jmax - 1
             do i = 2, imax - 1 
-                inv_t_xi = inv_T_ksi(u(i,j),v(i,j),Q_barra(i,j,1)/metric_jacobian(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+                rho = Q_barra(i,j,1)/metric_jacobian(i,j)
+                p = (gama-1.0d0) * (Q_barra(i,j,4)/metric_jacobian(i,j) & 
+                      - 0.5d0*( (Q_barra(i,j,2)/metric_jacobian(i,j))**2.0d0 &
+                      + (Q_barra(i,j,3)/metric_jacobian(i,j))**2.0d0)/rho)
+                a  = sqrt(gama*p/rho)
+                inv_t_xi = inv_T_ksi(u,v,Q_barra(i,j,1)/metric_jacobian(i,j),a,ksi_x(i,j),ksi_y(i,j),dim)
                 if (iter == 0) write(*,*) inv_T_xi(1,1),inv_T_xi(1,2),inv_T_xi(1,3),inv_T_xi(1,4)
                 if (iter == 0) write(*,*) inv_T_xi(2,1),inv_T_xi(2,2),inv_T_xi(2,3),inv_T_xi(2,4)
                 if (iter == 0) write(*,*) inv_T_xi(3,1),inv_T_xi(3,2),inv_T_xi(3,3),inv_T_xi(3,4)

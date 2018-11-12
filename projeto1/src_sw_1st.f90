@@ -5,16 +5,31 @@ subroutine sw_1st
     use fluxes_pos_neg
     implicit none
 
-    ! ******
+    !*******
     ! let is begin using ADI
-    ! ******
+    !*******
+    !*******
+    ! create a vector to store the eigenvalues pos and neg
+    !*******
 
     call allocate_vars_sw
-    
+        
     call allocate_vars_sys_ksi
+
     do i = 1, dim
         Identy(i,i,1:imax) = 1.0d0
     end do
+
+    do j = 1, jmax
+        do i = 1, imax
+            u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
+            v(i,j)   = Q_barra(i,j,3)/Q_barra(i,j,1)
+            rho(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
+            p(i,j)   = (gama-1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
+                       - 0.50d0*rho(i,j)*(u(i,j)**2.0d0+v(i,j)**2.0d0))
+            a(i,j)   = sqrt(gama*p(i,j)/rho(i,j))
+        end do 
+    end do 
 
     call calculate_fluxes(E_pos,E_neg,F_pos,F_neg)
     
@@ -31,10 +46,9 @@ do j = 2, jmax - 1
                 diag_neg(index,index) = eig_neg 
             end do 
             
-            rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
-            inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
             
-            t_xi     = T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            t_xi     = T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
             
             aux_mult     = matmul(diag_pos,inv_t_xi)
             A_pos        = matmul(t_xi,aux_mult)
@@ -105,10 +119,9 @@ do i = 2, imax - 1
                 diag_neg(index,index) = eig_neg 
             end do 
 
-            rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
-            inv_teta = inv_T_eta(u(i,j),v(i,j),rho_t,a(i,j),eta_x(i,j),eta_y(i,j),dim)
+            inv_teta = inv_T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
 
-            teta     = T_eta(u(i,j),v(i,j),rho_t,a(i,j),eta_x(i,j),eta_y(i,j),dim)
+            teta     = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
 
             aux_mult     = matmul(diag_pos,inv_teta)
             B_pos        = matmul(teta,aux_mult)

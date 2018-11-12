@@ -4,6 +4,7 @@
 subroutine boundary_conditions_curv
     use vars
     implicit none
+        real(8)                         :: u, v, p, rho, T, a, q_vel
 
 ! 1 lb/ft**2 = 47.880258888889
 ! 1 R = 0.555556K
@@ -11,54 +12,59 @@ subroutine boundary_conditions_curv
 ! inlet boundary
 
 i = 1
-do j = 1, jmax 
-    u(i,j)  = Q_barra(i+1,j,2)/Q_barra(i+1,j,1)
-    v(i,j)  = u(i,j)*dtan(theta)  
-    T(i,j)  = T_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u(i,j)/a_cr)**2.0d0))
-    p(i,j)  = p_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u(i,j)/a_cr)**2.0d0))**(gama/(gama-1.0d0))
-    Q_barra(i,j,1) = metric_jacobian(i,j)*(p(i,j)/(R*T(i,j)))
-    Q_barra(i,j,2) = Q_barra(i,j,1)*u(i,j)
-    Q_barra(i,j,3) = Q_barra(i,j,1)*v(i,j)    
-    Q_barra(i,j,4) = metric_jacobian(i,j)*(p(i,j)/(gama-1.0d0) &
-                     + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2.0d0 + v(i,j)**2.0d0))
-
-    ! E_barra(i,j,1) = Q_barra(i,j,1)*U_contravariant(i,j) 
-    ! E_barra(i,j,2) = Q_barra(i,j,2)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_x(i,j)
-    ! E_barra(i,j,3) = Q_barra(i,j,3)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_y(i,j)
-    ! E_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*U_contravariant(i,j)
-
-    ! F_barra(i,j,1) = Q_barra(i,j,1)*V_contravariant(i,j) 
-    ! F_barra(i,j,2) = Q_barra(i,j,2)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_x(i,j)
-    ! F_barra(i,j,3) = Q_barra(i,j,3)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_y(i,j)
-    ! F_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*V_contravariant(i,j)
+do j = 2, jmax - 1
+    u  = Q_barra(i+1,j,2)/Q_barra(i+1,j,1)
+    v  = u*dtan(theta)  
+    T  = T_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u/a_cr)**2.0d0))
+    p  = p_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u/a_cr)**2.0d0))**(gama/(gama-1.0d0))
+    Q_barra(i,j,1) = metric_jacobian(i,j)*(p/(R*T))
+    Q_barra(i,j,2) = Q_barra(i,j,1)*u
+    Q_barra(i,j,3) = Q_barra(i,j,1)*v    
+    Q_barra(i,j,4) = metric_jacobian(i,j)*(p/(gama-1.0d0) &
+                     + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u**2.0d0 + v**2.0d0))
 end do
 
 ! lower boundary (wall boundary)
 
 j = 1
-do i = 2, imax
+do i = 1, imax
     U_contravariant(i,j) = U_contravariant(i,j+1)
     V_contravariant(i,j) = 0.0d0
         
         ! u e v sao determinados pela matriz jacobiana de transformacao
         ! so lebrar dos termos contrvariante das variaveis
-
-    u(i,j)         = x_ksi(i,j)*U_contravariant(i,j) 
-    v(i,j)         = y_ksi(i,j)*U_contravariant(i,j) 
     Q_barra(i,j,1) = metric_jacobian(i,j)*(Q_barra(i,j+1,1)/metric_jacobian(i,j+1))
     Q_barra(i,j,2) = metric_jacobian(i,j)*(Q_barra(i,j+1,2)/metric_jacobian(i,j+1))
     Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i,j+1,3)/metric_jacobian(i,j+1))
     Q_barra(i,j,4) = metric_jacobian(i,j)*(Q_barra(i,j+1,4)/metric_jacobian(i,j+1))
+end do
 
-    ! E_barra(i,j,1) = Q_barra(i,j,1)*U_contravariant(i,j) 
-    ! E_barra(i,j,2) = Q_barra(i,j,2)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_x(i,j)
-    ! E_barra(i,j,3) = Q_barra(i,j,3)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_y(i,j)
-    ! E_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*U_contravariant(i,j)
+! outlet boundary
 
-    ! F_barra(i,j,1) = Q_barra(i,j,1)*V_contravariant(i,j) 
-    ! F_barra(i,j,2) = Q_barra(i,j,2)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_x(i,j)
-    ! F_barra(i,j,3) = Q_barra(i,j,3)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_y(i,j)
-    ! F_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*V_contravariant(i,j)
+i = imax
+do j = 2, jmax - 1
+    rho = Q_barra(i,j,1)/metric_jacobian(i,j)
+    u   = Q_barra(i,j,2)/Q_barra(i,j,1)
+    v   = Q_barra(i,j,3)/Q_barra(i,j,1)
+    p = (gama-1.0d0) * (Q_barra(i,j,4)/metric_jacobian(i,j) & 
+               - 0.5d0*rho*(u**2.0d0+v**2.0d0) )
+    a          = sqrt(gama*p/rho)
+    q_vel = sqrt(u**2.0d0 + v**2.0d0)
+    if( (q_vel/a) <= 1.0d0 ) then
+        Q_barra(i,j,1) = metric_jacobian(i,j)*(Q_barra(i-1,j,1)/metric_jacobian(i-1,j))
+        Q_barra(i,j,2) = metric_jacobian(i,j)*(Q_barra(i-1,j,2)/metric_jacobian(i-1,j))
+        Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i-1,j,3)/metric_jacobian(i-1,j))
+        p              = p_total/3.0d0
+        u   = Q_barra(i-1,j,2)/Q_barra(i-1,j,1)
+        v   = Q_barra(i-1,j,3)/Q_barra(i-1,j,1)
+        Q_barra(i,j,4) = metric_jacobian(i,j)*(p/(gama-1.0d0) &
+                        + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u**2.0d0 + v**2.0d0))
+    else
+        Q_barra(i,j,1) = metric_jacobian(i,j)*(Q_barra(i-1,j,1)/metric_jacobian(i-1,j))
+        Q_barra(i,j,2) = metric_jacobian(i,j)*(Q_barra(i-1,j,2)/metric_jacobian(i-1,j))
+        Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i-1,j,3)/metric_jacobian(i-1,j))
+        Q_barra(i,j,4) = metric_jacobian(i,j)*(Q_barra(i-1,j,4)/metric_jacobian(i-1,j))
+    end if
 end do
 
 ! symmetry boundary
@@ -69,59 +75,6 @@ do i = 1, imax
     Q_barra(i,j,2) =  metric_jacobian(i,j)*(Q_barra(i,j-2,2)/metric_jacobian(i,j-2))
     Q_barra(i,j,3) = -metric_jacobian(i,j)*(Q_barra(i,j-2,3)/metric_jacobian(i,j-2))
     Q_barra(i,j,4) =  metric_jacobian(i,j)*(Q_barra(i,j-2,4)/metric_jacobian(i,j-2))
-
-    ! E_barra(i,j,1) = Q_barra(i,j,1)*U_contravariant(i,j) 
-    ! E_barra(i,j,2) = Q_barra(i,j,2)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_x(i,j)
-    ! E_barra(i,j,3) = Q_barra(i,j,3)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_y(i,j)
-    ! E_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*U_contravariant(i,j)
-
-    ! F_barra(i,j,1) = Q_barra(i,j,1)*V_contravariant(i,j) 
-    ! F_barra(i,j,2) = Q_barra(i,j,2)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_x(i,j)
-    ! F_barra(i,j,3) = Q_barra(i,j,3)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_y(i,j)
-    ! F_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*V_contravariant(i,j)
-end do
-
-! outlet boundary
-
-i = imax
-do j = 1, jmax
-    u(i,j)     = Q_barra(i,j,2)/Q_barra(i,j,1)
-    v(i,j)     = Q_barra(i,j,3)/Q_barra(i,j,1)
-    a(i,j)     = sqrt(gama*p(i,j)*metric_jacobian(i,j)/Q_barra(i,j,1))
-    q_vel(i,j) = sqrt(u(i,j)**2.0d0 + v(i,j)**2.0d0)
-    if( (q_vel(i,j)/a(i,j)) < 1.0d0 ) then
-        Q_barra(i,j,1) = metric_jacobian(i,j)*(Q_barra(i-1,j,1)/metric_jacobian(i-1,j))
-        Q_barra(i,j,2) = metric_jacobian(i,j)*(Q_barra(i-1,j,2)/metric_jacobian(i-1,j))
-        Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i-1,j,3)/metric_jacobian(i-1,j))
-        p(i,j)         = p_total/3.0d0
-        Q_barra(i,j,4) = metric_jacobian(i,j)*(p(i,j)/(gama-1.0d0) &
-                        + (Q_barra(i,j,1)/(2.0d0*metric_jacobian(i,j)))*(u(i,j)**2.0d0 + v(i,j)**2.0d0))
-
-        ! E_barra(i,j,1) = Q_barra(i,j,1)*U_contravariant(i,j) 
-        ! E_barra(i,j,2) = Q_barra(i,j,2)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_x(i,j)
-        ! E_barra(i,j,3) = Q_barra(i,j,3)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_y(i,j)
-        ! E_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*U_contravariant(i,j)
-
-        ! F_barra(i,j,1) = Q_barra(i,j,1)*V_contravariant(i,j) 
-        ! F_barra(i,j,2) = Q_barra(i,j,2)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_x(i,j)
-        ! F_barra(i,j,3) = Q_barra(i,j,3)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_y(i,j)
-        ! F_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*V_contravariant(i,j)
-    else
-        Q_barra(i,j,1) = metric_jacobian(i,j)*(Q_barra(i-1,j,1)/metric_jacobian(i-1,j))
-        Q_barra(i,j,2) = metric_jacobian(i,j)*(Q_barra(i-1,j,2)/metric_jacobian(i-1,j))
-        Q_barra(i,j,3) = metric_jacobian(i,j)*(Q_barra(i-1,j,3)/metric_jacobian(i-1,j))
-        Q_barra(i,j,4) = metric_jacobian(i,j)*(Q_barra(i-1,j,4)/metric_jacobian(i-1,j))
-
-        ! E_barra(i,j,1) = Q_barra(i,j,1)*U_contravariant(i,j) 
-        ! E_barra(i,j,2) = Q_barra(i,j,2)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_x(i,j)
-        ! E_barra(i,j,3) = Q_barra(i,j,3)*U_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*ksi_y(i,j)
-        ! E_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*U_contravariant(i,j)
-
-        ! F_barra(i,j,1) = Q_barra(i,j,1)*V_contravariant(i,j) 
-        ! F_barra(i,j,2) = Q_barra(i,j,2)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_x(i,j)
-        ! F_barra(i,j,3) = Q_barra(i,j,3)*V_contravariant(i,j) + metric_jacobian(i,j)*p(i,j)*eta_y(i,j)
-        ! F_barra(i,j,4) = metric_jacobian(i,j)*( (Q_barra(i,j,4)/metric_jacobian(i,j)) + p(i,j) )*V_contravariant(i,j)
-    end if
 end do
 
 ! do j = 1, jmax

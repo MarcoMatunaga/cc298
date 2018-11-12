@@ -9,6 +9,7 @@ module vars_sw
     real(8),dimension(:,:),allocatable           :: B_pos, B_neg
     real(8),dimension(:,:),allocatable           :: aux_mult
     real(8),dimension(:,:),allocatable           :: B_sys, aux_deltaQ, aux_deltaQ_til
+    real(8),dimension(:,:),allocatable           :: u,v,rho,p,a
     real(8),dimension(:,:,:),allocatable         :: flux_residue, Identy
     real(8),dimension(:,:,:),allocatable         :: A_pos_sys, A_neg_sys
     real(8),dimension(:,:,:),allocatable         :: B_pos_sys, B_neg_sys
@@ -16,7 +17,6 @@ module vars_sw
     real(8),dimension(:,:,:),allocatable         :: main_sw,lower_sw,upper_sw
     integer(4)                                   :: index, index_i, index_j
     real(8)                                      :: eig_pos, eig_neg
-    real(8)                                      :: rho_t
 contains
     
     subroutine allocate_vars_sw
@@ -27,6 +27,7 @@ contains
         allocate(deltaQ(imax,jmax,dim))
         allocate(deltaQ_til(imax,jmax,dim))
         allocate(aux_mult(dim,dim))
+        allocate(u(imax,jmax),v(imax,jmax),rho(imax,jmax),p(imax,jmax),a(imax,jmax))
     end subroutine allocate_vars_sw
 
     subroutine allocate_vars_sys_ksi
@@ -103,6 +104,7 @@ contains
         deallocate(flux_residue)
         deallocate(aux_mult)
         deallocate(deltaQ)
-        deallocate(deltaQ_til)        
+        deallocate(deltaQ_til)
+        deallocate(u,v,rho,p,a)        
     end subroutine deallocate_vars_left
 end module vars_sw

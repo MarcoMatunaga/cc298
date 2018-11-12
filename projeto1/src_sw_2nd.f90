@@ -5,13 +5,27 @@ subroutine sw_2nd
     use fluxes_pos_neg
     implicit none
 
-    ! ******
+    !*******
     ! let is begin using ADI
-    ! ******
+    !*******
+    !*******
+    ! create a vector to store the eigenvalues pos and neg
+    !*******
+    do j = 1, jmax
+        do i = 1, imax
+            u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
+            v(i,j)   = Q_barra(i,j,3)/Q_barra(i,j,1)
+            rho(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
+            p(i,j)   = (gama-1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
+                       - 0.50d0*rho(i,j)*(u(i,j)**2.0d0+v(i,j)**2.0d0))
+            a(i,j)   = sqrt(gama*p(i,j)/rho(i,j))
+        end do 
+    end do 
 
     call allocate_vars_sw
     
     call allocate_vars_sys_ksi
+
     do i = 1, dim
         Identy(i,i,1:imax) = 1.0d0
     end do
@@ -30,24 +44,24 @@ do j = 2, jmax - 1
                 diag_pos(index,index) = eig_pos
                 diag_neg(index,index) = eig_neg 
             end do 
-            !
-            rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
-            inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
-            !
-            t_xi     = T_ksi(u(i,j),v(i,j),rho_t,a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
-            !
+            
+            inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            
+            t_xi     = T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            
             aux_mult     = matmul(diag_pos,inv_t_xi)
             A_pos        = matmul(t_xi,aux_mult)
-            !
+            
             aux_mult     = matmul(diag_neg,inv_t_xi)
             A_neg        = matmul(t_xi,aux_mult)
-            !
+            
             do index_j = 1, dim
                 do index_i = 1, dim  
                     A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
                     A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
                 end do
             end do 
+            
     end do 
     
     do i = 2, imax - 1
@@ -61,7 +75,7 @@ do j = 2, jmax - 1
     end do
     
     ! set the matrixes
-
+    
     do i = 2, imax - 1
         do index_j = 1, dim 
             do index_i = 1, dim 
@@ -95,7 +109,6 @@ end do
     end do
 
 do i = 2, imax - 1
-
         do j = 2, jmax - 1
             eig = diag_eta(V_contravariant(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
 
@@ -105,10 +118,9 @@ do i = 2, imax - 1
                 diag_neg(index,index) = eig_neg 
             end do 
 
-            rho_t = Q_barra(i,j,1)/metric_jacobian(i,j)
-            inv_teta = inv_T_eta(u(i,j),v(i,j),rho_t,a(i,j),eta_x(i,j),eta_y(i,j),dim)
+            inv_teta = inv_T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
 
-            teta     = T_eta(u(i,j),v(i,j),rho_t,a(i,j),eta_x(i,j),eta_y(i,j),dim)
+            teta     = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
 
             aux_mult     = matmul(diag_pos,inv_teta)
             B_pos        = matmul(teta,aux_mult)
@@ -162,18 +174,19 @@ do i = 2, imax - 1
 
 end do 
 
-        ! if (iter == 8) then 
-        !     open(997,file='sw')
-        !     do j = 2, jmax - 1
-        !         do i = 2, imax - 1 
-        !             write(997,*) 'pos1',i,j,Q_barra(i,j,1)
-        !             write(997,*) 'pos2',i,j,Q_barra(i,j,2)
-        !             write(997,*) 'pos3',i,j,Q_barra(i,j,3)
-        !             write(997,*) 'pos4',i,j,Q_barra(i,j,4)
-        !         end do
-        !     end do 
-        !     close(997)    
-        ! end if
+
+        if (iter == 8) then 
+            open(997,file='sw')
+            do j = 2, jmax - 1
+                do i = 2, imax - 1 
+                    write(997,*) 'pos1',i,j,Q_barra(i,j,1)
+                    write(997,*) 'pos2',i,j,Q_barra(i,j,2)
+                    write(997,*) 'pos3',i,j,Q_barra(i,j,3)
+                    write(997,*) 'pos4',i,j,Q_barra(i,j,4)
+                end do
+            end do 
+            close(997)    
+        end if
 
         ! if (iter == 0) then 
         !     open (996,file='t_matrices_sw') 
@@ -189,6 +202,6 @@ end do
         ! end if
 
         call deallocate_vars_left
-        
+
 end subroutine sw_2nd
 

@@ -138,7 +138,7 @@ contains
             do i = 1, imax
                 !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
                 !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-                write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), p(i,j), mach(i,j)
+                write(3,'(9ES20.10)') meshx(i,j), meshy(i,j), DBLE(i), DBLE(j), p_out(i,j), mach(i,j)
             end do
         end do
         close(3)
@@ -161,7 +161,7 @@ contains
         
         do j = 1, ind_j
              do i = 1, imax
-                 rho_out(i,j)   = Q_barra(i,j,1)/metric_jacobian(i,j)
+                 rho_out(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
                  u_out(i,j) = Q_barra(i,j,2)/Q_barra(i,j,1)
                  v_out(i,j) = Q_barra(i,j,3)/Q_barra(i,j,1)
                  p_out(i,j) = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
@@ -236,8 +236,6 @@ contains
     write(7,*) 'ZONE I = ', imax, ' J =', ind_j, ' DATAPACKING = POINT' 
     do j = 1, ind_j
         do i = 1, imax
-            !write(3,'(7es11.3e2)') meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
-            !write(3,*) meshx(i,j), meshy(i,j), x_ksi(i,j), x_eta(i,j), y_ksi(i,j), y_eta(i,j), metric_jacobian(i,j)
             write(7,'(15ES20.10)') meshx(i,j), meshy(i,j), u_out(i,j), v_out(i,j), q_vel_out(i,j), rho_out(i,j), p_out(i,j), & 
             Q_barra(i,j,4)/metric_jacobian(i,j), mach(i,j)
         end do

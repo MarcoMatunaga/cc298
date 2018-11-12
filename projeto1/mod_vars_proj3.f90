@@ -1,7 +1,6 @@
 module vars_proj3
     use vars
 implicit none
-    real(8)                      :: u_p3, v_p3, p_p3, rho
     real(8)                      :: Height, Length
     real(8)                      :: shock_angle, mach_inlet, turn_angle, mach_inlet_n
     real(8)                      :: mach_2, mach_2_n
@@ -10,7 +9,8 @@ contains
     
     subroutine analytical
         implicit none
-        
+        real(8)                         :: p, rho
+
         shock_angle  = shock_angle*(3.1415d0/180.0d0)
         
         ! calculo para determinar as condicoes pos choque
@@ -45,9 +45,9 @@ contains
 
         x_ana = 0.0d0
             do while (x_ana < x_a)
-                 p_p3  = 1.0d0/gama
+                 p  = 1.0d0/gama
                  rho = 1.0d0
-                 write(9,'(3es11.3e2)') x_ana, p_p3, rho
+                 write(9,'(3es11.3e2)') x_ana, p, rho
                  x_ana = x_ana + 0.01d0  
             end do
             
@@ -55,8 +55,8 @@ contains
             
             do while (x_ana >= x_a .and. x_ana < x_3)
                  rho =  (gama + 1.0d0)*mach_inlet_n**2.0d0/(2.0d0 + (gama - 1.0d0)*mach_inlet_n**2.0d0)
-                 p_p3   =  (1.0d0 + (2.0d0*gama/( gama + 1.0d0 ))*(mach_inlet_n**2.0d0 - 1.0d0) ) / gama
-                 write(9,'(3es11.3e2)') x_ana, p_p3, rho
+                 p   =  (1.0d0 + (2.0d0*gama/( gama + 1.0d0 ))*(mach_inlet_n**2.0d0 - 1.0d0) ) / gama
+                 write(9,'(3es11.3e2)') x_ana, p, rho
                  x_ana = x_ana + 0.01d0  
             end do
             
@@ -66,10 +66,10 @@ contains
                  mach_2_n = mach_2*sin(shock_r_angle)
                  rho      = (gama + 1.0d0)*mach_inlet_n**2.0d0/(2.0d0 + (gama - 1.0d0)*mach_inlet_n**2.0d0) * (gama &
                             + 1.0d0)*mach_2_n**2.0d0/(2.0d0 + (gama - 1.0d0)*mach_2_n**2.0d0)
-                 p_p3     =  ((1.0d0 + (2.0d0*gama/( gama + 1.0d0 ))*(mach_inlet_n**2.0d0 - 1.0d0) ) / gama) * ((1.0d0 &
+                 p     =  ((1.0d0 + (2.0d0*gama/( gama + 1.0d0 ))*(mach_inlet_n**2.0d0 - 1.0d0) ) / gama) * ((1.0d0 &
                             + (2.0d0*gama/( gama + 1.0d0 ))*(mach_2_n**2.0d0 - 1.0d0) ) )
 
-                 write(9,'(3es11.3e2)') x_ana, p_p3, rho
+                 write(9,'(3es11.3e2)') x_ana, p, rho
 
                  x_ana = x_ana + 0.01d0  
             end do

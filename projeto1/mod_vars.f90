@@ -2,7 +2,6 @@ module vars
 implicit none
 
 ! flow, equations, variables vectors/matrixes
-real(8),dimension(:,:),allocatable           :: T, p, u, v, q_vel, a
 real(8),dimension(:,:),allocatable           :: U_contravariant, V_contravariant
 real(8),dimension(:,:,:),allocatable         :: residue
 real(8),dimension(:,:,:),allocatable         :: Q_barra, E_barra, F_barra 
@@ -31,6 +30,8 @@ real(8),dimension(:,:),allocatable           :: delta_t
 real(8)                                      :: delta_y, delta_x
 real(8)                                      :: max_residue, res_conv
 real(8)                                      :: CFL
+integer(4)                                   :: ramp, CFL_ramp_size
+
 
 ! mesh, metric terms, jacobians
 real(8),dimension(:,:),allocatable           :: meshx, meshy
@@ -66,8 +67,6 @@ real(8),dimension(:,:),allocatable           :: sigma_ksi, sigma_eta
         allocate(residue(imax,jmax,dim))
         allocate(metric_jacobian(imax,jmax))
         allocate(U_contravariant(imax,jmax), V_contravariant(imax,jmax))
-        allocate(p(imax,jmax), T(imax,jmax))
-        allocate(u(imax,jmax), v(imax,jmax), a(imax,jmax), q_vel(imax,jmax))
         allocate(y_ksi(imax,jmax), y_eta(imax,jmax))
         allocate(x_ksi(imax,jmax), x_eta(imax,jmax))
         allocate(ksi_x(imax,jmax), ksi_y(imax,jmax))
@@ -84,8 +83,6 @@ real(8),dimension(:,:),allocatable           :: sigma_ksi, sigma_eta
         deallocate(delta_t)
         deallocate(residue)
         deallocate(U_contravariant, V_contravariant)
-        deallocate(p, T)
-        deallocate(u, v, a, q_vel)
         deallocate(y_ksi, y_eta)
         deallocate(x_ksi, x_eta)
         deallocate(ksi_x, ksi_y)
