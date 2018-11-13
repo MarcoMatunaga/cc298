@@ -6,14 +6,13 @@ subroutine boundary_proj3
     integer(4)                      :: bc_i, bc_j
     real(8)                         :: u, v, p, rho
     ! inlet boundary 
-    bc_i = 1
-
-    do bc_j = 1, jmax
-
         u = mach_inlet
         v = 0.0d0
         p = 1.0d0/gama
         rho  = 1.0d0
+    
+    bc_i = 1
+    do bc_j = 1, jmax
 
         Q_barra(bc_i,bc_j,1) = metric_jacobian(bc_i,bc_j)*rho
         Q_barra(bc_i,bc_j,2) = metric_jacobian(bc_i,bc_j)*rho*u
@@ -62,9 +61,9 @@ subroutine boundary_proj3
         ! u e v sao determinados pela matriz jacobiana de transformacao
         ! so lebrar dos termos contrvariante das variaveis
 
-        v = y_ksi(bc_i,bc_j)*U_contravariant(bc_i,bc_j) 
-        u = x_ksi(bc_i,bc_j)*U_contravariant(bc_i,bc_j)
-        rho  = Q_barra(bc_i,bc_j+1,1)/metric_jacobian(bc_i,bc_j)
+        v = 0.0d0
+        u = Q_barra(bc_i,bc_j+1,2)/Q_barra(bc_i,bc_j+1,1)
+        rho  = Q_barra(bc_i,bc_j+1,1)/metric_jacobian(bc_i,bc_j+1)
         p = (gama-1.0d0) * (Q_barra(bc_i,bc_j+1,4)/metric_jacobian(bc_i,bc_j) & 
                - 0.5d0*( (Q_barra(bc_i,bc_j+1,2)/metric_jacobian(bc_i,bc_j))**2.0d0 &
                + (Q_barra(bc_i,bc_j+1,3)/metric_jacobian(bc_i,bc_j))**2.0d0)/rho)

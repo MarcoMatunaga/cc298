@@ -27,8 +27,8 @@ module fluxes_pos_neg
         u_temp = Q_barra(ind_i,ind_j,2)/Q_barra(ind_i,ind_j,1)
         v_temp = Q_barra(ind_i,ind_j,3)/Q_barra(ind_i,ind_j,1)
         p_temp = (gama-1.0d0) * (Q_barra(ind_i,ind_j,4)/metric_jacobian(ind_i,ind_j) & 
-               - 0.5d0*( (Q_barra(ind_i,ind_j,2)/metric_jacobian(ind_i,ind_j))**2.0d0 &
-               + (Q_barra(ind_i,ind_j,3)/metric_jacobian(ind_i,ind_j))**2.0d0)/rho_temp)
+                 - 0.5d0*( (Q_barra(ind_i,ind_j,2)/metric_jacobian(ind_i,ind_j))**2.0d0 &
+                 + (Q_barra(ind_i,ind_j,3)/metric_jacobian(ind_i,ind_j))**2.0d0)/rho_temp)
         a_temp = sqrt(gama*p_temp/rho_temp)
         k1_til = k1/sqrt(k1**2.0d0 + k2**2.0d0)
         k2_til = k2/sqrt(k1**2.0d0 + k2**2.0d0)
@@ -103,10 +103,6 @@ module fluxes_pos_neg
                 flux_eta_pos(aux_i,aux_j,1:dim) = aux_eta_pos(1:dim)
                 flux_eta_neg(aux_i,aux_j,1:dim) = aux_eta_neg(1:dim)
                 
-                ! if (isnan(aux_ksi_neg(1))) write(*,*) '1',iter,aux_i,aux_j,U_contravariant(aux_i,aux_j),V_contravariant(aux_i,aux_j)
-                ! if (isnan(aux_ksi_neg(2))) write(*,*) '2',iter,aux_i,aux_j,U_contravariant(aux_i,aux_j),V_contravariant(aux_i,aux_j)
-                ! if (isnan(aux_ksi_neg(3))) write(*,*) '3',iter,aux_i,aux_j,U_contravariant(aux_i,aux_j),V_contravariant(aux_i,aux_j)
-                ! if (isnan(aux_ksi_neg(4))) write(*,*) '4',iter,aux_i,aux_j,U_contravariant(aux_i,aux_j),V_contravariant(aux_i,aux_j)
             end do
         end do
         

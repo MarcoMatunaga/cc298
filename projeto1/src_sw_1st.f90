@@ -36,7 +36,6 @@ subroutine sw_1st
     ! setting the system 
     
 do j = 2, jmax - 1
-    
     do i = 2, imax - 1
             eig = diag_ksi(U_contravariant(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
 
@@ -174,20 +173,25 @@ do i = 2, imax - 1
     end do 
 
 end do 
-
-
-        if (iter == 8) then 
-            open(997,file='sw')
-            do j = 2, jmax - 1
-                do i = 2, imax - 1 
-                    write(997,*) 'pos1',i,j,Q_barra(i,j,1)
-                    write(997,*) 'pos2',i,j,Q_barra(i,j,2)
-                    write(997,*) 'pos3',i,j,Q_barra(i,j,3)
-                    write(997,*) 'pos4',i,j,Q_barra(i,j,4)
-                end do
+        
+        do j = 2, jmax - 1
+            do i = 2, imax - 1
+                write(*,*) iter,which_boundary,U_contravariant(i,j),V_contravariant(i,j)
             end do 
-            close(997)    
-        end if
+        end do 
+
+        ! if (iter == 8) then 
+        !     open(997,file='sw')
+        !     do j = 2, jmax - 1
+        !         do i = 2, imax - 1 
+        !             write(997,*) 'pos1',i,j,Q_barra(i,j,1)
+        !             write(997,*) 'pos2',i,j,Q_barra(i,j,2)
+        !             write(997,*) 'pos3',i,j,Q_barra(i,j,3)
+        !             write(997,*) 'pos4',i,j,Q_barra(i,j,4)
+        !         end do
+        !     end do 
+        !     close(997)    
+        ! end if
 
         ! if (iter == 0) then 
         !     open (996,file='t_matrices_sw') 

@@ -11,7 +11,7 @@ shock_angle = 29.00
 /
 
 &PAR_Time
-max_iter = 8000
+max_iter = 600
 time_method = 2 ! 1 euler_explicit
                 ! 2 implicit_beam_warming
                 ! 3 pulliam_chausse
