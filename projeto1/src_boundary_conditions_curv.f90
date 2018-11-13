@@ -27,36 +27,12 @@ do j = 2, jmax - 1
 
 end do
 
-! lower boundary (wall boundary)
-
-j = 1
-do i = 1, imax
-
-    U_contravariant(i,j) = U_contravariant(i,j+1)
-    V_contravariant(i,j) = 0.0d0
-        
-        ! u e v sao determinados pela matriz jacobiana de transformacao
-        !so lebrar dos termos contrvariante das variaveis
-
-    rho = Q_barra(i,j+1,1)/metric_jacobian(i,j+1)
-    u   = Q_barra(i,j+1,2)/Q_barra(i,j+1,1)
-    v   = Q_barra(i,j+1,3)/Q_barra(i,j+1,1)
-    en  = Q_barra(i,j+1,4)/metric_jacobian(i,j+1)
-    p   = (gama - 1.0d0)*(en - 0.50d0*rho*(u**2.0d0+v**2.0d0)) 
-
-    Q_barra(i,j,1) = metric_jacobian(i,j)*rho
-    Q_barra(i,j,2) = metric_jacobian(i,j)*rho*u
-    Q_barra(i,j,3) = metric_jacobian(i,j)*rho*v
-    Q_barra(i,j,4) = metric_jacobian(i,j)*(p/(gama-1.0d0) &
-                     + (0.50d0*rho*(u**2.0d0 + v**2.0d0)))
-
-end do
-
 ! outlet boundary
 
 i = imax
 do j = 2, jmax - 1
 
+    ! Mach calculation
     rho = Q_barra(i,j,1)/metric_jacobian(i,j)
     u   = Q_barra(i,j,2)/Q_barra(i,j,1)
     v   = Q_barra(i,j,3)/Q_barra(i,j,1)
@@ -65,6 +41,7 @@ do j = 2, jmax - 1
     a          = sqrt(gama*p/rho)
     q_vel = sqrt(u**2.0d0 + v**2.0d0)
 
+    ! extrapolate the properties
     rho = Q_barra(i-1,j,1)/metric_jacobian(i-1,j)
     u   = Q_barra(i-1,j,2)/Q_barra(i-1,j,1)
     v   = Q_barra(i-1,j,3)/Q_barra(i-1,j,1)
@@ -100,6 +77,32 @@ do i = 1, imax
     Q_barra(i,j,3) = metric_jacobian(i,j)*rho*v
     Q_barra(i,j,4) = metric_jacobian(i,j)*(p/(gama-1.0d0) &
                      + (0.50d0*rho*(u**2.0d0 + v**2.0d0)))
+
+end do
+
+! lower boundary (wall boundary)
+
+j = 1
+do i = 1, imax
+       
+        ! u e v sao determinados pela matriz jacobiana de transformacao
+        !so lebrar dos termos contrvariante das variaveis
+
+    rho = Q_barra(i,j+1,1)/metric_jacobian(i,j+1)
+    u   = Q_barra(i,j+1,2)/Q_barra(i,j+1,1)
+    v   = Q_barra(i,j+1,3)/Q_barra(i,j+1,1)
+    v   = 0.0d0 
+    en  = Q_barra(i,j+1,4)/metric_jacobian(i,j+1)
+    p   = (gama - 1.0d0)*(en - 0.50d0*rho*(u**2.0d0+v**2.0d0)) 
+
+    Q_barra(i,j,1) = metric_jacobian(i,j)*rho
+    Q_barra(i,j,2) = metric_jacobian(i,j)*rho*u
+    Q_barra(i,j,3) = metric_jacobian(i,j)*rho*v
+    Q_barra(i,j,4) = metric_jacobian(i,j)*(p/(gama-1.0d0) &
+                     + (0.50d0*rho*(u**2.0d0 + v**2.0d0)))
+
+    U_contravariant(i,j) = u*ksi_x(i,j+1) + v*ksi_y(i,j+1)
+    V_contravariant(i,j) = 0.0d0
 
 end do
 

@@ -64,9 +64,9 @@ subroutine boundary_proj3
         v = 0.0d0
         u = Q_barra(bc_i,bc_j+1,2)/Q_barra(bc_i,bc_j+1,1)
         rho  = Q_barra(bc_i,bc_j+1,1)/metric_jacobian(bc_i,bc_j+1)
-        p = (gama-1.0d0) * (Q_barra(bc_i,bc_j+1,4)/metric_jacobian(bc_i,bc_j) & 
-               - 0.5d0*( (Q_barra(bc_i,bc_j+1,2)/metric_jacobian(bc_i,bc_j))**2.0d0 &
-               + (Q_barra(bc_i,bc_j+1,3)/metric_jacobian(bc_i,bc_j))**2.0d0)/rho)
+        p = (gama-1.0d0) * (Q_barra(bc_i,bc_j+1,4)/metric_jacobian(bc_i,bc_j+1) & 
+               - 0.5d0*( (Q_barra(bc_i,bc_j+1,2)/metric_jacobian(bc_i,bc_j+1))**2.0d0 &
+               + (Q_barra(bc_i,bc_j+1,3)/metric_jacobian(bc_i,bc_j+1))**2.0d0)/rho)
 
         Q_barra(bc_i,bc_j,1) = metric_jacobian(bc_i,bc_j)*rho
         Q_barra(bc_i,bc_j,2) = metric_jacobian(bc_i,bc_j)*rho*u

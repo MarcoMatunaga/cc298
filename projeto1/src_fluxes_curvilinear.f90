@@ -13,19 +13,22 @@ subroutine fluxes_curvilinear
 E_barra = 0.0d0
 F_barra = 0.0d0
 
-do j = 1, jmax 
-    do i = 1, imax 
-        
-        !  fluxes in curvilinear coordinates - ksi direction
+do j = 1, jmax
+    do i = 1, imax
+               
         u = Q_barra(i,j,2)/Q_barra(i,j,1)   
         v = Q_barra(i,j,3)/Q_barra(i,j,1)
         p = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
                  - 0.50d0*( (Q_barra(i,j,1)/metric_jacobian(i,j))*(u**2.0d0+v**2.0d0) ) )
-        
+
         U_contravariant(i,j) = u*ksi_x(i,j) + v*ksi_y(i,j)
         V_contravariant(i,j) = u*eta_x(i,j) + v*eta_y(i,j)
-        if ( j == 1 ) V_contravariant(i,j) = 0.0d0
+        if ( j==1 ) then
+            V_contravariant(i,j) = 0.0d0
+            U_contravariant(i,j) = Q_barra(i,j+1,2)/Q_barra(i,j+1,1)*ksi_x(i,j+1)
+        end if
 
+        !  fluxes in curvilinear coordinates - ksi direction
         E_barra(i,j,1) = Q_barra(i,j,1)*U_contravariant(i,j) 
         E_barra(i,j,2) = Q_barra(i,j,2)*U_contravariant(i,j) + metric_jacobian(i,j)*p*ksi_x(i,j)
         E_barra(i,j,3) = Q_barra(i,j,3)*U_contravariant(i,j) + metric_jacobian(i,j)*p*ksi_y(i,j)
