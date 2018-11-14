@@ -20,6 +20,12 @@ subroutine boundary_proj3
         Q_barra(bc_i,bc_j,4) = metric_jacobian(bc_i,bc_j)*(p/(gama-1.0d0) &
                                + 0.5d0*rho*(u**2.0d0 + v**2.0d0))
 
+        u = Q_barra(bc_i,bc_j,2)/Q_barra(bc_i,bc_j,1)
+        v = Q_barra(bc_i,bc_j,3)/Q_barra(bc_i,bc_j,1)
+
+        U_contravariant(bc_i,bc_j) = u*ksi_x(bc_i,bc_j) + v*ksi_y(bc_i,bc_j)
+        V_contravariant(bc_i,bc_j) = u*eta_x(bc_i,bc_j) + v*eta_y(bc_i,bc_j)
+
     end do
 
     ! post shock conditions - upper boundary
@@ -38,6 +44,12 @@ subroutine boundary_proj3
         Q_barra(bc_i,bc_j,4) = metric_jacobian(bc_i,bc_j)*(p/(gama-1.0d0) &
                                + 0.5d0*rho*(u**2.0d0 + v**2.0d0))
 
+        u = Q_barra(bc_i,bc_j,2)/Q_barra(bc_i,bc_j,1)
+        v = Q_barra(bc_i,bc_j,3)/Q_barra(bc_i,bc_j,1)
+
+        U_contravariant(bc_i,bc_j) = u*ksi_x(bc_i,bc_j) + v*ksi_y(bc_i,bc_j)
+        V_contravariant(bc_i,bc_j) = u*eta_x(bc_i,bc_j) + v*eta_y(bc_i,bc_j)
+
     end do
 
     ! outlet boundary
@@ -49,14 +61,18 @@ subroutine boundary_proj3
         Q_barra(bc_i,bc_j,3) = Q_barra(bc_i-1,bc_j,3)
         Q_barra(bc_i,bc_j,4) = Q_barra(bc_i-1,bc_j,4)
 
+        u = Q_barra(bc_i,bc_j,2)/Q_barra(bc_i,bc_j,1)
+        v = Q_barra(bc_i,bc_j,3)/Q_barra(bc_i,bc_j,1)
+
+        U_contravariant(bc_i,bc_j) = u*ksi_x(bc_i,bc_j) + v*ksi_y(bc_i,bc_j)
+        V_contravariant(bc_i,bc_j) = u*eta_x(bc_i,bc_j) + v*eta_y(bc_i,bc_j)
+
     end do
 
     ! wall boundary
     bc_j = 1
 
         do bc_i = 2, imax - 1
-        U_contravariant(bc_i,bc_j) = U_contravariant(bc_i,bc_j+1)
-        V_contravariant(bc_i,bc_j) = 0.0d0
         
         ! u e v sao determinados pela matriz jacobiana de transformacao
         ! so lebrar dos termos contrvariante das variaveis
@@ -73,6 +89,9 @@ subroutine boundary_proj3
         Q_barra(bc_i,bc_j,3) = metric_jacobian(bc_i,bc_j)*rho*v
         Q_barra(bc_i,bc_j,4) = metric_jacobian(bc_i,bc_j)*(p/(gama-1.0d0) & 
                                + 0.5d0*rho*(u**2.0d0 + v**2.0d0))
+
+        U_contravariant(bc_i,bc_j) = u*ksi_x(bc_i,bc_j) + v*ksi_y(bc_i,bc_j)
+        V_contravariant(bc_i,bc_j) = 0.0d0
 
     end do
 

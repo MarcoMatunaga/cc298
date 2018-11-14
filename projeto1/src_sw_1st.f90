@@ -67,7 +67,11 @@ do j = 2, jmax - 1
     do i = 2, imax - 1
         !**** colocar a subroutina do residuo com 
         !**** intervalo ao inves de indice por indice
-        call residue_flux_vector_splitting_1st(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+        if (j == 2 .or. j == jmax - 1 .or. i == 2 .or. i == imax - 1) then
+            call residue_flux_vector_splitting_1st(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+        else
+            call residue_flux_vector_splitting_2nd(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+        end if
         B_sys(1,i-1) = -flux_residue(i,j,1) 
         B_sys(2,i-1) = -flux_residue(i,j,2) 
         B_sys(3,i-1) = -flux_residue(i,j,3) 

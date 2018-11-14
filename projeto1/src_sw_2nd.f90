@@ -11,6 +11,15 @@ subroutine sw_2nd
     !*******
     ! create a vector to store the eigenvalues pos and neg
     !*******
+
+    call allocate_vars_sw
+        
+    call allocate_vars_sys_ksi
+
+    do i = 1, dim
+        Identy(i,i,1:imax) = 1.0d0
+    end do
+
     do j = 1, jmax
         do i = 1, imax
             u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
@@ -22,20 +31,11 @@ subroutine sw_2nd
         end do 
     end do 
 
-    call allocate_vars_sw
-    
-    call allocate_vars_sys_ksi
-
-    do i = 1, dim
-        Identy(i,i,1:imax) = 1.0d0
-    end do
-
     call calculate_fluxes(E_pos,E_neg,F_pos,F_neg)
     
     ! setting the system 
     
 do j = 2, jmax - 1
-    
     do i = 2, imax - 1
             eig = diag_ksi(U_contravariant(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
 
@@ -67,7 +67,11 @@ do j = 2, jmax - 1
     do i = 2, imax - 1
         !**** colocar a subroutina do residuo com 
         !**** intervalo ao inves de indice por indice
-        call residue_flux_vector_splitting_1st(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+        if (j == 2 .or. j == jmax - 1 .or. i == 2 .or. i == imax - 1) then
+            call residue_flux_vector_splitting_1st(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+        else
+            call residue_flux_vector_splitting_2nd(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+        end if
         B_sys(1,i-1) = -flux_residue(i,j,1) 
         B_sys(2,i-1) = -flux_residue(i,j,2) 
         B_sys(3,i-1) = -flux_residue(i,j,3) 
@@ -173,20 +177,25 @@ do i = 2, imax - 1
     end do 
 
 end do 
-
-
-        if (iter == 8) then 
-            open(997,file='sw')
-            do j = 2, jmax - 1
-                do i = 2, imax - 1 
-                    write(997,*) 'pos1',i,j,Q_barra(i,j,1)
-                    write(997,*) 'pos2',i,j,Q_barra(i,j,2)
-                    write(997,*) 'pos3',i,j,Q_barra(i,j,3)
-                    write(997,*) 'pos4',i,j,Q_barra(i,j,4)
-                end do
+        
+        do j = 2, jmax - 1
+            do i = 2, imax - 1
+                write(*,*) iter,which_boundary,U_contravariant(i,j),V_contravariant(i,j)
             end do 
-            close(997)    
-        end if
+        end do 
+
+        ! if (iter == 8) then 
+        !     open(997,file='sw')
+        !     do j = 2, jmax - 1
+        !         do i = 2, imax - 1 
+        !             write(997,*) 'pos1',i,j,Q_barra(i,j,1)
+        !             write(997,*) 'pos2',i,j,Q_barra(i,j,2)
+        !             write(997,*) 'pos3',i,j,Q_barra(i,j,3)
+        !             write(997,*) 'pos4',i,j,Q_barra(i,j,4)
+        !         end do
+        !     end do 
+        !     close(997)    
+        ! end if
 
         ! if (iter == 0) then 
         !     open (996,file='t_matrices_sw') 
@@ -204,4 +213,3 @@ end do
         call deallocate_vars_left
 
 end subroutine sw_2nd
-

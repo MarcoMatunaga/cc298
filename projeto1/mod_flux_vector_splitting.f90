@@ -27,8 +27,7 @@ module fluxes_pos_neg
         u_temp = Q_barra(ind_i,ind_j,2)/Q_barra(ind_i,ind_j,1)
         v_temp = Q_barra(ind_i,ind_j,3)/Q_barra(ind_i,ind_j,1)
         p_temp = (gama-1.0d0) * (Q_barra(ind_i,ind_j,4)/metric_jacobian(ind_i,ind_j) & 
-                 - 0.5d0*( (Q_barra(ind_i,ind_j,2)/metric_jacobian(ind_i,ind_j))**2.0d0 &
-                 + (Q_barra(ind_i,ind_j,3)/metric_jacobian(ind_i,ind_j))**2.0d0)/rho_temp)
+                 - 0.5d0*rho_temp*( u_temp**2.0d0 + v_temp**2.0d0 ) )
         a_temp = sqrt(gama*p_temp/rho_temp)
         k1_til = k1/sqrt(k1**2.0d0 + k2**2.0d0)
         k2_til = k2/sqrt(k1**2.0d0 + k2**2.0d0)
@@ -68,7 +67,7 @@ module fluxes_pos_neg
         real(8),dimension(dim)                           :: aux_eta_pos, aux_eta_neg
         real(8),dimension(dim)                           :: eta_neg, eta_pos
         real(8),dimension(dim)                           :: ksi_neg, ksi_pos
-        real(8)                                          :: a_temp, p_temp, rho_temp
+        real(8)                                          :: a_temp, p_temp, rho_temp, u_temp, v_temp
         integer(4)                                       :: aux_i, aux_j, pos
         
         flux_eta_neg = 0.0d0
@@ -80,9 +79,10 @@ module fluxes_pos_neg
             do aux_i = 1, imax
                 
                 rho_temp = Q_barra(aux_i,aux_j,1)/metric_jacobian(aux_i,aux_j)
+                u_temp = Q_barra(aux_i,aux_j,2)/Q_barra(aux_i,aux_j,1)
+                v_temp = Q_barra(aux_i,aux_j,3)/Q_barra(aux_i,aux_j,1)
                 p_temp = (gama-1.0d0) * (Q_barra(aux_i,aux_j,4)/metric_jacobian(aux_i,aux_j) & 
-                        - 0.5d0*( (Q_barra(aux_i,aux_j,2)/metric_jacobian(aux_i,aux_j))**2.0d0 &
-                        + (Q_barra(aux_i,aux_j,3)/metric_jacobian(aux_i,aux_j))**2.0d0)/rho_temp)
+                        - 0.5d0*rho_temp*( (u_temp)**2.0d0 + (v_temp)**2.0d0))
                 a_temp = sqrt(gama*p_temp/rho_temp)           
 
                 eig_v_ksi = diag_ksi(U_contravariant(aux_i,aux_j),a_temp,ksi_x(aux_i,aux_j),ksi_y(aux_i,aux_j),dim)

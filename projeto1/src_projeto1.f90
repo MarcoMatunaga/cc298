@@ -6,8 +6,9 @@ program proj1
         use vars_proj3
         use output_routines
         implicit none
-
-
+!****
+! create a fortran program with command line inputs
+!****
 namelist /PAR_Flow/ gama, R, T_total, p_total 
 namelist /PAR_Flow_shock/ mach_inlet, shock_angle
 namelist /PAR_Time/ max_iter,time_method,res_conv
