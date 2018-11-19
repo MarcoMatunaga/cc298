@@ -32,7 +32,7 @@ eps_dis_e = 10.00
 dis_factor = 2.00
 ramp = 0
 CFL_ramp_size = 3
-CFL = 0.1 
+CFL = 1.0 
 /
 
 &PAR_Analytical
