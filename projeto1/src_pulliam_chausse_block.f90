@@ -92,7 +92,7 @@ do index = 1, dim
         !    d - right part
         !    x - the answer
         !    n - number of equations
-        call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,imax-2)
+        call blktriad(main,lower,upper,dim,imax-2,d_sys,x_sys)
         !
         do i = 2, imax - 1
             x1_sys(i,j_sol,index) = x_sys(i-1)
@@ -150,8 +150,8 @@ do index = 1, dim
                 main(j-1) = main(j-1) + L_eta
             
         end do
-        !
-        call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,jmax-2)
+        !    maind,lower,upper,id,md,xb,x
+        call blktriad(main,lower,upper,dim,jmax-2,d_sys,x_sys)
         do j = 2, jmax - 1
             x1_sys(i_sol,j,index) = x_sys(j-1)
             ! if (index == 1) write(*,*) x1_sys(i,2,index), x_sys(1)

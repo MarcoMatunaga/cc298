@@ -34,6 +34,7 @@ contains
                         + (gama+1.0d0)*mach_2**4.0d0/4.0d0 )*tan(turn_angle)**2.0d0)/(lambda_shock**3.0d0)
         shock_r_angle = atan( (mach_2**2.0d0 - 1.0d0 + 2.0d0*lambda_shock*cos((4.0d0*3.1415d0 + acos(khi))/3.0d0) )/(3.0d0*(1.0d0&
                         +(gama-1.0d0)*(mach_2**2.0d0)/2.0d0)*tan(turn_angle)) )
+        write(*,*) shock_r_angle*(180.0d0/dacos(-1.0d0)), mach_2
         z = y_sol/sin(shock_r_angle - turn_angle)
         x_3 = z*cos(shock_r_angle - turn_angle) + x_wall
 

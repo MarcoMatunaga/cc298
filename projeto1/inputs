@@ -6,12 +6,12 @@ p_total = 101360.00
 /
 
 &PAR_Flow_shock
-mach_inlet = 2.9
-shock_angle = 29.00
+mach_inlet = 3.0
+shock_angle = 30.00
 /
 
 &PAR_Time
-max_iter = 2000
+max_iter = 10
 time_method = 4 ! 1 euler_explicit
                 ! 2 implicit_beam_warming
                 ! 3 pulliam_chausse
