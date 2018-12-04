@@ -11,8 +11,8 @@ shock_angle = 30.00
 /
 
 &PAR_Time
-max_iter = 10
-time_method = 4 ! 1 euler_explicit
+max_iter = 1000
+time_method = 3 ! 1 euler_explicit
                 ! 2 implicit_beam_warming
                 ! 3 pulliam_chausse
                 ! 4 sw_1st
@@ -26,13 +26,13 @@ res_conv = -15.00
 
 &PAR_Numeric
 which_diss = 2
-k2 = 0.5
+k2 = 0.25
 k4 = 0.01
 eps_dis_e = 10.00
 dis_factor = 2.00
 ramp = 0
 CFL_ramp_size = 3
-CFL = 1.0 
+CFL = 0.1 
 /
 
 &PAR_Analytical
@@ -41,7 +41,7 @@ y_sol = 0.5
 
 &PAR_Others
 dim = 4
-which_boundary = 2 ! 1 bocal
+which_boundary = 1 ! 1 bocal
 	           ! 2 shock reflection
 imax = 100
 jmax = 80

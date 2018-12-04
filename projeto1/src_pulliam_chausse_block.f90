@@ -3,16 +3,25 @@ subroutine pulliam_chausse_block
     use diagonalization
     use functions
     implicit none
-    real(8),dimension(:),allocatable                   :: diag_plus, diag_minus
-    real(8),dimension(:),allocatable                   :: result, aux_mult
-    real(8),dimension(:),allocatable                   :: lower,main,upper
-    real(8),dimension(:),allocatable                   :: x_sys,d_sys
-    real(8),dimension(:,:),allocatable                 :: inv_t_xi , n_inverse
-    real(8),dimension(:,:),allocatable                 :: Teta
-    real(8),dimension(:,:,:),allocatable               :: x1_sys, right_side
-    real(8),dimension(:,:),allocatable                 :: u,v,p,rho,a
-    real(8)                                            :: L_ksi, L_eta
-    integer(4)                                         :: index, i_sol, j_sol
+    real(8),dimension(:,:,:),allocatable      :: main,upper,lower
+    real(8),dimension(:,:,:),allocatable      :: x2_f, delta_Q
+    real(8),dimension(:,:),allocatable        :: u,v,rho,p,a 
+    real(8),dimension(:,:),allocatable        :: inv_t_xi
+    real(8),dimension(:,:),allocatable        :: right_side
+    real(8),dimension(:,:),allocatable        :: x1,x2
+    real(8),dimension(:,:),allocatable        :: Identy
+    real(8),dimension(:,:),allocatable        :: n_inverse, Teta
+    real(8),dimension(:),allocatable          :: diag_plus, diag_minus
+    real(8),dimension(:),allocatable          :: residue_pc, result
+    real(8),dimension(:),allocatable          :: aux_mult
+    real(8)                                   :: L_ksi, L_eta
+    integer(4)                                :: index
+
+allocate(u(imax,jmax),v(imax,jmax),rho(imax,jmax))
+allocate(p(imax,jmax),a(imax,jmax))
+
+allocate(aux_mult(dim),result(dim))
+allocate(Identy(dim,dim))
 
 do j = 1, jmax
         do i = 1, imax
@@ -20,190 +29,166 @@ do j = 1, jmax
             Q_dis(i,j,2) = Q_barra(i,j,2)/metric_jacobian(i,j)
             Q_dis(i,j,3) = Q_barra(i,j,3)/metric_jacobian(i,j)
             Q_dis(i,j,4) = Q_barra(i,j,4)/metric_jacobian(i,j)
+
+            u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
+            v(i,j)   = Q_barra(i,j,3)/Q_barra(i,j,1)
+            rho(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
+            p(i,j)   = (gama-1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
+                       - 0.50d0*rho(i,j)*(u(i,j)**2.0d0+v(i,j)**2.0d0))
+            a(i,j)   = sqrt(gama*p(i,j)/rho(i,j))
         end do
 end do
 
-allocate(x1_sys(imax,jmax,dim))
-allocate(right_side(imax,jmax,dim))
-allocate(rho(imax,jmax),u(imax,jmax),v(imax,jmax),p(imax,jmax),a(imax,jmax))
-allocate(inv_t_xi(dim,dim),n_inverse(dim,dim))
-allocate(Teta(dim,dim))
-allocate(result(dim))
-allocate(diag_minus(dim),diag_plus(dim))
+! start to solve the system at the ksi direction
 
-do j = 1, jmax
-    do i = 1, imax
-        u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
-        v(i,j)   = Q_barra(i,j,3)/Q_barra(i,j,1)
-        rho(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
-        p(i,j)   = (gama-1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
-                   - 0.50d0*rho(i,j)*(u(i,j)**2.0d0+v(i,j)**2.0d0))
-        a(i,j)   = sqrt(gama*p(i,j)/rho(i,j))
+allocate(inv_t_xi(dim,dim))
+allocate(diag_plus(dim),diag_minus(dim))
+allocate(main(dim,dim,imax-2),upper(dim,dim,imax-2),lower(dim,dim,imax-2))
+allocate(right_side(dim,imax-2))
+allocate(x1(dim,imax-2))
+allocate(residue_pc(dim))
+
+do j = 2, jmax - 1
+    do i = 2, imax - 1
+  
+        inv_t_xi           = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+        
+        call compute_residue(i,j)
+        residue_pc(1:dim)     = -residue(i,j,1:dim)
+        aux_mult              = matmul(inv_T_xi,residue_pc)
+        right_side(1:dim,i-1) = aux_mult(1:dim)
+
+    end do
+end do
+
+do j = 2, jmax - 1
+
+    do i = 2, imax - 1 
+        diag_plus  = diag_ksi(U_contravariant(i+1,j),a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
+        
+        L_ksi = dis_imp_ksi(i,j,eps_dis_i,3)
+        do index = 1, dim
+            upper(index,index,i-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi*Identy(index,index)
+        end do
+
+        diag_minus = diag_ksi(U_contravariant(i-1,j),a(i-1,j),ksi_x(i-1,j),ksi_y(i-1,j),dim)
+
+        L_ksi = dis_imp_ksi(i,j,eps_dis_i,1)
+        do index = 1, dim
+            lower(index,index,i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_ksi*Identy(index,index)
+        end do
+
+        L_ksi = dis_imp_ksi(i,j,eps_dis_i,2)
+        do index = 1, dim
+            main(index,index,i-1) = 1.0d0 + L_ksi
+        end do
+
     end do 
+
+    call blktriad(main,lower,upper,dim,imax-2,right_side,x1) 
+
 end do 
 
-allocate(lower(imax-2),main(imax-2),upper(imax-2))
-allocate(x_sys(imax-2),d_sys(imax-2),aux_mult(dim))
+deallocate(inv_t_xi)
+deallocate(diag_plus,diag_minus)
+deallocate(main,upper,lower)
+deallocate(right_side)
+deallocate(residue_pc)
 
-diag_minus = 0.0d0
-diag_plus  = 0.0d0
-d_sys = 0.0d0
-x1_sys = 0.0d0
-x_sys  = 0.0d0
-lower  = 0.0d0
-upper  = 0.0d0
-main   = 1.0d0
-aux_mult = 0.0d0
-right_side = 0.0d0
+! start to solve the system at the eta-direction
+
+allocate(diag_plus(dim),diag_minus(dim))
+allocate(main(dim,dim,jmax-2),upper(dim,dim,jmax-2),lower(dim,dim,jmax-2))
+allocate(right_side(dim,jmax-2))
+allocate(x2(dim,jmax-2))
+allocate(x2_f(imax,jmax,dim))
+allocate(n_inverse(dim,dim))
 
 do j = 2, jmax - 1
     do i = 2, imax - 1
-        call compute_residue(i,j)
-        aux_mult(1:dim) = -residue(i,j,1:dim)
-        inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
-        result = matmul(inv_t_xi,aux_mult)
-        right_side(i,j,1:dim) = result(1:dim)
-    end do 
-end do
 
-do index = 1, dim
-    !
-    do j_sol = 2, jmax - 1
-        !
-        do i = 2, imax - 1
-            !
-            d_sys(i-1) = right_side(i,j_sol,index)
-            !
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,3)
-            diag_plus  = diag_ksi(U_contravariant(i+1,j_sol),a(i+1,j_sol),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim)
-                upper(i-1) = 0.50d0*delta_t(i,j_sol)*diag_plus(index) + L_ksi
-
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,1)
-            diag_minus = diag_ksi(U_contravariant(i-1,j_sol),a(i-1,j_sol),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim)
-                lower(i-1) = -0.50d0*delta_t(i,j_sol)*diag_minus(index) + L_ksi
-
-            L_ksi = dis_imp_ksi(i,j_sol,eps_dis_i,2)
-                main(i-1) = main(i-1) + L_ksi
-            !
-        end do 
-        !    a - sub-diagonal (means it is the diagonal below the main diagonal)
-        !    b - the main diagonal
-        !    c - sup-diagonal (means it is the diagonal above the main diagonal)
-        !    d - right part
-        !    x - the answer
-        !    n - number of equations
-        call blktriad(main,lower,upper,dim,imax-2,d_sys,x_sys)
-        !
-        do i = 2, imax - 1
-            x1_sys(i,j_sol,index) = x_sys(i-1)
-        end do
-        !
-    end do
-    !
-end do
-!
-!
-deallocate(lower,main,upper)
-deallocate(x_sys,d_sys)
-!
-! start to solve the system in the eta location
-!
-allocate(lower(jmax-2),main(jmax-2),upper(jmax-2))
-allocate(x_sys(jmax-2),d_sys(jmax-2))
-!
-!
-d_sys = 0.0d0
-x_sys  = 0.0d0
-lower  = 0.0d0
-upper  = 0.0d0
-main   = 1.0d0
-aux_mult = 0.0d0
-right_side = 0.0d0
-!
-!
-do j = 2, jmax - 1
-    do i = 2, imax - 1
-        aux_mult(1:dim) = x1_sys(i,j,1:dim)
+        aux_mult(1:dim) = x1(1:dim,i-1)
         n_inverse = inv_N_matrix(ksi_x(i,j),ksi_y(i,j),eta_x(i,j),eta_y(i,j),dim)
         result = matmul(n_inverse,aux_mult)
-        right_side(i,j,1:dim) = result(1:dim)
+        right_side(1:dim,j-1) = result(1:dim)
+
     end do 
-end do
-!
-do index = 1, dim
-    ! do i = 2, imax - 1
-    do i_sol = 2, imax - 1
-        !
-        do j = 2, jmax - 1
-            
-            d_sys(j-1) = right_side(i_sol,j,index)
-            
-            L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
-            diag_plus = diag_eta(V_contravariant(i_sol,j+1),a(i_sol,j+1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim)
-                upper(j-1) = 0.50d0*delta_t(i_sol,j)*diag_plus(index) + L_eta
-
-            L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
-            diag_minus = diag_eta(V_contravariant(i_sol,j-1),a(i_sol,j-1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim)
-                lower(j-1) = -0.50d0*delta_t(i_sol,j)*diag_minus(index) + L_eta
-
-            L_eta = dis_imp_eta(i_sol,j,eps_dis_i,2)
-                main(j-1) = main(j-1) + L_eta
-            
-        end do
-        !    maind,lower,upper,id,md,xb,x
-        call blktriad(main,lower,upper,dim,jmax-2,d_sys,x_sys)
-        do j = 2, jmax - 1
-            x1_sys(i_sol,j,index) = x_sys(j-1)
-            ! if (index == 1) write(*,*) x1_sys(i,2,index), x_sys(1)
-        end do
-        !
-    end do
-    !
 end do 
-!
-!
-deallocate(lower,main,upper)
-deallocate(x_sys,d_sys)
-deallocate(diag_minus,diag_plus)
-!
-!
+
+do i = 2, imax - 1
+
+    do j = 2, jmax - 1
+
+        diag_plus = diag_eta(V_contravariant(i,j+1),a(i,j+1),eta_x(i,j+1),eta_y(i,j+1),dim)
+
+        L_eta = dis_imp_eta(i,j,eps_dis_i,3)
+        do index = 1, dim
+            upper(index,index,j-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + L_eta*Identy(index,index)
+        end do
+
+        diag_minus = diag_eta(V_contravariant(i,j-1),a(i,j-1),eta_x(i,j-1),eta_y(i,j-1),dim)
+
+        L_eta = dis_imp_eta(i,j,eps_dis_i,1)
+        do index = 1, dim
+            lower(index,index,j-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_eta*Identy(index,index)
+        end do
+
+        L_eta = dis_imp_eta(i,j,eps_dis_i,2)
+        do index = 1, dim
+            main(index,index,j-1) = 1.0d0 + L_eta
+        end do
+
+    end do 
+
+    call blktriad(main,lower,upper,dim,jmax-2,right_side,x2) 
+
+    do j = 2, jmax - 1 
+        x2_f(i,j,1:dim) = x2(1:dim,j-1)
+    end do 
+
+end do
+
+deallocate(diag_plus,diag_minus)
+deallocate(main,upper,lower)
+deallocate(right_side)
+deallocate(x1)
+deallocate(x2)
+
+deallocate(Identy)
+
+! calculate delta_Q in order to update the numerical solution
+
+allocate(Teta(dim,dim))
+allocate(delta_Q(imax,jmax,dim))
+
 do j = 2, jmax - 1
     do i = 2, imax - 1
         Teta = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
-        aux_mult(1:dim) = x1_sys(i,j,1:dim)
+        aux_mult(1:dim) = x2_f(i,j,1:dim)
         result = matmul(Teta,aux_mult)
-        right_side(i,j,1:dim) = result(1:dim)
+        delta_Q(i,j,1:dim) = result(1:dim)
     end do 
 end do 
-!
-deallocate(x1_sys)
-deallocate(inv_t_xi,n_inverse)
-deallocate(result,aux_mult,Teta)
-deallocate(u,v,p,rho,a)
-! update the solution vector
+
+deallocate(u,v,rho)
+deallocate(p,a)
+deallocate(x2_f)
+deallocate(n_inverse,Teta)
+
+! update the solution
 
 do j = 2, jmax - 1
     do i = 2, imax - 1
-        !
-        Q_barra(i,j,1) = Q_barra(i,j,1) + right_side(i,j,1) 
-        Q_barra(i,j,2) = Q_barra(i,j,2) + right_side(i,j,2) 
-        Q_barra(i,j,3) = Q_barra(i,j,3) + right_side(i,j,3) 
-        Q_barra(i,j,4) = Q_barra(i,j,4) + right_side(i,j,4) 
-        !
+
+        Q_barra(i,j,1) = Q_barra(i,j,1) + delta_Q(i,j,1) 
+        Q_barra(i,j,2) = Q_barra(i,j,2) + delta_Q(i,j,2) 
+        Q_barra(i,j,3) = Q_barra(i,j,3) + delta_Q(i,j,3) 
+        Q_barra(i,j,4) = Q_barra(i,j,4) + delta_Q(i,j,4) 
+        
     end do
 end do
 
-
-        if (iter == 50) then 
-            open(999,file='pc')
-            do j = 2, jmax - 1
-                do i = 2, imax - 1 
-                    write(999,*) iter,i,j,Q_barra(i,j,1)/metric_jacobian(i,j)     
-                end do 
-            end do
-            close(999)    
-        end if
-
-deallocate(right_side)
+deallocate(delta_Q)
+deallocate(aux_mult,result)
 
 end subroutine pulliam_chausse_block

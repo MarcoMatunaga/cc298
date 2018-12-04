@@ -98,7 +98,8 @@ do
     
     if (time_method == 1) call euler_explicit
     if (time_method == 2) call implicit_beam_warming
-    if (time_method == 3) call pulliam_chausse
+    !if (time_method == 3) call pulliam_chausse
+    if (time_method == 3) call pulliam_chausse_block
     if (time_method == 4) call sw_1st
     ! if (time_method == 5) call sw_2nd
     ! if (time_method == 6) call ausm_plus_1st

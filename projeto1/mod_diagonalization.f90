@@ -198,7 +198,7 @@ contains
         eta_x_temp_til = eta_x_temp/(sqrt(eta_x_temp**2.0d0+eta_y_temp**2.0d0))
         eta_y_temp_til = eta_y_temp/(sqrt(eta_x_temp**2.0d0+eta_y_temp**2.0d0))
         m1             = (ksi_x_temp_til*eta_x_temp_til + ksi_y_temp_til*eta_y_temp_til)
-        m2             = (ksi_x_temp_til*eta_x_temp_til - ksi_y_temp_til*eta_y_temp_til)
+        m2             = (ksi_x_temp_til*eta_y_temp_til - ksi_y_temp_til*eta_x_temp_til)
 
         N_matrix(1,1) = 1.0d0
         N_matrix(1,2) = 0.0d0
