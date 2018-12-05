@@ -4,7 +4,7 @@ subroutine pulliam_chausse_block
     use functions
     implicit none
     real(8),dimension(:,:,:),allocatable      :: main,upper,lower
-    real(8),dimension(:,:,:),allocatable      :: x2_f, delta_Q
+    real(8),dimension(:,:,:),allocatable      :: x1_f, x2_f, delta_Q
     real(8),dimension(:,:),allocatable        :: u,v,rho,p,a 
     real(8),dimension(:,:),allocatable        :: inv_t_xi
     real(8),dimension(:,:),allocatable        :: right_side
@@ -46,11 +46,20 @@ allocate(diag_plus(dim),diag_minus(dim))
 allocate(main(dim,dim,imax-2),upper(dim,dim,imax-2),lower(dim,dim,imax-2))
 allocate(right_side(dim,imax-2))
 allocate(x1(dim,imax-2))
+allocate(x1_f(imax,jmax,dim))
 allocate(residue_pc(dim))
 
+main  = 0.0d0
+upper = 0.0d0
+lower = 0.0d0
+right_side = 0.0d0
+x1 = 0.0d0
+inv_t_xi = 0.0d0
+
 do j = 2, jmax - 1
-    do i = 2, imax - 1
-  
+
+    do i = 2, imax - 1 
+
         inv_t_xi           = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
         
         call compute_residue(i,j)
@@ -58,12 +67,6 @@ do j = 2, jmax - 1
         aux_mult              = matmul(inv_T_xi,residue_pc)
         right_side(1:dim,i-1) = aux_mult(1:dim)
 
-    end do
-end do
-
-do j = 2, jmax - 1
-
-    do i = 2, imax - 1 
         diag_plus  = diag_ksi(U_contravariant(i+1,j),a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
         
         L_ksi = dis_imp_ksi(i,j,eps_dis_i,3)
@@ -87,6 +90,10 @@ do j = 2, jmax - 1
 
     call blktriad(main,lower,upper,dim,imax-2,right_side,x1) 
 
+    do i = 2, imax - 1 
+        x1_f(i,j,1:dim) = x1(1:dim,i-1)
+    end do 
+
 end do 
 
 deallocate(inv_t_xi)
@@ -104,20 +111,21 @@ allocate(x2(dim,jmax-2))
 allocate(x2_f(imax,jmax,dim))
 allocate(n_inverse(dim,dim))
 
-do j = 2, jmax - 1
-    do i = 2, imax - 1
-
-        aux_mult(1:dim) = x1(1:dim,i-1)
-        n_inverse = inv_N_matrix(ksi_x(i,j),ksi_y(i,j),eta_x(i,j),eta_y(i,j),dim)
-        result = matmul(n_inverse,aux_mult)
-        right_side(1:dim,j-1) = result(1:dim)
-
-    end do 
-end do 
+main  = 0.0d0
+upper = 0.0d0
+lower = 0.0d0
+right_side = 0.0d0
+x2 = 0.0d0
+n_inverse = 0.0d0
 
 do i = 2, imax - 1
 
     do j = 2, jmax - 1
+
+        aux_mult(1:dim) = x1_f(i,j,1:dim)
+        n_inverse = inv_N_matrix(ksi_x(i,j),ksi_y(i,j),eta_x(i,j),eta_y(i,j),dim)
+        result = matmul(n_inverse,aux_mult)
+        right_side(1:dim,j-1) = result(1:dim)
 
         diag_plus = diag_eta(V_contravariant(i,j+1),a(i,j+1),eta_x(i,j+1),eta_y(i,j+1),dim)
 
@@ -161,6 +169,9 @@ deallocate(Identy)
 allocate(Teta(dim,dim))
 allocate(delta_Q(imax,jmax,dim))
 
+Teta = 0.0d0
+delta_Q = 0.0d0
+
 do j = 2, jmax - 1
     do i = 2, imax - 1
         Teta = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
@@ -173,6 +184,7 @@ end do
 deallocate(u,v,rho)
 deallocate(p,a)
 deallocate(x2_f)
+deallocate(x1_f)
 deallocate(n_inverse,Teta)
 
 ! update the solution
