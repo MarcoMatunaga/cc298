@@ -12,35 +12,25 @@ subroutine sw_2nd
     ! create a vector to store the eigenvalues pos and neg
     !*******
 
-    call allocate_vars_sw
-        
     call allocate_vars_sys_ksi
 
     do i = 1, dim
         Identy(i,i,1:imax) = 1.0d0
     end do
-
-    do j = 1, jmax
-        do i = 1, imax
-            u(i,j)   = Q_barra(i,j,2)/Q_barra(i,j,1)
-            v(i,j)   = Q_barra(i,j,3)/Q_barra(i,j,1)
-            rho(i,j) = Q_barra(i,j,1)/metric_jacobian(i,j)
-            p(i,j)   = (gama-1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
-                       - 0.50d0*rho(i,j)*(u(i,j)**2.0d0+v(i,j)**2.0d0))
-            a(i,j)   = sqrt(gama*p(i,j)/rho(i,j))
-        end do 
-    end do 
-
-    call calculate_fluxes(E_pos,E_neg,F_pos,F_neg)
-    
+   
     ! setting the system 
     
 do j = 2, jmax - 1
+
+    call frontier_xi
+
     do i = 2, imax - 1
+
             eig = diag_ksi(U_contravariant(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
 
             do index = 1, dim 
-                call eigen_values_calculate(eig(index),eig_pos,eig_neg)
+                eig_pos = 0.50d0*(eig(index) + abs(eig(index)))
+                eig_neg = 0.50d0*(eig(index) - abs(eig(index)))
                 diag_pos(index,index) = eig_pos
                 diag_neg(index,index) = eig_neg 
             end do 
@@ -57,8 +47,8 @@ do j = 2, jmax - 1
             
             do index_j = 1, dim
                 do index_i = 1, dim  
-                    A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
-                    A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
+                    A_pos_sys(index_i,index_j,i) = A_pos(index_i,index_j)
+                    A_neg_sys(index_i,index_j,i) = A_neg(index_i,index_j)
                 end do
             end do 
             
@@ -83,10 +73,10 @@ do j = 2, jmax - 1
     do i = 2, imax - 1
         do index_j = 1, dim 
             do index_i = 1, dim 
-                main_sw(index_i,index_j,i-1)  = Identy(index_i,index_j,i) + A_pos_sys(index_i,index_j,i) &
-                                                -A_neg_sys(index_i,index_j,i) 
-                lower_sw(index_i,index_j,i-1) = -A_pos_sys(index_i,index_j,i-1)
-                upper_sw(index_i,index_j,i-1) = A_neg_sys(index_i,index_j,i+1)
+                main_sw(index_i,index_j,i-1)  = Identy(index_i,index_j,i) + delta_t(i,j)*A_pos_sys(index_i,index_j,i) &
+                                                -delta_t(i,j)*A_neg_sys(index_i,index_j,i) 
+                lower_sw(index_i,index_j,i-1) = -delta_t(i,j)*A_pos_sys(index_i,index_j,i-1)
+                upper_sw(index_i,index_j,i-1) =  delta_t(i,j)*A_neg_sys(index_i,index_j,i+1)
             end do
         end do 
     end do
@@ -113,11 +103,16 @@ end do
     end do
 
 do i = 2, imax - 1
+
+        call frontier_eta
+
         do j = 2, jmax - 1
+            
             eig = diag_eta(V_contravariant(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
 
             do index = 1, dim 
-                call eigen_values_calculate(eig(index),eig_pos,eig_neg)
+                eig_pos = 0.50d0*(eig(index) + abs(eig(index)))
+                eig_neg = 0.50d0*(eig(index) - abs(eig(index)))
                 diag_pos(index,index) = eig_pos
                 diag_neg(index,index) = eig_neg 
             end do 
@@ -134,10 +129,11 @@ do i = 2, imax - 1
 
             do index_i = 1, dim
                 do index_j = 1, dim  
-                    B_pos_sys(index_i,index_j,j) = delta_t(i,j)*B_pos(index_i,index_j)
-                    B_neg_sys(index_i,index_j,j) = delta_t(i,j)*B_neg(index_i,index_j)
+                    B_pos_sys(index_i,index_j,j) = B_pos(index_i,index_j)
+                    B_neg_sys(index_i,index_j,j) = B_neg(index_i,index_j)
                 end do
             end do 
+
         end do
 
     do j = 2, jmax - 1
@@ -152,10 +148,10 @@ do i = 2, imax - 1
     do j = 2, jmax - 1
         do index_j = 1, dim 
             do index_i = 1, dim 
-                main_sw(index_i,index_j,j-1)  = Identy(index_i,index_j,j) + B_pos_sys(index_i,index_j,j) &
-                                                -B_neg_sys(index_i,index_j,j) 
-                lower_sw(index_i,index_j,j-1) = -B_pos_sys(index_i,index_j,j-1)
-                upper_sw(index_i,index_j,j-1) = B_neg_sys(index_i,index_j,j+1)
+                main_sw(index_i,index_j,j-1)  = Identy(index_i,index_j,j) + delta_t(i,j)*B_pos_sys(index_i,index_j,j) &
+                                                -delta_t(i,j)*B_neg_sys(index_i,index_j,j) 
+                lower_sw(index_i,index_j,j-1) = -delta_t(i,j)*B_pos_sys(index_i,index_j,j-1)
+                upper_sw(index_i,index_j,j-1) = delta_t(i,j)*B_neg_sys(index_i,index_j,j+1)
             end do
         end do 
     end do

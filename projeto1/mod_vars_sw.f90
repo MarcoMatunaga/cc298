@@ -1,5 +1,6 @@
 module vars_sw
     use vars
+    use diagonalization
     implicit none
     real(8),dimension(:),allocatable             :: eig
     real(8),dimension(:,:),allocatable           :: diag_pos, diag_neg
@@ -107,4 +108,124 @@ contains
         deallocate(deltaQ_til)
         deallocate(u,v,rho,p,a)        
     end subroutine deallocate_vars_left
+
+    subroutine frontier_xi
+        implicit none
+        
+        i = 1 
+
+        eig = diag_ksi(U_contravariant(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+
+            do index = 1, dim 
+                eig_pos = 0.50d0*(eig(index) + abs(eig(index)))
+                eig_neg = 0.50d0*(eig(index) - abs(eig(index)))
+                diag_pos(index,index) = eig_pos
+                diag_neg(index,index) = eig_neg 
+            end do 
+            
+            inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            
+            t_xi     = T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            
+            aux_mult     = matmul(diag_pos,inv_t_xi)
+            A_pos        = matmul(t_xi,aux_mult)
+            
+            aux_mult     = matmul(diag_neg,inv_t_xi)
+            A_neg        = matmul(t_xi,aux_mult)
+            
+            do index_j = 1, dim
+                do index_i = 1, dim  
+                    A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
+                    A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
+                end do
+            end do 
+
+        i = imax 
+
+        eig = diag_ksi(U_contravariant(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+
+            do index = 1, dim 
+                eig_pos = 0.50d0*(eig(index) + abs(eig(index)))
+                eig_neg = 0.50d0*(eig(index) - abs(eig(index)))
+                diag_pos(index,index) = eig_pos
+                diag_neg(index,index) = eig_neg 
+            end do 
+            
+            inv_t_xi = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            
+            t_xi     = T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
+            
+            aux_mult     = matmul(diag_pos,inv_t_xi)
+            A_pos        = matmul(t_xi,aux_mult)
+            
+            aux_mult     = matmul(diag_neg,inv_t_xi)
+            A_neg        = matmul(t_xi,aux_mult)
+            
+            do index_j = 1, dim
+                do index_i = 1, dim  
+                    A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
+                    A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
+                end do
+            end do 
+
+    end subroutine frontier_xi
+
+    subroutine frontier_eta
+        implicit none
+        
+        j = 1 
+
+        eig = diag_eta(V_contravariant(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
+
+            do index = 1, dim 
+                eig_pos = 0.50d0*(eig(index) + abs(eig(index)))
+                eig_neg = 0.50d0*(eig(index) - abs(eig(index)))
+                diag_pos(index,index) = eig_pos
+                diag_neg(index,index) = eig_neg 
+            end do 
+
+            inv_teta = inv_T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
+
+            teta     = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
+
+            aux_mult     = matmul(diag_pos,inv_teta)
+            B_pos        = matmul(teta,aux_mult)
+
+            aux_mult     = matmul(diag_neg,inv_teta)
+            B_neg        = matmul(teta,aux_mult)
+
+            do index_i = 1, dim
+                do index_j = 1, dim  
+                    B_pos_sys(index_i,index_j,j) = delta_t(i,j)*B_pos(index_i,index_j)
+                    B_neg_sys(index_i,index_j,j) = delta_t(i,j)*B_neg(index_i,index_j)
+                end do
+            end do 
+        
+        j = jmax 
+
+            do index = 1, dim 
+                eig_pos = 0.50d0*(eig(index) + abs(eig(index)))
+                eig_neg = 0.50d0*(eig(index) - abs(eig(index)))
+                diag_pos(index,index) = eig_pos
+                diag_neg(index,index) = eig_neg 
+            end do 
+
+            inv_teta = inv_T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
+
+            teta     = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
+
+            aux_mult     = matmul(diag_pos,inv_teta)
+            B_pos        = matmul(teta,aux_mult)
+
+            aux_mult     = matmul(diag_neg,inv_teta)
+            B_neg        = matmul(teta,aux_mult)
+
+            do index_i = 1, dim
+                do index_j = 1, dim  
+                    B_pos_sys(index_i,index_j,j) = delta_t(i,j)*B_pos(index_i,index_j)
+                    B_neg_sys(index_i,index_j,j) = delta_t(i,j)*B_neg(index_i,index_j)
+                end do
+            end do 
+
+    end subroutine frontier_eta
 end module vars_sw

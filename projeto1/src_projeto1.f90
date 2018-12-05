@@ -4,7 +4,9 @@
 program proj1
         use vars 
         use vars_proj3
+        use vars_sw
         use output_routines
+        use fluxes_pos_neg
         implicit none
 !****
 ! create a fortran program with command line inputs
@@ -26,7 +28,7 @@ read(8,PAR_Others)
 close(8)
 
 call allocate_vars
-    
+
     delta_eta = 1.0d0
     delta_ksi = 1.0d0
 
@@ -90,7 +92,11 @@ call output_inicial
 do 
     if ( max_residue < res_conv .or. iter > max_iter ) exit
 
-    call fluxes_curvilinear 
+    if (time_method == 1 .or. time_method == 2 .or. time_method == 3) call fluxes_curvilinear 
+    if (time_method == 4 .or. time_method == 5) then
+        call allocate_vars_sw
+        call calculate_fluxes(E_pos,E_neg,F_pos,F_neg)
+    end if 
     call output_fluxes
     call calculate_CFL
     

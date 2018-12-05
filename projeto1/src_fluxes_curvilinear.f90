@@ -1,6 +1,5 @@
 subroutine fluxes_curvilinear
     use vars
-    use fluxes_pos_neg
     implicit none
     real(8)                         :: u, v, p
 !********

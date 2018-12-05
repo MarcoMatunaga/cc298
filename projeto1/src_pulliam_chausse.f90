@@ -105,13 +105,12 @@ end do
 !
 deallocate(lower,main,upper)
 deallocate(x_sys,d_sys)
-!
+
 ! start to solve the system in the eta location
-!
+
 allocate(lower(jmax-2),main(jmax-2),upper(jmax-2))
 allocate(x_sys(jmax-2),d_sys(jmax-2))
-!
-!
+
 d_sys = 0.0d0
 x_sys  = 0.0d0
 lower  = 0.0d0
@@ -119,8 +118,8 @@ upper  = 0.0d0
 main   = 1.0d0
 aux_mult = 0.0d0
 right_side = 0.0d0
-!
-!
+
+
 do j = 2, jmax - 1
     do i = 2, imax - 1
         aux_mult(1:dim) = x1_sys(i,j,1:dim)
@@ -133,7 +132,7 @@ end do
 do index = 1, dim
     ! do i = 2, imax - 1
     do i_sol = 2, imax - 1
-        !
+        
         do j = 2, jmax - 1
             
             d_sys(j-1) = right_side(i_sol,j,index)
@@ -150,23 +149,21 @@ do index = 1, dim
                 main(j-1) = main(j-1) + L_eta
             
         end do
-        !
+        
         call thomas_pulliam_chausse(lower,main,upper,d_sys,x_sys,jmax-2)
         do j = 2, jmax - 1
             x1_sys(i_sol,j,index) = x_sys(j-1)
             ! if (index == 1) write(*,*) x1_sys(i,2,index), x_sys(1)
         end do
-        !
+        
     end do
-    !
+    
 end do 
-!
-!
+
 deallocate(lower,main,upper)
 deallocate(x_sys,d_sys)
 deallocate(diag_minus,diag_plus)
-!
-!
+
 do j = 2, jmax - 1
     do i = 2, imax - 1
         Teta = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
