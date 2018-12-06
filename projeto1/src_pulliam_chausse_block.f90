@@ -4,7 +4,7 @@ subroutine pulliam_chausse_block
     use functions
     implicit none
     real(8),dimension(:,:,:),allocatable      :: main,upper,lower
-    real(8),dimension(:,:,:),allocatable      :: x1_f, x2_f, delta_Q
+    real(8),dimension(:,:,:),allocatable      :: x1_f, x2_f
     real(8),dimension(:,:),allocatable        :: u,v,rho,p,a 
     real(8),dimension(:,:),allocatable        :: inv_t_xi
     real(8),dimension(:,:),allocatable        :: right_side
@@ -167,17 +167,24 @@ deallocate(Identy)
 ! calculate delta_Q in order to update the numerical solution
 
 allocate(Teta(dim,dim))
-allocate(delta_Q(imax,jmax,dim))
 
 Teta = 0.0d0
-delta_Q = 0.0d0
+result = 0.0d0
 
 do j = 2, jmax - 1
     do i = 2, imax - 1
+
         Teta = T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
         aux_mult(1:dim) = x2_f(i,j,1:dim)
         result = matmul(Teta,aux_mult)
-        delta_Q(i,j,1:dim) = result(1:dim)
+
+        ! update the solution
+
+        Q_barra(i,j,1) = Q_barra(i,j,1) + result(1) 
+        Q_barra(i,j,2) = Q_barra(i,j,2) + result(2) 
+        Q_barra(i,j,3) = Q_barra(i,j,3) + result(3) 
+        Q_barra(i,j,4) = Q_barra(i,j,4) + result(4) 
+
     end do 
 end do 
 
@@ -186,21 +193,6 @@ deallocate(p,a)
 deallocate(x2_f)
 deallocate(x1_f)
 deallocate(n_inverse,Teta)
-
-! update the solution
-
-do j = 2, jmax - 1
-    do i = 2, imax - 1
-
-        Q_barra(i,j,1) = Q_barra(i,j,1) + delta_Q(i,j,1) 
-        Q_barra(i,j,2) = Q_barra(i,j,2) + delta_Q(i,j,2) 
-        Q_barra(i,j,3) = Q_barra(i,j,3) + delta_Q(i,j,3) 
-        Q_barra(i,j,4) = Q_barra(i,j,4) + delta_Q(i,j,4) 
-        
-    end do
-end do
-
-deallocate(delta_Q)
 deallocate(aux_mult,result)
 
 end subroutine pulliam_chausse_block
