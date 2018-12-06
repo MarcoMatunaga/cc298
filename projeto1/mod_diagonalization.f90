@@ -2,7 +2,7 @@ module diagonalization
     use vars
 
 contains
-
+    !*** posso criar apenas uma funcao para calcular as matrizes diagonais
     function diag_ksi(U_c,a_temp,ksi_x_temp,ksi_y_temp,size)
         implicit none
         integer(4),intent(in)                           :: size
