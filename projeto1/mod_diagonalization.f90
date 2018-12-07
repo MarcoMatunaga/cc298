@@ -58,10 +58,10 @@ contains
         T_ksi(3,3) = alfa_t*(v_temp + ksi_y_temp_til*a_temp)
         T_ksi(3,4) = alfa_t*(v_temp - ksi_y_temp_til*a_temp)
         
-        T_ksi(4,1) = phi_temp**2.0d0/(gama - 1.0d0)
+        T_ksi(4,1) = phi_temp/(gama - 1.0d0)
         T_ksi(4,2) = rho_temp*(ksi_y_temp_til*u_temp - ksi_x_temp_til*v_temp)
-        T_ksi(4,3) = alfa_t*( (phi_temp**2.0d0 + a_temp**2.0d0)/(gama-1.0d0) + a_temp*theta_til )
-        T_ksi(4,4) = alfa_t*( (phi_temp**2.0d0 + a_temp**2.0d0)/(gama-1.0d0) - a_temp*theta_til )
+        T_ksi(4,3) = alfa_t*( (phi_temp + a_temp**2.0d0)/(gama-1.0d0) + a_temp*theta_til )
+        T_ksi(4,4) = alfa_t*( (phi_temp + a_temp**2.0d0)/(gama-1.0d0) - a_temp*theta_til )
         
     end function T_ksi
 
@@ -82,7 +82,7 @@ contains
         phi_temp       = 0.50d0*(gama - 1.0d0)*(u_temp**2.0d0 + v_temp**2.0d0)
         theta_til      = ksi_x_temp_til*u_temp + ksi_y_temp_til*v_temp
         
-        inv_T_ksi(1,1) = ( 1.0d0 - phi_temp**2.0d0/a_temp**2.0d0)
+        inv_T_ksi(1,1) = ( 1.0d0 - phi_temp/a_temp**2.0d0)
         inv_T_ksi(1,2) = (gama - 1.0d0)*u_temp/a_temp**2.0d0
         inv_T_ksi(1,3) = (gama - 1.0d0)*v_temp/a_temp**2.0d0  
         inv_T_ksi(1,4) = -(gama - 1.0d0)/a_temp**2.0d0
@@ -92,12 +92,12 @@ contains
         inv_T_ksi(2,3) = -ksi_x_temp_til/rho_temp 
         inv_T_ksi(2,4) = 0.0d0
         
-        inv_T_ksi(3,1) = beta_t*(phi_temp**2.0d0 - a_temp*theta_til)
+        inv_T_ksi(3,1) = beta_t*(phi_temp - a_temp*theta_til)
         inv_T_ksi(3,2) = beta_t*(ksi_x_temp_til*a_temp - (gama - 1.0d0)*u_temp )
         inv_T_ksi(3,3) = beta_t*(ksi_y_temp_til*a_temp - (gama - 1.0d0)*v_temp )
         inv_T_ksi(3,4) = beta_t*(gama - 1.0d0)
         
-        inv_T_ksi(4,1) = beta_t*(phi_temp**2.0d0 + a_temp*theta_til)
+        inv_T_ksi(4,1) = beta_t*(phi_temp + a_temp*theta_til)
         inv_T_ksi(4,2) = -beta_t*(ksi_x_temp_til*a_temp + (gama - 1.0d0)*u_temp )
         inv_T_ksi(4,3) = -beta_t*(ksi_y_temp_til*a_temp + (gama - 1.0d0)*v_temp )
         inv_T_ksi(4,4) = beta_t*(gama - 1.0d0)
@@ -136,10 +136,10 @@ contains
         T_eta(3,3) = alfa_t*(v_temp + eta_y_temp_til*a_temp)
         T_eta(3,4) = alfa_t*(v_temp - eta_y_temp_til*a_temp)
         
-        T_eta(4,1) = phi_temp**2.0d0/(gama - 1.0d0)
+        T_eta(4,1) = phi_temp/(gama - 1.0d0)
         T_eta(4,2) = rho_temp*(eta_y_temp_til*u_temp - eta_x_temp_til*v_temp)
-        T_eta(4,3) = alfa_t*( (phi_temp**2.0d0 + a_temp**2.0d0)/(gama-1.0d0) + a_temp*theta_til )
-        T_eta(4,4) = alfa_t*( (phi_temp**2.0d0 + a_temp**2.0d0)/(gama-1.0d0) - a_temp*theta_til )
+        T_eta(4,3) = alfa_t*( (phi_temp + a_temp**2.0d0)/(gama-1.0d0) + a_temp*theta_til )
+        T_eta(4,4) = alfa_t*( (phi_temp + a_temp**2.0d0)/(gama-1.0d0) - a_temp*theta_til )
         
     end function T_eta
 
@@ -159,7 +159,7 @@ contains
         phi_temp       = 0.50d0*(gama - 1.0d0)*(u_temp**2.0d0 + v_temp**2.0d0)
         theta_til      = eta_x_temp_til*u_temp + eta_y_temp_til*v_temp
         
-        inv_T_eta(1,1) = ( 1.0d0 - phi_temp**2.0d0/a_temp**2.0d0)
+        inv_T_eta(1,1) = ( 1.0d0 - phi_temp/a_temp**2.0d0)
         inv_T_eta(1,2) = (gama - 1.0d0)*u_temp/a_temp**2.0d0 
         inv_T_eta(1,3) = (gama - 1.0d0)*v_temp/a_temp**2.0d0  
         inv_T_eta(1,4) = -(gama - 1.0d0)/a_temp**2.0d0
@@ -169,12 +169,12 @@ contains
         inv_T_eta(2,3) = -eta_x_temp_til/rho_temp  
         inv_T_eta(2,4) = 0.0d0
 
-        inv_T_eta(3,1) = beta_t*(phi_temp**2.0d0 - a_temp*theta_til)
+        inv_T_eta(3,1) = beta_t*(phi_temp - a_temp*theta_til)
         inv_T_eta(3,2) = beta_t*(eta_x_temp_til*a_temp - (gama - 1.0d0)*u_temp )
         inv_T_eta(3,3) = beta_t*(eta_y_temp_til*a_temp - (gama - 1.0d0)*v_temp )
         inv_T_eta(3,4) = beta_t*(gama - 1.0d0)
 
-        inv_T_eta(4,1) = beta_t*(phi_temp**2.0d0 + a_temp*theta_til)
+        inv_T_eta(4,1) = beta_t*(phi_temp + a_temp*theta_til)
         inv_T_eta(4,2) = -beta_t*(eta_x_temp_til*a_temp + (gama - 1.0d0)*u_temp )
         inv_T_eta(4,3) = -beta_t*(eta_y_temp_til*a_temp + (gama - 1.0d0)*v_temp )
         inv_T_eta(4,4) = beta_t*(gama - 1.0d0)
