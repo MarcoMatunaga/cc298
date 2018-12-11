@@ -98,7 +98,7 @@ do
     if ( max_residue < res_conv .or. iter > max_iter ) exit
 
     if (time_method == 1 .or. time_method == 2 .or. time_method == 3) call fluxes_curvilinear 
-    if (time_method == 4 .or. time_method == 5) then
+    if (time_method == 4 .or. time_method == 5 .or. time_method == 11 .or. time_method == 12) then
         call allocate_vars_sw
         call calculate_fluxes(E_pos,E_neg,F_pos,F_neg)
     end if 
@@ -117,6 +117,8 @@ do
     ! if (time_method == 8) call van_leer_1st
     ! if (time_method == 9) call van_leer_2nd
     if (time_method == 10) call pulliam_chausse
+    if (time_method == 11) call sw_1st_a
+    if (time_method == 12) call sw_2nd_a
         call cpu_time(finish_iter)
         print '(i0,"Time per iterration = ",f6.3," seconds.")',iter,finish_iter-start_iter
 

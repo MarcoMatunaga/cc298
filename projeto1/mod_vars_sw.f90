@@ -160,8 +160,8 @@ contains
             
             do index_j = 1, dim
                 do index_i = 1, dim  
-                    A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
-                    A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
+                    A_pos_sys(index_i,index_j,i) = A_pos(index_i,index_j)
+                    A_neg_sys(index_i,index_j,i) = A_neg(index_i,index_j)
                 end do
             end do 
 
@@ -188,8 +188,8 @@ contains
             
             do index_j = 1, dim
                 do index_i = 1, dim  
-                    A_pos_sys(index_i,index_j,i) = delta_t(i,j)*A_pos(index_i,index_j)
-                    A_neg_sys(index_i,index_j,i) = delta_t(i,j)*A_neg(index_i,index_j)
+                    A_pos_sys(index_i,index_j,i) = A_pos(index_i,index_j)
+                    A_neg_sys(index_i,index_j,i) = A_neg(index_i,index_j)
                 end do
             end do 
 
@@ -221,8 +221,8 @@ contains
 
             do index_i = 1, dim
                 do index_j = 1, dim  
-                    B_pos_sys(index_i,index_j,j) = delta_t(i,j)*B_pos(index_i,index_j)
-                    B_neg_sys(index_i,index_j,j) = delta_t(i,j)*B_neg(index_i,index_j)
+                    B_pos_sys(index_i,index_j,j) = B_pos(index_i,index_j)
+                    B_neg_sys(index_i,index_j,j) = B_neg(index_i,index_j)
                 end do
             end do 
         
@@ -247,8 +247,8 @@ contains
 
             do index_i = 1, dim
                 do index_j = 1, dim  
-                    B_pos_sys(index_i,index_j,j) = delta_t(i,j)*B_pos(index_i,index_j)
-                    B_neg_sys(index_i,index_j,j) = delta_t(i,j)*B_neg(index_i,index_j)
+                    B_pos_sys(index_i,index_j,j) = B_pos(index_i,index_j)
+                    B_neg_sys(index_i,index_j,j) = B_neg(index_i,index_j)
                 end do
             end do 
 

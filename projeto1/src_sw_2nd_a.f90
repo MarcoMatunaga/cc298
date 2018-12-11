@@ -1,4 +1,4 @@
-subroutine sw_1st
+subroutine sw_2nd_a
     use vars
     use vars_sw
     use diagonalization
@@ -13,12 +13,28 @@ subroutine sw_1st
     !*******
 
     call allocate_vars_sys_ksi
+    call allocate_vars_sys_ksi_2nd
 
     do i = 1, dim
         Identy(i,i,1:imax) = 1.0d0
     end do
    
     ! setting the system 
+    
+    call residue_flux_vector_splitting_2nd_frontier(E_pos,E_neg,F_pos,F_neg,flux_residue)
+    
+    do j = 3, jmax - 2
+        do i = 3, imax - 2
+            !**** colocar a subroutina do residuo com 
+            !**** intervalo ao inves de indice por indice
+                call residue_flux_vector_splitting_2nd(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+            !call residue_flux_vector_splitting_2nd(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
+            B_sys(1,i-1) = -flux_residue(i,j,1) 
+            B_sys(2,i-1) = -flux_residue(i,j,2) 
+            B_sys(3,i-1) = -flux_residue(i,j,3) 
+            B_sys(4,i-1) = -flux_residue(i,j,4) 
+        end do
+    end do
     
 do j = 2, jmax - 1
 
@@ -53,36 +69,26 @@ do j = 2, jmax - 1
             end do 
             
     end do 
-    
-    do i = 2, imax - 1
-        !**** colocar a subroutina do residuo com 
-        !**** intervalo ao inves de indice por indice
-        if (j == 2 .or. j == jmax - 1 .or. i == 2 .or. i == imax - 1) then
-            call residue_flux_vector_splitting_1st(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
-        else
-            call residue_flux_vector_splitting_2nd(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
-        end if
-        !call residue_flux_vector_splitting_2nd(i,j,E_pos,E_neg,F_pos,F_neg,flux_residue)
-        B_sys(1,i-1) = -flux_residue(i,j,1) 
-        B_sys(2,i-1) = -flux_residue(i,j,2) 
-        B_sys(3,i-1) = -flux_residue(i,j,3) 
-        B_sys(4,i-1) = -flux_residue(i,j,4) 
-    end do
-    
+   
     ! set the matrixes
     
-    do i = 2, imax - 1
+    call frontier_xi_2nd
+    
+    do i = 3, imax - 2
         do index_j = 1, dim 
             do index_i = 1, dim 
-                main_sw(index_i,index_j,i-1)  = Identy(index_i,index_j,i) + delta_t(i,j)*A_pos_sys(index_i,index_j,i) &
-                                                -delta_t(i,j)*A_neg_sys(index_i,index_j,i) 
-                lower_sw(index_i,index_j,i-1) = -delta_t(i,j)*A_pos_sys(index_i,index_j,i-1)
-                upper_sw(index_i,index_j,i-1) =  delta_t(i,j)*A_neg_sys(index_i,index_j,i+1)
+                lower_sw(index_i,index_j,i-1)  = 0.50d0*delta_t(i,j)*A_pos_sys(index_i,index_j,i-2)
+                lower_sw1(index_i,index_j,i-1) = -2.0d0*delta_t(i,j)*A_pos_sys(index_i,index_j,i-1)
+                main_sw(index_i,index_j,i-1)   = Identy(index_i,index_j,i) &
+                                                 + 0.50d0*delta_t(i,j)*(3.0d0*A_pos_sys(index_i,index_j,i) &
+                                                 -3.0d0*A_neg_sys(index_i,index_j,i))                                                
+                upper_sw(index_i,index_j,i-1)  = 2.0d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i+1)
+                upper_sw1(index_i,index_j,i-1) = -0.50d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i+2)
             end do
         end do 
     end do
 
-    call blktriad(main_sw,lower_sw,upper_sw,dim,imax-2,B_sys,aux_deltaQ_til)
+    call penta_block(lower_sw,lower_sw1,main_sw,upper_sw,upper_sw1,B_sys,dim,imax-2,aux_deltaQ_til)
 
     do i = 2, imax - 1
         deltaQ_til(i,j,1) = aux_deltaQ_til(1,i-1)
@@ -94,10 +100,12 @@ do j = 2, jmax - 1
 end do 
 
     call deallocate_vars_ksi
+    call deallocate_vars_ksi_2nd
 
 ! solving in the eta-direction
     
     call allocate_vars_sys_eta
+    call allocate_vars_sys_eta_2nd
 
     do i = 1, dim
         Identy(i,i,1:jmax) = 1.0d0
@@ -145,19 +153,24 @@ do i = 2, imax - 1
     end do
 
     ! set the matrixes
+    
+    call frontier_eta_2nd
 
-    do j = 2, jmax - 1
+    do j = 3, jmax - 2
         do index_j = 1, dim 
             do index_i = 1, dim 
-                main_sw(index_i,index_j,j-1)  = Identy(index_i,index_j,j) + delta_t(i,j)*B_pos_sys(index_i,index_j,j) &
-                                                -delta_t(i,j)*B_neg_sys(index_i,index_j,j) 
-                lower_sw(index_i,index_j,j-1) = -delta_t(i,j)*B_pos_sys(index_i,index_j,j-1)
-                upper_sw(index_i,index_j,j-1) = delta_t(i,j)*B_neg_sys(index_i,index_j,j+1)
+                lower_sw(index_i,index_j,j-1)  = 0.50d0*delta_t(i,j)*B_pos_sys(index_i,index_j,j-2)
+                lower_sw1(index_i,index_j,j-1) = -2.0d0*delta_t(i,j)*B_pos_sys(index_i,index_j,j-1)
+                main_sw(index_i,index_j,j-1)   = Identy(index_i,index_j,j) &
+                                                 + 0.50d0*delta_t(i,j)*(3.0d0*B_pos_sys(index_i,index_j,j) &
+                                                 -3.0d0*B_neg_sys(index_i,index_j,j-2))
+                upper_sw(index_i,index_j,j-1)  = 2.0d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+1)
+                upper_sw1(index_i,index_j,j-1) = -0.50d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+2)
             end do
         end do 
     end do
 
-    call blktriad(main_sw,lower_sw,upper_sw,dim,jmax-2,B_sys,aux_deltaQ)
+    call penta_block(lower_sw,lower_sw1,main_sw,upper_sw,upper_sw1,B_sys,dim,jmax-2,aux_deltaQ)
 
     do j = 2, jmax -1
         deltaQ(i,j,1) = aux_deltaQ(1,j-1)
@@ -174,8 +187,8 @@ do i = 2, imax - 1
     end do 
 
 end do 
-        
+    
         call deallocate_vars_left
+        call deallocate_vars_sys_eta_2nd
 
-end subroutine sw_1st
-
+end subroutine sw_2nd_a
