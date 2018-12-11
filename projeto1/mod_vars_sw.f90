@@ -16,6 +16,7 @@ module vars_sw
     real(8),dimension(:,:,:),allocatable         :: B_pos_sys, B_neg_sys
     real(8),dimension(:,:,:),allocatable         :: deltaQ, deltaQ_til
     real(8),dimension(:,:,:),allocatable         :: main_sw,lower_sw,upper_sw
+    real(8),dimension(:,:,:),allocatable         :: lower_sw1,upper_sw1
     integer(4)                                   :: index, index_i, index_j
     real(8)                                      :: eig_pos, eig_neg
 contains
@@ -59,6 +60,13 @@ contains
         aux_mult       = 0.0d0
     end subroutine allocate_vars_sys_ksi
 
+    subroutine allocate_vars_sys_ksi_2nd
+        implicit none
+        allocate(lower_sw1(dim,dim,imax-2),upper_sw1(dim,dim,imax-2))
+        lower_sw1     = 0.0d0
+        upper_sw1     = 0.0d0
+    end subroutine allocate_vars_sys_ksi_2nd
+
     subroutine deallocate_vars_ksi
         implicit none
         deallocate(main_sw,lower_sw,upper_sw)
@@ -69,6 +77,11 @@ contains
         deallocate(B_sys)
         deallocate(Identy)
     end subroutine deallocate_vars_ksi
+
+    subroutine deallocate_vars_ksi_2nd
+        implicit none
+        deallocate(lower_sw1,upper_sw1)
+    end subroutine deallocate_vars_ksi_2nd
 
     subroutine allocate_vars_sys_eta
         implicit none
@@ -91,6 +104,18 @@ contains
         inv_teta   = 0.0d0 
     end subroutine allocate_vars_sys_eta
 
+    subroutine allocate_vars_sys_eta_2nd
+        implicit none
+        allocate(lower_sw1(dim,dim,jmax-2),upper_sw1(dim,dim,jmax-2))
+        lower_sw1   = 0.0d0
+        upper_sw1   = 0.0d0
+    end subroutine allocate_vars_sys_eta_2nd
+
+    subroutine deallocate_vars_sys_eta_2nd
+        implicit none
+        deallocate(lower_sw1,upper_sw1)
+    end subroutine deallocate_vars_sys_eta_2nd
+    
     subroutine deallocate_vars_left
         implicit none
         deallocate(aux_deltaQ)
@@ -228,4 +253,60 @@ contains
             end do 
 
     end subroutine frontier_eta
+
+    subroutine frontier_xi_2nd
+        implicit none
+        
+        do index_j = 1, dim 
+            do index_i = 1, dim 
+        
+            i = 2
+                lower_sw(index_i,index_j,i-1)  = 0.0d0
+                lower_sw1(index_i,index_j,i-1) = -2.0d0*delta_t(i,j)*A_pos_sys(index_i,index_j,i-1)
+                main_sw(index_i,index_j,i-1)   = Identy(index_i,index_j,i) & 
+                                                 + 0.50d0*delta_t(i,j)*(3.0d0*A_pos_sys(index_i,index_j,i) &
+                                                 -3.0d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i))                                                
+                upper_sw(index_i,index_j,i-1)  = 2.0d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i+1)
+                upper_sw1(index_i,index_j,i-1) = -0.50d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i+2)
+    
+            i = imax - 1
+                lower_sw(index_i,index_j,i-1)  = 0.50d0*delta_t(i,j)*A_pos_sys(index_i,index_j,i-2)
+                lower_sw1(index_i,index_j,i-1) = -2.0d0*delta_t(i,j)*A_pos_sys(index_i,index_j,i-1)
+                main_sw(index_i,index_j,i-1)   = Identy(index_i,index_j,i) & 
+                                                 + 0.50d0*delta_t(i,j)*(3.0d0*A_pos_sys(index_i,index_j,i) &
+                                                 -3.0d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i))                                                
+                upper_sw(index_i,index_j,i-1)  = 2.0d0*delta_t(i,j)*A_neg_sys(index_i,index_j,i+1)
+                upper_sw1(index_i,index_j,i-1) = 0.0d0
+            end do 
+        end do 
+
+    end subroutine frontier_xi_2nd
+
+    subroutine frontier_eta_2nd
+        implicit none
+        
+        do index_j = 1, dim 
+            do index_i = 1, dim 
+
+            j = 2
+                lower_sw(index_i,index_j,j-1)  = 0.0d0
+                lower_sw1(index_i,index_j,j-1) = -2.0d0*delta_t(i,j)*B_pos_sys(index_i,index_j,j-1)
+                main_sw(index_i,index_j,j-1)   = Identy(index_i,index_j,j) & 
+                                                 + 0.50d0*delta_t(i,j)*(3.0d0*B_pos_sys(index_i,index_j,j) &
+                                                 -3.0d0*B_neg_sys(index_i,index_j,j-2))
+                upper_sw(index_i,index_j,j-1)  = 2.0d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+1)
+                upper_sw1(index_i,index_j,j-1) = -0.50d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+2)
+
+            j = jmax - 1
+                lower_sw(index_i,index_j,j-1)  = 0.50d0*delta_t(i,j)*B_pos_sys(index_i,index_j,j-2)
+                lower_sw1(index_i,index_j,j-1) = -2.0d0*delta_t(i,j)*B_pos_sys(index_i,index_j,j-1)
+                main_sw(index_i,index_j,j-1)   = Identy(index_i,index_j,j) & 
+                                                 + 0.50d0*delta_t(i,j)*(3.0d0*B_pos_sys(index_i,index_j,j) &
+                                                 -3.0d0*B_neg_sys(index_i,index_j,j-2))
+                upper_sw(index_i,index_j,j-1)  = 2.0d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+1)
+                upper_sw1(index_i,index_j,j-1) = 0.0d0
+            end do 
+        end do 
+
+    end subroutine frontier_eta_2nd
 end module vars_sw

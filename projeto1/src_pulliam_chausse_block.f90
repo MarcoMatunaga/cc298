@@ -16,9 +16,6 @@ subroutine pulliam_chausse_block
     real(8),dimension(:),allocatable          :: aux_mult
     real(8)                                   :: L_ksi, L_eta
     integer(4)                                :: index
-     real(8),dimension(4,4)                       :: aux
-     real(8),dimension(4,4)                    :: t_xi, inv_teta
-     real(8),dimension(4,4)                       :: ninv1,ninv2
 
 allocate(u(imax,jmax),v(imax,jmax),rho(imax,jmax))
 allocate(p(imax,jmax),a(imax,jmax))
@@ -92,7 +89,7 @@ do j = 2, jmax - 1
 
     end do 
 
-    call blktriad(main,lower,upper,dim,imax-2,right_side,x1) 
+    call blktriad_pc(main,lower,upper,dim,imax-2,right_side,x1) 
 
     do i = 2, imax - 1 
         x1_f(i,j,1:dim) = x1(1:dim,i-1)
@@ -127,20 +124,7 @@ do i = 2, imax - 1
 
         aux_mult(1:dim) = x1_f(i,j,1:dim)
         n_inverse = inv_N_matrix(ksi_x(i,j),ksi_y(i,j),eta_x(i,j),eta_y(i,j),dim)
-        result = matmul(n_inverse,aux_mult)
-        ninv1 = n_inverse
-        !
-            
-        inv_teta           = inv_T_eta(u(i,j),v(i,j),rho(i,j),a(i,j),eta_x(i,j),eta_y(i,j),dim)
-        t_xi                = T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
-        aux = matmul(inv_teta,T_xi)
-        result = matmul(aux,aux_mult)
-        ninv2 = aux
-        open(999,file='n inv')
-            do index = 1, dim
-                write(999,*) index,ninv1(index,index),ninv2(index,index)
-            end do 
-        close(999)   
+        result = matmul(n_inverse,aux_mult) 
 
         right_side(1:dim,j-1) = result(1:dim)
 
@@ -165,7 +149,7 @@ do i = 2, imax - 1
 
     end do 
 
-    call blktriad(main,lower,upper,dim,jmax-2,right_side,x2) 
+    call blktriad_pc(main,lower,upper,dim,jmax-2,right_side,x2) 
 
     do j = 2, jmax - 1 
         x2_f(i,j,1:dim) = x2(1:dim,j-1)

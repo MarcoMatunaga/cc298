@@ -12,7 +12,7 @@ shock_angle = 30.00
 
 &PAR_Time
 max_iter = 5000
-time_method = 4 ! 1 euler_explicit
+time_method = 5 ! 1 euler_explicit
                 ! 2 implicit_beam_warming
                 ! 3 pulliam_chausse
                 ! 4 sw_1st
@@ -32,7 +32,7 @@ eps_dis_e = 10.00 ! pulliam chaussee put 20
 dis_factor = 2.00
 ramp = 0
 CFL_ramp_size = 3
-CFL = 0.2 
+CFL = 10 
 /
 
 &PAR_Analytical

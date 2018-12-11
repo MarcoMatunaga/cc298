@@ -8,6 +8,8 @@ program proj1
         use output_routines
         use fluxes_pos_neg
         implicit none
+        real(8)                         :: start, finish
+        real(8)                         :: start_iter, finish_iter
 !****
 ! create a fortran program with command line inputs
 !****
@@ -89,6 +91,8 @@ end if
 max_residue = 1.0d0
 call output_inicial 
 
+    call cpu_time(start)
+
 do 
     if ( max_residue < res_conv .or. iter > max_iter ) exit
 
@@ -101,17 +105,19 @@ do
     call calculate_CFL
     
     ! time marching
-    
+        call cpu_time(start_iter)
     if (time_method == 1) call euler_explicit
     if (time_method == 2) call implicit_beam_warming
-    !if (time_method == 3) call pulliam_chausse
     if (time_method == 3) call pulliam_chausse_block
     if (time_method == 4) call sw_1st
-    ! if (time_method == 5) call sw_2nd
+    if (time_method == 5) call sw_2nd
     ! if (time_method == 6) call ausm_plus_1st
     ! if (time_method == 7) call ausm_plus_2nd
     ! if (time_method == 8) call van_leer_1st
     ! if (time_method == 9) call van_leer_2nd
+    if (time_method == 10) call pulliam_chausse
+        call cpu_time(finish_iter)
+        print '("Time per iterration = ",f6.3," seconds.")',finish_iter-start_iter
 
     iter = iter + 1
     if ( mod(iter,(max_iter/10)) == 0 ) then
@@ -125,6 +131,8 @@ do
 
 end do
 
+        call cpu_time(finish)
+        print '("Time = ",f6.3," seconds.")',finish-start
 ! close the archive used to write the residue
 
 close(5)
