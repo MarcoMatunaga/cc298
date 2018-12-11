@@ -60,6 +60,7 @@ do j = 2, jmax - 1
 
     do i = 2, imax - 1 
 
+        !******* use functions to calculate the primitive variables and other variables
         inv_t_xi           = inv_T_ksi(u(i,j),v(i,j),rho(i,j),a(i,j),ksi_x(i,j),ksi_y(i,j),dim)
         
         call compute_residue(i,j)
@@ -71,14 +72,14 @@ do j = 2, jmax - 1
         
         L_ksi = dis_imp_ksi(i,j,eps_dis_i,3)
         do index = 1, dim
-            upper(index,index,i-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi*Identy(index,index)
+            upper(index,index,i-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + L_ksi
         end do
 
         diag_minus = diag_ksi(U_contravariant(i-1,j),a(i-1,j),ksi_x(i-1,j),ksi_y(i-1,j),dim)
 
         L_ksi = dis_imp_ksi(i,j,eps_dis_i,1)
         do index = 1, dim
-            lower(index,index,i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_ksi*Identy(index,index)
+            lower(index,index,i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_ksi
         end do
 
         L_ksi = dis_imp_ksi(i,j,eps_dis_i,2)
@@ -88,7 +89,7 @@ do j = 2, jmax - 1
 
     end do 
 
-    call blktriad(main,lower,upper,dim,imax-2,right_side,x1) 
+    call blktriad_pc(main,lower,upper,dim,imax-2,right_side,x1) 
 
     do i = 2, imax - 1 
         x1_f(i,j,1:dim) = x1(1:dim,i-1)
@@ -96,7 +97,6 @@ do j = 2, jmax - 1
 
 end do 
 
-deallocate(inv_t_xi)
 deallocate(diag_plus,diag_minus)
 deallocate(main,upper,lower)
 deallocate(right_side)
@@ -124,21 +124,22 @@ do i = 2, imax - 1
 
         aux_mult(1:dim) = x1_f(i,j,1:dim)
         n_inverse = inv_N_matrix(ksi_x(i,j),ksi_y(i,j),eta_x(i,j),eta_y(i,j),dim)
-        result = matmul(n_inverse,aux_mult)
+        result = matmul(n_inverse,aux_mult) 
+
         right_side(1:dim,j-1) = result(1:dim)
 
         diag_plus = diag_eta(V_contravariant(i,j+1),a(i,j+1),eta_x(i,j+1),eta_y(i,j+1),dim)
 
         L_eta = dis_imp_eta(i,j,eps_dis_i,3)
         do index = 1, dim
-            upper(index,index,j-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + L_eta*Identy(index,index)
+            upper(index,index,j-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + L_eta
         end do
 
         diag_minus = diag_eta(V_contravariant(i,j-1),a(i,j-1),eta_x(i,j-1),eta_y(i,j-1),dim)
 
         L_eta = dis_imp_eta(i,j,eps_dis_i,1)
         do index = 1, dim
-            lower(index,index,j-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_eta*Identy(index,index)
+            lower(index,index,j-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + L_eta
         end do
 
         L_eta = dis_imp_eta(i,j,eps_dis_i,2)
@@ -148,7 +149,7 @@ do i = 2, imax - 1
 
     end do 
 
-    call blktriad(main,lower,upper,dim,jmax-2,right_side,x2) 
+    call blktriad_pc(main,lower,upper,dim,jmax-2,right_side,x2) 
 
     do j = 2, jmax - 1 
         x2_f(i,j,1:dim) = x2(1:dim,j-1)
@@ -194,5 +195,6 @@ deallocate(x2_f)
 deallocate(x1_f)
 deallocate(n_inverse,Teta)
 deallocate(aux_mult,result)
+deallocate(inv_t_xi)
 
 end subroutine pulliam_chausse_block

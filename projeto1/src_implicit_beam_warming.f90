@@ -18,9 +18,8 @@ real(8),dimension(:,:,:),allocatable           :: deltaQ, deltaQ_til
 !real(8),dimension(:,:,:),allocatable           :: Ax_sys, Ay_sys
 real(8),dimension(:,:),allocatable             :: Bx_sys, By_sys
 real(8),dimension(:,:),allocatable             :: Identy
-real(8),dimension(dim,dim)                     :: inv_t_xi
 real(8)                                        :: L_ksi, L_eta
-real(8)                                        :: u, v, p, a, rho
+real(8)                                        :: u, v
 
 integer index_i, index_j, i_sol, j_sol
 
@@ -161,19 +160,6 @@ call jacobian_ksi(u,v,Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol)
     ! j_sol = j_sol + 1
 
 end do looping_j_sol
-
-        if (iter == 0) then 
-            open(995,file= 'bw_first_system')
-            do j = 2, jmax - 1
-                do i = 2, imax - 1 
-                    write(995,*) 'pos1',i,j,deltaQ_til(1,i,j)
-                    write(995,*) 'pos2',i,j,deltaQ_til(2,i,j)
-                    write(995,*) 'pos3',i,j,deltaQ_til(3,i,j)
-                    write(995,*) 'pos4',i,j,deltaQ_til(4,i,j)
-                end do
-            end do 
-            close(995)    
-        end if
     
     ! step ii)
     
@@ -250,50 +236,6 @@ call jacobian_eta(u,v,Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1)
         end do 
         ! i_sol = i_sol + 1
     end do 
-
-        if (iter == 8) then 
-            open(998,file='bw')
-            do j = 2, jmax - 1
-                do i = 2, imax - 1 
-                    write(998,*) 'pos1',i,j,Q_barra(i,j,1),deltaQ(i,j,1)          
-                    write(998,*) 'pos2',i,j,Q_barra(i,j,2),deltaQ(i,j,2)          
-                    write(998,*) 'pos3',i,j,Q_barra(i,j,3),deltaQ(i,j,3)          
-                    write(998,*) 'pos4',i,j,Q_barra(i,j,4),deltaQ(i,j,4)        
-                end do
-            end do 
-            close(998)    
-        end if
-        
-        if (iter == 0) then 
-            open (996,file='t_matrices') 
-            do j = 2, jmax - 1
-                do i = 2, imax - 1 
-                    u = Q_barra(i,j,2)/Q_barra(i,j,1)
-                    v = Q_barra(i,j,3)/Q_barra(i,j,1)
-                    write(996,*)  'ksi',U_contravariant(i,j),a,ksi_x(i,j),ksi_y(i,j),&
-                                        u,v,Q_barra(i,j,1)/metric_jacobian(i,j)
-                    write(996,*)  'eta',V_contravariant(i,j),a,eta_x(i,j),eta_y(i,j),&
-                                        u,v,Q_barra(i,j,1)/metric_jacobian(i,j)
-                end do
-            end do 
-            close(996) 
-        end if
-        
-        inv_T_xi = 0.0d0
-        do j = 2, jmax - 1
-            do i = 2, imax - 1 
-                rho = Q_barra(i,j,1)/metric_jacobian(i,j)
-                p = (gama-1.0d0) * (Q_barra(i,j,4)/metric_jacobian(i,j) & 
-                      - 0.5d0*( (Q_barra(i,j,2)/metric_jacobian(i,j))**2.0d0 &
-                      + (Q_barra(i,j,3)/metric_jacobian(i,j))**2.0d0)/rho)
-                a  = sqrt(gama*p/rho)
-                inv_t_xi = inv_T_ksi(u,v,Q_barra(i,j,1)/metric_jacobian(i,j),a,ksi_x(i,j),ksi_y(i,j),dim)
-                if (iter == 0) write(*,*) inv_T_xi(1,1),inv_T_xi(1,2),inv_T_xi(1,3),inv_T_xi(1,4)
-                if (iter == 0) write(*,*) inv_T_xi(2,1),inv_T_xi(2,2),inv_T_xi(2,3),inv_T_xi(2,4)
-                if (iter == 0) write(*,*) inv_T_xi(3,1),inv_T_xi(3,2),inv_T_xi(3,3),inv_T_xi(3,4)
-                if (iter == 0) write(*,*) inv_T_xi(4,1),inv_T_xi(4,2),inv_T_xi(4,3),inv_T_xi(4,4)
-            end do
-        end do 
 
 deallocate(Id_x)
 deallocate(Bx_sys)
