@@ -3,7 +3,7 @@ subroutine non_linear_dissipation
     implicit none
     !
     integer(4)                          :: i_nld, j_nld
-    real(8)                             :: max_nu, a
+    real(8)                             :: max_nu, a, u, v, rho
     real(8),dimension(:,:),allocatable  :: p_v
     
     allocate(p_v(imax,jmax))     
@@ -47,6 +47,16 @@ subroutine non_linear_dissipation
     nu_dis_eta = 0.0d0
     nu_dis_ksi = 0.0d0
 
+    do j_nld = 1, jmax 
+        do i_nld = 1, imax 
+            u   = Q_barra(i_nld,j_nld,2)/Q_barra(i_nld,j_nld,1)
+            v   = Q_barra(i_nld,j_nld,3)/Q_barra(i_nld,j_nld,1)
+            rho = Q_barra(i_nld,j_nld,1)/metric_jacobian(i_nld,j_nld)
+            p_v(i_nld,j_nld)   = (gama-1.0d0)*(Q_barra(i_nld,j_nld,4)/metric_jacobian(i_nld,j_nld) &
+                                 - 0.50d0*rho*(u**2.0d0+v**2.0d0))
+        end do 
+    end do
+
     do j_nld = 2, jmax - 1
         do i_nld = 2, imax - 1
             nu_dis_ksi(i_nld,j_nld) = abs(p_v(i_nld+1,j_nld) - 2.0d0*p_v(i_nld,j_nld) + p_v(i_nld-1,j_nld))/(p_v(i_nld+1,j_nld) &
@@ -73,7 +83,7 @@ subroutine non_linear_dissipation
 
     do j_nld = 1, jmax
         do i_nld = 1, imax
-                a  = gama*p_v(i_nld,j_nld)/(Q_barra(i,j,1)/metric_jacobian(i,j))
+                a  = sqrt(gama*p_v(i_nld,j_nld)/(Q_barra(i_nld,j_nld,1)/metric_jacobian(i_nld,j_nld)))
                 sigma_ksi(i_nld,j_nld)      = abs(U_contravariant(i_nld,j_nld)) & 
                                               + a*sqrt(ksi_x(i_nld,j_nld)**2.0d0 + ksi_y(i_nld,j_nld)**2.0d0 )
                 sigma_eta(i_nld,j_nld)      = abs(V_contravariant(i_nld,j_nld)) &
@@ -87,7 +97,7 @@ subroutine non_linear_dissipation
     !       maximum or minimum value for dissipation
     !******
     !
-    eps_dis_i  = dis_factor*(min(minval(eps2_ksi),minval(eps2_eta))+min(minval(eps4_eta),minvaL(eps4_ksi))) 
-    
+    eps_dis_i = dis_factor*(min(minval(eps2_ksi),minval(eps2_eta))+min(minval(eps4_eta),minvaL(eps4_ksi))) 
+
     deallocate(p_v)
 end subroutine non_linear_dissipation
