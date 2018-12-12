@@ -3,7 +3,8 @@ subroutine pulliam_chausse_block_penta
     use diagonalization
     use functions
     implicit none
-    real(8),dimension(:,:,:),allocatable      :: D4_ksi_pc, D4_eta_pc
+    real(8),dimension(:,:),allocatable        :: Diss_ksi_pc, Diss_eta_pc
+    real(8),dimension(5)                      :: aux_diss
     real(8),dimension(:,:,:),allocatable      :: main,upper,lower
     real(8),dimension(:,:,:),allocatable      :: upper1,lower1
     real(8),dimension(:,:,:),allocatable      :: x1_f, x2_f
@@ -20,7 +21,7 @@ subroutine pulliam_chausse_block_penta
 
 allocate(u(imax,jmax),v(imax,jmax),rho(imax,jmax))
 allocate(p(imax,jmax),a(imax,jmax))
-allocate(D4_ksi_pc(imax,jmax,dim),D4_eta_pc(imax,jmax,dim))
+allocate(Diss_ksi_pc(5,dim),Diss_eta_pc(5,dim))
 
 allocate(aux_mult(dim),result(dim))
 allocate(Identy(dim,dim))
@@ -62,26 +63,6 @@ x1 = 0.0d0
 inv_t_xi = 0.0d0
 
 do j = 2, jmax - 1
-    do i = 2, imax - 1
-        call artificial_dissipation(i,j)
-        D4_ksi_pc(i,j,1:dim) = D4_ksi(i,j,1:dim)
-        D4_eta_pc(i,j,1:dim) = D4_eta(i,j,1:dim) 
-        write(*,*) D4_ksi_pc(i,j,1),D4_ksi(i,j,1)
-    end do 
-end do
-
-do j = 3, jmax - 2
-    do i = 3, imax - 2
-        
-        do index = 1, dim 
-            lower1(index,index,i-1) = D4_ksi_pc(i-2,j,index)
-            upper1(index,index,i-1) = D4_ksi_pc(i+2,j,index)
-        end do
-
-    end do 
-end do 
-
-do j = 2, jmax - 1
 
     do i = 2, imax - 1 
 
@@ -93,18 +74,32 @@ do j = 2, jmax - 1
         aux_mult              = matmul(inv_T_xi,residue_pc)
         right_side(1:dim,i-1) = aux_mult(1:dim)
 
+        ! calculate the dissipation terms
+            do index = 1, dim
+                aux_diss = dis_ksi4_imp(i,j,index,eps_dis_e) 
+                Diss_ksi_pc(1:5,index) = aux_diss(1:5)
+            end do 
+
+        do index = 1, dim
+            upper1(index,index,i-1) = Diss_ksi_pc(1,index)
+        end do 
+
+        do index = 1, dim 
+            lower1(index,index,i-1) = Diss_ksi_pc(5,index)
+        end do 
+
         diag_plus  = diag_ksi(U_contravariant(i+1,j),a(i+1,j),ksi_x(i+1,j),ksi_y(i+1,j),dim)
         do index = 1, dim
-            upper(index,index,i-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + D4_ksi_pc(i+1,j,index)
+            upper(index,index,i-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + Diss_ksi_pc(2,index)
         end do
 
         diag_minus = diag_ksi(U_contravariant(i-1,j),a(i-1,j),ksi_x(i-1,j),ksi_y(i-1,j),dim)
         do index = 1, dim
-            lower(index,index,i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + D4_ksi_pc(i-1,j,index)
+            lower(index,index,i-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + Diss_ksi_pc(4,index)
         end do
 
         do index = 1, dim
-            main(index,index,i-1) = 1.0d0 + D4_ksi_pc(i,j,index)
+            main(index,index,i-1) = 1.0d0 + Diss_ksi_pc(3,index)
         end do
 
     end do 
@@ -122,6 +117,7 @@ deallocate(main,upper,lower)
 deallocate(upper1,lower1)
 deallocate(right_side)
 deallocate(residue_pc)
+deallocate(Diss_ksi_pc)
 
 ! start to solve the system at the eta-direction
 
@@ -142,17 +138,6 @@ right_side = 0.0d0
 x2 = 0.0d0
 n_inverse = 0.0d0
 
-do j = 3, jmax - 2
-    do i = 3, imax - 2
-        
-        do index = 1, dim 
-            lower1(index,index,j-1) = D4_eta_pc(i,j-2,index)
-            upper1(index,index,j-1) = D4_eta_pc(i,j+2,index)
-        end do
-
-    end do 
-end do 
-
 do i = 2, imax - 1
 
     do j = 2, jmax - 1
@@ -162,19 +147,32 @@ do i = 2, imax - 1
         result = matmul(n_inverse,aux_mult) 
 
         right_side(1:dim,j-1) = result(1:dim)
+        ! calculate the dissipation terms
+            do index = 1, dim
+                aux_diss = dis_eta4_imp(i,j,index,eps_dis_e) 
+                Diss_eta_pc(1:5,index) = aux_diss(1:5)
+            end do 
+
+        do index = 1, dim
+            upper1(index,index,j-1) = Diss_eta_pc(1,index)
+        end do 
+
+        do index = 1, dim 
+            lower1(index,index,j-1) = Diss_eta_pc(5,index)
+        end do 
 
         diag_plus = diag_eta(V_contravariant(i,j+1),a(i,j+1),eta_x(i,j+1),eta_y(i,j+1),dim)
         do index = 1, dim
-            upper(index,index,j-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + D4_eta_pc(i,j+1,index)
+            upper(index,index,j-1)  =  0.50d0*delta_t(i,j)*diag_plus(index) + Diss_eta_pc(2,index)
         end do
 
         diag_minus = diag_eta(V_contravariant(i,j-1),a(i,j-1),eta_x(i,j-1),eta_y(i,j-1),dim)
         do index = 1, dim
-            lower(index,index,j-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + D4_eta_pc(i,j-1,index)
+            lower(index,index,j-1) = -0.50d0*delta_t(i,j)*diag_minus(index) + Diss_eta_pc(4,index)
         end do
 
         do index = 1, dim
-            main(index,index,j-1) = 1.0d0 + D4_eta_pc(i,j,index)
+            main(index,index,j-1) = 1.0d0 + Diss_eta_pc(3,index)
         end do
 
     end do 
@@ -193,6 +191,7 @@ deallocate(upper1,lower1)
 deallocate(right_side)
 deallocate(x1)
 deallocate(x2)
+deallocate(Diss_eta_pc)
 
 deallocate(Identy)
 
@@ -227,6 +226,5 @@ deallocate(x1_f)
 deallocate(n_inverse,Teta)
 deallocate(aux_mult,result)
 deallocate(inv_t_xi)
-deallocate(D4_ksi_pc,D4_eta_pc)
 
 end subroutine pulliam_chausse_block_penta

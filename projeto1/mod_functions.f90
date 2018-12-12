@@ -152,4 +152,67 @@ module functions
     end function non_lin_dis_eta
     !
     !
+    function dis_ksi4_imp(art_i,art_j,pos,eps) 
+        implicit none
+        integer(4), intent(in) :: art_i, art_j, pos
+        real(8),    intent(in) :: eps
+        real(8),dimension(5)   :: dis_ksi4_imp
+        real(8)                :: mult_factor
+        
+        if (art_i == 2 .or. art_i == imax - 1) then
+        
+                    mult_factor = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)
+
+                    dis_ksi4_imp(1) = 0.0d0
+                    dis_ksi4_imp(2) = mult_factor*(1.0d0/metric_jacobian(art_i+1,art_j))*Q_dis(art_i+1,art_j,pos)
+                    dis_ksi4_imp(3) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j))*(-2.0d0)*Q_dis(art_i,art_j,pos)
+                    dis_ksi4_imp(4) = mult_factor*(1.0d0/metric_jacobian(art_i-1,art_j))*Q_dis(art_i-1,art_j,pos)
+                    dis_ksi4_imp(5) = 0.0d0
+
+        else
+        
+                    mult_factor = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)
+
+                    dis_ksi4_imp(1) = mult_factor*(1.0d0/metric_jacobian(art_i+2,art_j))*Q_dis(art_i+2,art_j,pos)
+                    dis_ksi4_imp(2) = mult_factor*(1.0d0/metric_jacobian(art_i+1,art_j))*(-4.0d0)*Q_dis(art_i+1,art_j,pos)
+                    dis_ksi4_imp(3) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j))*6.0d0*Q_dis(art_i,art_j,pos)
+                    dis_ksi4_imp(4) = mult_factor*(1.0d0/metric_jacobian(art_i-1,art_j))*(-4.0d0)*Q_dis(art_i-1,art_j,pos)
+                    dis_ksi4_imp(5) = mult_factor*(1.0d0/metric_jacobian(art_i-2,art_j))*Q_dis(art_i-2,art_j,pos)
+
+        end if
+
+    end function dis_ksi4_imp
+
+    function dis_eta4_imp(art_i,art_j,pos,eps) 
+        implicit none
+        integer(4), intent(in) :: art_i, art_j, pos
+        real(8),    intent(in) :: eps
+        real(8), dimension(5)  :: dis_eta4_imp
+        real(8)                :: mult_factor
+        
+        if (art_j == 2 .or. art_j == jmax - 1) then
+        
+                    mult_factor = -eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)
+
+                    dis_eta4_imp(1) = 0.0d0
+                    dis_eta4_imp(2) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j+1))*Q_dis(art_i,art_j+1,pos)
+                    dis_eta4_imp(3) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j))*(-2.0d0)*Q_dis(art_i,art_j,pos)
+                    dis_eta4_imp(4) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j-1))*Q_dis(art_i,art_j-1,pos) 
+                    dis_eta4_imp(5) = 0.0d0
+        
+        else
+        
+                    mult_factor = eps*delta_t(art_i,art_j)*metric_jacobian(art_i,art_j)
+
+                    dis_eta4_imp(1) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j+2))*Q_dis(art_i,art_j+2,pos)
+                    dis_eta4_imp(2) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j+1))*(-4.0d0)*Q_dis(art_i,art_j+1,pos)
+                    dis_eta4_imp(3) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j))*6.0d0*Q_dis(art_i,art_j,pos)
+                    dis_eta4_imp(4) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j-1))*(-4.0d0)*Q_dis(art_i,art_j-1,pos)
+                    dis_eta4_imp(5) = mult_factor*(1.0d0/metric_jacobian(art_i,art_j-2))*Q_dis(art_i,art_j-2,pos)
+
+        end if
+        !
+        !
+    end function dis_eta4_imp
+
 end module functions
