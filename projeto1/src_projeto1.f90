@@ -119,6 +119,8 @@ do
     if (time_method == 10) call pulliam_chausse
     if (time_method == 11) call sw_1st_a
     if (time_method == 12) call sw_2nd_a
+    if (time_method == 13) call implicit_beam_warming_penta
+    if (time_method == 14) call pulliam_chausse_block_penta
         call cpu_time(finish_iter)
         print '(i0,"Time per iterration = ",f6.3," seconds.")',iter,finish_iter-start_iter
 
@@ -138,7 +140,7 @@ do
 end do
 
         call cpu_time(finish)
-        print '("Time = ",f6.3," seconds.")',finish-start - t_save
+        print '("Time = ",f10.3," seconds.")',finish-start - t_save
 ! close the archive used to write the residue
 
 close(5)
