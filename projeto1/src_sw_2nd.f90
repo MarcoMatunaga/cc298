@@ -162,7 +162,7 @@ do i = 2, imax - 1
                 lower_sw1(index_i,index_j,j-1) = -2.0d0*delta_t(i,j)*B_pos_sys(index_i,index_j,j-1)
                 main_sw(index_i,index_j,j-1)   = Identy(index_i,index_j,j) &
                                                  + 0.50d0*delta_t(i,j)*(3.0d0*B_pos_sys(index_i,index_j,j) &
-                                                 -3.0d0*B_neg_sys(index_i,index_j,j-2))
+                                                 -3.0d0*B_neg_sys(index_i,index_j,j))
                 upper_sw(index_i,index_j,j-1)  = 2.0d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+1)
                 upper_sw1(index_i,index_j,j-1) = -0.50d0*delta_t(i,j)*B_neg_sys(index_i,index_j,j+2)
             end do
@@ -170,7 +170,7 @@ do i = 2, imax - 1
     end do
 
     call penta_block(lower_sw,lower_sw1,main_sw,upper_sw,upper_sw1,B_sys,dim,jmax-2,aux_deltaQ)
-
+ 
     do j = 2, jmax -1
         deltaQ(i,j,1) = aux_deltaQ(1,j-1)
         deltaQ(i,j,2) = aux_deltaQ(2,j-1)
