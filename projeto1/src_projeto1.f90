@@ -102,6 +102,10 @@ do
         call allocate_vars_sw
         call calculate_fluxes(E_pos,E_neg,F_pos,F_neg)
     end if 
+    if (time_method == 8 .or. time_method == 9 .or. time_method == 15 .or. time_method == 16) then
+        !call allocate_vars_vl
+        call calculate_fluxes_vl(E_pos,E_neg,F_pos,F_neg)
+    end if
     call output_fluxes
     call calculate_CFL
     
@@ -114,13 +118,15 @@ do
     if (time_method == 5) call sw_2nd
     ! if (time_method == 6) call ausm_plus_1st
     ! if (time_method == 7) call ausm_plus_2nd
-    ! if (time_method == 8) call van_leer_1st
-    ! if (time_method == 9) call van_leer_2nd
+    if (time_method == 8) call van_leer_1st
+    if (time_method == 9) call van_leer_2nd
     if (time_method == 10) call pulliam_chausse
     if (time_method == 11) call sw_1st_a
     if (time_method == 12) call sw_2nd_a
     if (time_method == 13) call implicit_beam_warming_penta
     if (time_method == 14) call pulliam_chausse_block_penta
+    if (time_method == 15) call van_leer_1st_a
+    if (time_method == 16) call van_leer_2nd_a 
         call cpu_time(finish_iter)
         print '(i0,"Time per iterration = ",f6.3," seconds.")',iter,finish_iter-start_iter
 
