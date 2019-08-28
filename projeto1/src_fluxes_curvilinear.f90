@@ -17,9 +17,9 @@ do j = 1, jmax
                
         u = Q_barra(i,j,2)/Q_barra(i,j,1)   
         v = Q_barra(i,j,3)/Q_barra(i,j,1)
-        p = (gama - 1.0d0)*( Q_barra(i,j,4)/metric_jacobian(i,j) &
-            - 0.50d0*( (Q_barra(i,j,1)/metric_jacobian(i,j))*(u**2.0d0+v**2.0d0) ))
-
+        p = (gama - 1.0d0)*(Q_barra(i,j,4)/metric_jacobian(i,j) &
+            - 0.50d0*( (Q_barra(i,j,1)/metric_jacobian(i,j))*(u**2.0d0+v**2.0d0)))
+        print *, i, j, p
         if ( j /= 1 .and. j/= jmax .and. i /= 1 .and. i/= imax ) then
             U_contravariant(i,j) = u*ksi_x(i,j) + v*ksi_y(i,j)
             V_contravariant(i,j) = u*eta_x(i,j) + v*eta_y(i,j)

@@ -5,20 +5,25 @@ subroutine boundary_conditions_curv
     use vars
     implicit none
         real(8)                         :: u, v, p, rho, T, a, q_vel, en
+        real(8)                         :: p_inf, rho_inf, a_inf, e_inf
 
 ! 1 lb/ft**2 = 47.880258888889
 ! 1 R = 0.555556K
 
-! inlet boundary
+! freestream variables
+p_inf = p_total
+rho_inf = p_inf/(R*T_total)
+a_inf = sqrt(gama*p_inf/rho_inf) 
 
+! inlet boundary
 i = 1
 do j = 2, jmax - 1
 
-    u  = Q_barra(i+1,j,2)/Q_barra(i+1,j,1)
-    v  = u*dtan(theta)  
+    u  = (Q_barra(i+1,j,2)/Q_barra(i+1,j,1))/a_inf
+    v  = u*dtan(theta)/a_inf  
     T  = T_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u/a_cr)**2.0d0))
-    p  = p_total*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u/a_cr)**2.0d0))**(gama/(gama-1.0d0))
-    rho = (p/(R*T))
+    p  = (p_total/(rho_inf*a_inf**2.0d0))*(1.0d0-((gama-1.0d0)/(gama+1.0d0))*((u/a_cr)**2.0d0))**(gama/(gama-1.0d0))
+    rho = (p/(R*T))/rho_inf
     Q_barra(i,j,1) = metric_jacobian(i,j)*rho
     Q_barra(i,j,2) = metric_jacobian(i,j)*rho*u
     Q_barra(i,j,3) = metric_jacobian(i,j)*rho*v
@@ -50,10 +55,10 @@ do j = 2, jmax - 1
     v   = Q_barra(i-1,j,3)/Q_barra(i-1,j,1)
 
     if ( (q_vel/a) <= 1.0d0) then
-        p   = p_total/3.0d0
+        p   = (p_total/3.0d0)/(rho_inf*a_inf**2.0d0)
     else
         en  = Q_barra(i-1,j,4)/metric_jacobian(i-1,j)
-        p   = (gama - 1.0d0)*(en - 0.50d0*rho*(u**2.0d0+v**2.0d0)) 
+        p   = (gama - 1.0d0)*(en - 0.50d0*rho*(u**2.0d0+v**2.0d0))*(rho_inf*a_inf**2.0d0)
     endif
 
     Q_barra(i,j,1) = metric_jacobian(i,j)*rho
