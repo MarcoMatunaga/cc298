@@ -1,0 +1,5 @@
+FC = gfortran
+LD = gfortran
+FFLAGS = -O0 -g -fbacktrace -fcheck=all -fcheck=bounds -Wall
+LDFLAGS = -lblas -llapack
+

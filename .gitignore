@@ -1,3 +1,4 @@
+*.out
 *.o
 fort.6
 *.dat
@@ -18,4 +19,6 @@ jacobiana_bw
 t_matrices
 t_matrices_sw
 sw
+n
+inv
 n inv
