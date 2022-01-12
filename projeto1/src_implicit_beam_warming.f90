@@ -5,6 +5,7 @@ subroutine implicit_beam_warming
     use vars
     use functions
     use diagonalization
+    use functionsDerivatives
     implicit none
 
 real(8),dimension(:,:),allocatable             :: A_barra, B_barra, M_barra
@@ -32,6 +33,10 @@ allocate(Id_x(dim,dim,imax),Id_y(dim,dim,jmax))
 allocate(main_x(dim,dim,imax),main_y(dim,dim,jmax))
 allocate(Bx_sys(dim,imax),By_sys(dim,jmax))
 allocate(Identy(dim,dim))
+
+! debug files
+open(10, file='debug_fdJAC') 
+open(11, file='JAC_correct') 
 
 ! create the two identies matrix
 
@@ -99,7 +104,8 @@ looping_j_sol: do j_sol = 2, jmax - 1
             u = Q_barra(i+1,j_sol,2)/Q_barra(i+1,j_sol,1)
             v = Q_barra(i+1,j_sol,3)/Q_barra(i+1,j_sol,1)
 call jacobian_ksi(u,v,Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),dim,A_barra)
-            
+call FDFluxJacobian(Q_barra(i+1,j_sol,1),Q_barra(i+1,j_sol,2),Q_barra(i+1,j_sol,3), &
+                    Q_barra(i+1,j_sol,4),ksi_x(i+1,j_sol),ksi_y(i+1,j_sol),10.0d0**-5,A_barra)
             do index_i = 1, dim
                 do index_j = 1, dim
                     A_plus(index_i,index_j,i-1) = 0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
@@ -110,7 +116,8 @@ call jacobian_ksi(u,v,Q_barra(i+1,j_sol,4),Q_barra(i+1,j_sol,1),ksi_x(i+1,j_sol)
             u = Q_barra(i-1,j_sol,2)/Q_barra(i-1,j_sol,1)
             v = Q_barra(i-1,j_sol,3)/Q_barra(i-1,j_sol,1)
 call jacobian_ksi(u,v,Q_barra(i-1,j_sol,4),Q_barra(i-1,j_sol,1),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),dim,A_barra)
-            
+call FDFluxJacobian(Q_barra(i-1,j_sol,1),Q_barra(i-1,j_sol,2),Q_barra(i-1,j_sol,3), &
+                    Q_barra(i-1,j_sol,4),ksi_x(i-1,j_sol),ksi_y(i-1,j_sol),10.0d0**-5,A_barra)            
             do index_i = 1, dim
                 do index_j = 1, dim
                     A_minus(index_i,index_j,i-1) = -0.5d0*delta_t(i,j_sol)*A_barra(index_i,index_j) + L_ksi*Identy(index_i,index_j)
@@ -171,7 +178,8 @@ end do looping_j_sol
             u = Q_barra(i_sol,j+1,2)/Q_barra(i_sol,j+1,1)
             v = Q_barra(i_sol,j+1,3)/Q_barra(i_sol,j+1,1)
 call jacobian_eta(u,v,Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1),eta_y(i_sol,j+1),dim,B_barra)
-            
+call FDFluxJacobian(Q_barra(i_sol,j+1,1),Q_barra(i_sol,j+1,2),Q_barra(i_sol,j+1,3), &
+                    Q_barra(i_sol,j+1,4),eta_x(i_sol,j+1),eta_y(i_sol,j+1),10.0d0**-5,A_barra)            
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,3)
 
             do index_i = 1, dim
@@ -183,7 +191,8 @@ call jacobian_eta(u,v,Q_barra(i_sol,j+1,4),Q_barra(i_sol,j+1,1),eta_x(i_sol,j+1)
             u = Q_barra(i_sol,j-1,2)/Q_barra(i_sol,j-1,1)
             v = Q_barra(i_sol,j-1,3)/Q_barra(i_sol,j-1,1)
 call jacobian_eta(u,v,Q_barra(i_sol,j-1,4),Q_barra(i_sol,j-1,1),eta_x(i_sol,j-1),eta_y(i_sol,j-1),dim,B_barra)
-            
+call FDFluxJacobian(Q_barra(i_sol,j-1,1),Q_barra(i_sol,j-1,2),Q_barra(i_sol,j-1,3), &
+                    Q_barra(i_sol,j-1,4),eta_x(i_sol,j-1),eta_y(i_sol,j-1),10.0d0**-5,A_barra)            
             L_eta = dis_imp_eta(i_sol,j,eps_dis_i,1)
             
             do index_i = 1, dim
